@@ -1,0 +1,21 @@
+{
+    "addr": ":8080",
+    "cost": "14",
+    "db" : {
+        "name": "",
+        "password": "",
+        "user": ""
+    },
+    "files": {
+        "static": "./public/",
+        "tpl": "./views/"
+    },
+    "from": "",
+    "secret": "",
+    "smtp": {
+        "host": "",
+        "user": "",
+        "password": "",
+        "port": "587"
+    }
+}

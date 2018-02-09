@@ -1,0 +1,84 @@
+{{define "title"}}{{if .Tour.ID}}{{.Tour.Name}}{{else}}New Tour{{end}}{{end}}
+
+{{define "content"}}
+    {{with .Form}}
+    <form action="/admin/tour{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+        {{if .ID}}
+        <input type="hidden" name="id" value="{{.ID}}">
+        {{end}}
+        <div class="row">
+            <div class="col-6 form-group">
+                <label for="status">Status</label>
+                <select class="form-control" name="status">
+                    <option value="draft"{{if eq .Status "draft"}} selected{{end}}>Draft</option>
+                    <option value="published"{{if eq .Status "published"}} selected{{end}}>Published</option>
+                    <option value="cancelled"{{if eq .Status "cancelled"}} selected{{end}}>Cancelled</option>
+                    <option value="complete"{{if eq .Status "complete"}} selected{{end}}>Complete</option>
+                </select>
+            </div>
+            {{if .ID}}
+            <div class="col-6 form-group">
+                <label for="slug">Slug</label>
+                <input type="text" class="form-control{{with .Errors.Slug}} is-invalid{{end}}" name="slug" value="{{.Slug}}">
+                {{with .Errors.Slug}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control{{with .Errors.Name}} is-invalid{{end}}" name="name" value="{{.Name}}">
+            {{with .Errors.Name}}
+            <div class="invalid-feedback">{{.}}</div>
+            {{end}}
+        </div>
+        <div class="row">
+            <div class="col-6 form-group">
+                <label for="start">Start</label>
+                <input type="text" class="datetime_field form-control{{with .Errors.Start}} is-invalid{{end}}" aria-describedby="startHelp" name="start" value="{{.Start}}">
+                <small id="startHelp" class="form-text text-muted">YYYY-MM-DD h:mm</small>
+                {{with .Errors.Start}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+            <div class="col-6 form-group">
+                <label for="end">End</label>
+                <input type="text" class="datetime_field form-control{{with .Errors.End}} is-invalid{{end}}" aria-describedby="endHelp" name="end" value="{{.End}}">
+                <small id="endHelp" class="form-text text-muted">YYYY-MM-DD h:mm</small>                
+                {{with .Errors.End}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="description form-control" name="description" rows="8">{{.Description}}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="external_ticketing_url">Ticketing URL</label>
+            <input type="text" class="form-control{{with .Errors.TicketingURL}} is-invalid{{end}}" name="ticketing_url" value="{{.TicketingURL}}">
+            {{with .Errors.TicketingURL}}
+            <div class="invalid-feedback">{{.}}</div>
+            {{end}}
+        </div>
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea class="form-control" name="notes" rows="3">{{.Notes}}</textarea>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="col-6">
+                {{if .ID}}
+                <div class="float-right">
+                    <a href="/admin/tour?id={{.ID}}&remove"><i class="fas fa-trash-alt"></i></a>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </form>
+    {{end}}
+{{end}}
