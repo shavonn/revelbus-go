@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"revelforce-admin/handlers/middleware"
+	"revelforce/cmd/web/handlers/middleware"
 
 	"github.com/spf13/viper"
 

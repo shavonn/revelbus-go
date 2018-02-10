@@ -67,6 +67,20 @@
             <label for="notes">Notes</label>
             <textarea class="form-control" name="notes" rows="3">{{.Notes}}</textarea>
         </div>
+        
+        <div class="form-group">
+            <label for="brand">Brand</label>
+            {{if not .Brand}}
+            <input type="hidden" name="brand" value="{{.Brand}}" />
+            <input type="file" class="form-control-file" name="brand_image">
+            {{else}}
+            <img src="/assets/uploads/vendor/{{.Brand}}" />
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="deleteimg">
+                <label class="form-check-label" for="defaultCheck1">Delete</label>
+            </div>
+            {{end}}
+        </div>
         <div class="row">
             <div class="col-6">
                 <button type="submit" class="btn btn-primary">Submit</button>

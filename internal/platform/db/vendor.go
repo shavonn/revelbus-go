@@ -14,8 +14,8 @@ type Vendor struct {
 	Phone   string
 	Email   string
 	URL     string
-	Logo    string
 	Notes   string
+	Brand   string
 }
 
 type Vendors []*Vendor
@@ -23,8 +23,8 @@ type Vendors []*Vendor
 func (v *Vendor) Create() (int, error) {
 	conn, _ := GetConnection()
 
-	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes)
+	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand)
 	if err != nil {
 		return 0, err
 	}
@@ -40,8 +40,8 @@ func (v *Vendor) Create() (int, error) {
 func (v *Vendor) Update() error {
 	conn, _ := GetConnection()
 
-	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.ID)
+	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.ID)
 	return err
 }
 
@@ -56,11 +56,11 @@ func (t *Vendor) Delete() error {
 func GetVendorByID(id string) (*Vendor, error) {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes FROM vendors WHERE id = ?`
+	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand FROM vendors WHERE id = ?`
 	row := conn.QueryRow(stmt, id)
 
 	v := &Vendor{}
-	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes)
+	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

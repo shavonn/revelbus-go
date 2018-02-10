@@ -15,6 +15,7 @@ type Trip struct {
 	End          time.Time
 	TicketingURL string
 	Notes        string
+	Image        string
 }
 
 type Trips []*Trip
@@ -24,8 +25,8 @@ func (t *Trip) Create() (int, error) {
 
 	slug := getSlug(t.Title, "trips")
 
-	stmt := `INSERT INTO trips (title, slug, status, description, start, end, ticketing_url, notes, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Description, t.Start, t.End, t.TicketingURL, t.Notes)
+	stmt := `INSERT INTO trips (title, slug, status, description, start, end, ticketing_url, notes, image, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.Image)
 	if err != nil {
 		return 0, err
 	}
@@ -45,8 +46,8 @@ func (t *Trip) Update() error {
 		t.Slug = getSlug(t.Title, "trips")
 	}
 
-	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, description = ?, start = ?, end = ?, ticketing_url = ?, notes = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.ID)
+	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, description = ?, start = ?, end = ?, ticketing_url = ?, notes = ?, image = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.Image, t.ID)
 	return err
 }
 
@@ -61,11 +62,11 @@ func (t *Trip) Delete() error {
 func GetTripByID(id string) (*Trip, error) {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, title, slug, status, description, start, end, ticketing_url, notes FROM trips WHERE id = ?`
+	stmt := `SELECT id, title, slug, status, description, start, end, ticketing_url, notes, image FROM trips WHERE id = ?`
 	row := conn.QueryRow(stmt, id)
 
 	t := &Trip{}
-	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Notes)
+	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Notes, &t.Image)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

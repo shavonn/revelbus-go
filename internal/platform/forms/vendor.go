@@ -11,6 +11,7 @@ type VendorForm struct {
 	Email   string
 	URL     string
 	Notes   string
+	Brand   string
 	Errors  map[string]string
 }
 

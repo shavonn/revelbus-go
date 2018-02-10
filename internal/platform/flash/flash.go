@@ -2,7 +2,7 @@ package flash
 
 import (
 	"net/http"
-	"revelforce-admin/internal/platform/session"
+	"revelforce/internal/platform/session"
 )
 
 type Msg struct {

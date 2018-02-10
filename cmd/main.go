@@ -3,17 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
-	"revelforce-admin/cmd/config"
-	"revelforce-admin/handlers"
-	"revelforce-admin/internal/platform/db"
-	"revelforce-admin/internal/platform/session"
+	"revelforce/cmd/web"
+	"revelforce/cmd/web/handlers"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/session"
 	"time"
 
 	"github.com/spf13/viper"
 )
 
 func main() {
-	err := config.LoadConfig()
+	err := web.LoadConfig()
 	if err != nil {
 		log.Fatalf("Load Config : %v", err)
 	}

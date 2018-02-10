@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"revelforce-admin/internal/platform/db"
-	"revelforce-admin/internal/platform/flash"
-	"revelforce-admin/internal/platform/forms"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/flash"
+	"revelforce/internal/platform/forms"
 	"strconv"
 )
 
@@ -35,6 +35,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		End:          t.End.Format(db.TimeFormat),
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
+		Image:        t.Image,
 	}
 
 	render(w, r, "trip.html", &view{
@@ -62,6 +63,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		End:          r.PostForm.Get("end"),
 		TicketingURL: r.PostForm.Get("ticketing_url"),
 		Notes:        r.PostForm.Get("notes"),
+		Image:        r.PostForm.Get("image"),
 	}
 
 	if !f.Valid() {
@@ -76,6 +78,23 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		render(w, r, "trip.html", v)
 	}
 
+	fn, err := uploadFile(w, r, "trip_image", "uploads/trip/")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	if fn != "" {
+		f.Image = fn
+	} else if (len(f.Image) != 0) && (len(r.Form["deleteimg"]) == 1) {
+		err = deleteFile("uploads/trip/" + f.Image)
+		if err != nil {
+			serverError(w, r, err)
+			return
+		}
+		f.Image = ""
+	}
+
 	var msg string
 
 	trip := db.Trip{
@@ -87,6 +106,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		End:          db.ToTime(f.End),
 		TicketingURL: f.TicketingURL,
 		Notes:        f.Notes,
+		Image:        f.Image,
 	}
 
 	if id != "" {

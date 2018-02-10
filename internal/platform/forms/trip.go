@@ -10,6 +10,7 @@ type TripForm struct {
 	End          string
 	TicketingURL string
 	Notes        string
+	Image        string
 	Errors       map[string]string
 }
 

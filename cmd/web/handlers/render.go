@@ -4,9 +4,9 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
-	"revelforce-admin/internal/platform/db"
-	"revelforce-admin/internal/platform/flash"
-	"revelforce-admin/internal/platform/forms"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/flash"
+	"revelforce/internal/platform/forms"
 	"time"
 
 	"github.com/justinas/nosurf"

@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"revelforce-admin/internal/platform/db"
-	"revelforce-admin/internal/platform/flash"
-	"revelforce-admin/internal/platform/forms"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/flash"
+	"revelforce/internal/platform/forms"
 	"strconv"
 )
 
@@ -36,6 +36,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		Email:   v.Email,
 		URL:     v.URL,
 		Notes:   v.Notes,
+		Brand:   v.Brand,
 	}
 
 	render(w, r, "vendor.html", &view{
@@ -64,6 +65,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		Email:   r.PostForm.Get("email"),
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
+		Brand:   r.PostForm.Get("brand"),
 	}
 
 	if !f.Valid() {
@@ -78,6 +80,23 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		render(w, r, "vendor.html", v)
 	}
 
+	fn, err := uploadFile(w, r, "brand_image", "uploads/vendor/")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	if fn != "" {
+		f.Brand = fn
+	} else if (len(f.Brand) != 0) && (len(r.Form["deleteimg"]) == 1) {
+		err = deleteFile("uploads/vendor/" + f.Brand)
+		if err != nil {
+			serverError(w, r, err)
+			return
+		}
+		f.Brand = ""
+	}
+
 	var msg string
 
 	vendor := db.Vendor{
@@ -90,6 +109,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		Email:   f.Email,
 		URL:     f.URL,
 		Notes:   f.Notes,
+		Brand:   f.Brand,
 	}
 
 	if id != "" {
