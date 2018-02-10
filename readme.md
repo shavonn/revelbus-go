@@ -1,4 +1,4 @@
-# revelforce
+# revelforce-admin
 
 ## Config
 `config.[env-name].env.json`

@@ -18,12 +18,16 @@ func humanDate(t time.Time) string {
 }
 
 type view struct {
-	Err   appError
-	Flash flash.Msg
-	Form  forms.Form
-	Path  string
-	Token string
-	Tour  db.Tour
+	Err     appError
+	Flash   flash.Msg
+	Form    forms.Form
+	Path    string
+	Title   string
+	Token   string
+	Trip    db.Trip
+	Trips   db.Trips
+	Vendor  db.Vendor
+	Vendors db.Vendors
 }
 
 type appError struct {

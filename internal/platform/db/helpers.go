@@ -2,18 +2,23 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"strconv"
 	"time"
 
 	"github.com/gosimple/slug"
 )
 
-const (
-	timeFormat = "2006-01-02 15:04"
+var (
+	ErrNotFound = errors.New("Not found")
 )
 
-func toTime(t string) time.Time {
-	dt, err := time.Parse(timeFormat, t)
+const (
+	TimeFormat = "2006-01-02 15:04"
+)
+
+func ToTime(t string) time.Time {
+	dt, err := time.Parse(TimeFormat, t)
 	if err != nil {
 		dt = time.Now()
 	}

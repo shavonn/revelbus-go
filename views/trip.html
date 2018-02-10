@@ -1,8 +1,7 @@
-{{define "title"}}{{if .Tour.ID}}{{.Tour.Name}}{{else}}New Tour{{end}}{{end}}
-
 {{define "content"}}
     {{with .Form}}
-    <form action="/admin/tour{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
+    {{if .ID}}<p><strong>Trip ID:</strong> {{.ID}}</p>{{end}}
+    <form action="/admin/trip{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
         {{if .ID}}
         <input type="hidden" name="id" value="{{.ID}}">
@@ -28,9 +27,9 @@
             {{end}}
         </div>
         <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control{{with .Errors.Name}} is-invalid{{end}}" name="name" value="{{.Name}}">
-            {{with .Errors.Name}}
+            <label for="title">Title</label>
+            <input type="text" class="form-control{{with .Errors.Title}} is-invalid{{end}}" name="title" value="{{.Title}}">
+            {{with .Errors.Title}}
             <div class="invalid-feedback">{{.}}</div>
             {{end}}
         </div>
@@ -74,7 +73,7 @@
             <div class="col-6">
                 {{if .ID}}
                 <div class="float-right">
-                    <a href="/admin/tour?id={{.ID}}&remove"><i class="fas fa-trash-alt"></i></a>
+                    <a href="/admin/trip?id={{.ID}}&remove"><i class="fas fa-trash-alt"></i></a>
                 </div>
                 {{end}}
             </div>

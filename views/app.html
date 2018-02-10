@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    {{block "css" .}} {{end}}
+    {{block "css" .}}{{end}}
 
-    <title>{{template "title" .}} | Revel Force</title>
+    <title>{{if .Title}}{{.Title}} | {{end}}Revel Force</title>
   </head>
   <body>
         <div class="container">
@@ -25,13 +25,26 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/admin/tour">New Tour</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarTrips" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Trips</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarTrips">
+                                <a class="nav-link" href="/admin/trips">Trips</a>
+                                <a class="nav-link" href="/admin/trip">New Trip</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarVendors" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Vendors</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarVendors">
+                                <a class="nav-link" href="/admin/vendors">Vendors</a>
+                                <a class="nav-link" href="/admin/vendor">New Vendor</a>
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </nav>
             <main role="main" class="row">
                 <div class="col-12">
-                    <h2>{{template "title" .}}</h2>
+                    {{if .Title}}<h2>{{.Title}}</h2>{{end}}
                     {{if .Flash.Message}}
                         <div class="alert alert-{{.Flash.AlertType}}" role="alert">{{.Flash.Message}}</div>
                     {{end}}

@@ -9,10 +9,6 @@ import (
 var rxEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 var rxSlug = regexp.MustCompile("^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
-type Form interface {
-	Valid() bool
-}
-
 type validator struct {
 	Errors map[string]string
 }
