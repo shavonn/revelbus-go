@@ -20,21 +20,23 @@ type Vendor struct {
 
 type Vendors []*Vendor
 
-func (v *Vendor) Create() (int, error) {
+func (v *Vendor) Create() error {
 	conn, _ := GetConnection()
 
 	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return int(id), nil
+	v.ID = int(id)
+
+	return nil
 }
 
 func (v *Vendor) Update() error {
@@ -45,29 +47,26 @@ func (v *Vendor) Update() error {
 	return err
 }
 
-func (t *Vendor) Delete() error {
+func (v *Vendor) Delete() error {
 	conn, _ := GetConnection()
 
 	stmt := `DELETE FROM vendors WHERE id = ?`
-	_, err := conn.Exec(stmt, t.ID)
+	_, err := conn.Exec(stmt, v.ID)
 	return err
 }
 
-func GetVendorByID(id string) (*Vendor, error) {
+func (v *Vendor) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand FROM vendors WHERE id = ?`
-	row := conn.QueryRow(stmt, id)
+	row := conn.QueryRow(stmt, v.ID)
 
-	v := &Vendor{}
 	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand)
 	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
+		return ErrNotFound
 	}
 
-	return v, nil
+	return err
 }
 
 func GetVendors() (Vendors, error) {

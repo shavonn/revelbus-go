@@ -1,22 +1,22 @@
 {{define "content"}}
-{{if .Vendors}}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Vendors}}
-        <tr>
-            <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
-            <td class="text-right"><a href="/admin/vendor?id={{.ID}}&remove">x</i></a></td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
-{{else}}
-<div class="alert alert-primary" role="alert">No vendors to be found. Whatever shall we do?</div>
-{{end}}
+    {{if .Vendors}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Vendors}}
+            <tr>
+                <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                <td class="text-right"><a href="/admin/vendor?id={{.ID}}&remove">x</i></a></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="alert alert-primary" role="alert">No vendors to be found. Whatever shall we do?</div>
+    {{end}}
 {{end}}

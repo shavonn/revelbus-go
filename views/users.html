@@ -1,0 +1,24 @@
+{{define "content"}}
+    {{if .Users}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Users}}
+            <tr>
+                <td><a href="/admin/user?id={{.ID}}">{{.Name}}</a></td>
+                <td>{{.Role}}</td>
+                <td class="text-right"><a href="/admin/user?id={{.ID}}&remove">x</a></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="alert alert-primary" role="alert">No users to be found. Whatever shall we do?</div>
+    {{end}}
+{{end}}

@@ -20,7 +20,7 @@ type Trip struct {
 
 type Trips []*Trip
 
-func (t *Trip) Create() (int, error) {
+func (t *Trip) Create() error {
 	conn, _ := GetConnection()
 
 	slug := getSlug(t.Title, "trips")
@@ -28,15 +28,17 @@ func (t *Trip) Create() (int, error) {
 	stmt := `INSERT INTO trips (title, slug, status, description, start, end, ticketing_url, notes, image, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.Image)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return int(id), nil
+	t.ID = int(id)
+
+	return nil
 }
 
 func (t *Trip) Update() error {
@@ -59,24 +61,21 @@ func (t *Trip) Delete() error {
 	return err
 }
 
-func GetTripByID(id string) (*Trip, error) {
+func (t *Trip) Get() error {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, title, slug, status, description, start, end, ticketing_url, notes, image FROM trips WHERE id = ?`
-	row := conn.QueryRow(stmt, id)
+	stmt := `SELECT title, slug, status, description, start, end, ticketing_url, notes, image FROM trips WHERE id = ?`
+	row := conn.QueryRow(stmt, t.ID)
 
-	t := &Trip{}
-	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Notes, &t.Image)
+	err := row.Scan(&t.Title, &t.Slug, &t.Status, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Notes, &t.Image)
 	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
+		return ErrNotFound
 	}
 
-	return t, nil
+	return err
 }
 
-func GetTrips() (Trips, error) {
+func GetTrips() (*Trips, error) {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT id, title, status, start, end FROM trips ORDER BY end, start`
@@ -88,17 +87,17 @@ func GetTrips() (Trips, error) {
 
 	trips := Trips{}
 	for rows.Next() {
-		e := &Trip{}
-		err := rows.Scan(&e.ID, &e.Title, &e.Status, &e.Start, &e.End)
+		t := &Trip{}
+		err := rows.Scan(&t.ID, &t.Title, &t.Status, &t.Start, &t.End)
 		if err != nil {
 			return nil, err
 		}
-		trips = append(trips, e)
+		trips = append(trips, t)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return trips, nil
+	return &trips, nil
 }

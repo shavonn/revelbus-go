@@ -1,15 +1,29 @@
 package email
 
-func TestEmail(e string) error {
-	reset := email{
+func NewPassword(e string, pw string) error {
+	m := email{
 		To: []string{
 			e,
 		},
-		Subject: "This is a test!",
-		Text:    "This email is a test email.",
-		HTML:    "<p>This email is a test email.</p>",
+		Subject: "Your New Password",
+		Text:    "Your new password is: " + pw,
+		HTML:    "<p>Your new password is: " + pw + "</p>",
 	}
 
-	err := send(reset)
+	err := send(m)
+	return err
+}
+
+func RecoverAccount(e string, h string) error {
+	m := email{
+		To: []string{
+			e,
+		},
+		Subject: "Password Recovery",
+		Text:    "Click to reset password: /auth/recover/?email=" + e + "&hash=" + h,
+		HTML:    "<p>Click to reset password: /auth/recover/?email=" + e + "&hash=" + h + "</p>",
+	}
+
+	err := send(m)
 	return err
 }
