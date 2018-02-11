@@ -4,6 +4,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Active</th>
                 <th></th>
             </tr>
         </thead>
@@ -11,6 +12,7 @@
             {{range .Vendors}}
             <tr>
                 <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                <td>{{.Active}}</td>
                 <td class="text-right"><a href="/admin/vendor?id={{.ID}}&remove">x</i></a></td>
             </tr>
             {{end}}

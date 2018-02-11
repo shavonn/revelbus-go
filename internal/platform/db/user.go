@@ -171,11 +171,8 @@ func (u *User) CheckRecover(h string) error {
 	row := conn.QueryRow(stmt, u.Email, h)
 
 	err := row.Scan(&u.Email)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return ErrNotFound
-		}
-		return err
+	if err != nil && err == sql.ErrNoRows {
+		return ErrNotFound
 	}
 
 	return err
@@ -183,7 +180,6 @@ func (u *User) CheckRecover(h string) error {
 
 func (u *User) Recover(h string, pw string) error {
 	err := u.Get()
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ErrNotFound

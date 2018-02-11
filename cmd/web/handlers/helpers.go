@@ -18,9 +18,9 @@ var (
 	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-func toInt(id string) int {
-	i, _ := strconv.Atoi(id)
-	return i
+func toInt(s string) int {
+	n, _ := strconv.Atoi(s)
+	return n
 }
 
 func randomString(strlen int) string {

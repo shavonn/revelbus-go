@@ -12,6 +12,7 @@ type VendorForm struct {
 	URL     string
 	Notes   string
 	Brand   string
+	Active  bool
 	Errors  map[string]string
 }
 

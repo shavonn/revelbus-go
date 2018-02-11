@@ -41,6 +41,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		URL:     v.URL,
 		Notes:   v.Notes,
 		Brand:   v.Brand,
+		Active:  v.Active,
 	}
 
 	render(w, r, "vendor.html", &view{
@@ -70,6 +71,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
 		Brand:   r.PostForm.Get("brand"),
+		Active:  (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
 	}
 
 	if !f.Valid() {
@@ -114,6 +116,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     f.URL,
 		Notes:   f.Notes,
 		Brand:   f.Brand,
+		Active:  f.Active,
 	}
 
 	if id != "" {
