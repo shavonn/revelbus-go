@@ -1,6 +1,31 @@
 {{define "content"}}
+{{if .Trip.ID}}
+<div class="row">
+    <div class="col-md-6">
+        <p><strong>Trip ID:</strong> {{.Trip.ID}}</p>
+    </div>
+    <div class="col-md-6 text-right">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#vendorModal">
+            + Vendor
+        </button>
+    </div>
+</div>
+<ul class="nav nav-tabs" id="eventTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="venues-tab" data-toggle="tab" href="#venues" role="tab" aria-controls="venues" aria-selected="true">Venues</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="partners-tab" data-toggle="tab" href="#partners" role="tab" aria-controls="partners" aria-selected="true">Partners</a>
+    </li>
+</ul>
+<div class="tab-content" id="eventTabContent">
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+{{end}}
+
     {{with .Form}}
-    {{if .ID}}<p><strong>Trip ID:</strong> {{.ID}}</p>{{end}}
     <form action="/admin/trip{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
         {{if .ID}}
@@ -93,4 +118,87 @@
         </div>
     </form>
     {{end}}
+
+{{if .Trip.ID}}
+    </div>
+    <div class="tab-pane fade" id="venues" role="tabpanel" aria-labelledby="venues-tab">
+        <h2>Venues</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Trip.Venues}}
+                <tr>
+                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                    <td>{{if .Primary}}<a href="/admin/trip?id={{$.Trip.ID}}&venue={{.ID}}&primary=0">primary</a>{{else}}<a href="/admin/trip?id={{$.Trip.ID}}&venue={{.ID}}&primary=1">make primary</a>{{end}}</td>
+                    <td class="text-right"><a href="/admin/trip?id={{$.Trip.ID}}&venue={{.ID}}">x</a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    <div class="tab-pane fade" id="partners" role="tabpanel" aria-labelledby="partners-tab">
+        <h2>Partners</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Trip.Partners}}
+                <tr>
+                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                    <td class="text-right"><a href="/admin/trip?id={{$.Trip.ID}}&partner={{.ID}}">x</i></a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="vendorModal" tabindex="-1" role="dialog" aria-labelledby="vendorModalLabel" aria-hidden="true">
+    <form action="/admin/trip?id={{.Trip.ID}}&vendor" method="post" novalidate>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vendorModalLabel">Add Vendor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="csrf_token" value="{{$.Token}}">
+                <div class="form-group">
+                    <label for="vendors">Vendors</label>
+                    <select class="form-control" name="vendor">
+                        {{range $.Vendors}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select class="form-control" name="role">
+                        <option value="partner">Partner</option>
+                        <option value="venue">Venue</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+
+{{end}}
+
 {{end}}

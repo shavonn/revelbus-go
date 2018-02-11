@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	ErrDuplicate          = errors.New("Duplicate entry")
 	ErrDuplicateEmail     = errors.New("Email address already in use")
 	ErrInvalidCredentials = errors.New("Invalid user credentials")
 	ErrNotFound           = errors.New("Not found")

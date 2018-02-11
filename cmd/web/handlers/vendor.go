@@ -150,7 +150,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 }
 
 func listVendors(w http.ResponseWriter, r *http.Request) {
-	vendors, err := db.GetVendors()
+	vendors, err := db.GetVendors(false)
 	if err != nil {
 		serverError(w, r, err)
 		return

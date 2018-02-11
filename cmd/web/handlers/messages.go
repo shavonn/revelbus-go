@@ -9,8 +9,9 @@ const (
 	MsgPasswordResetSuccessful = "Reset successful. You may now login with your new password."
 	MsgRecoverySent            = "If an account exists with that email, a password recovery email will be sent."
 	MsgSuccessfulSignup        = "Your account has been successfully created!"
-	MsgSuccessfullyCreated     = "Successfully created!"
-	MsgSuccessfullyRemoved     = "Successfully deleted!"
-	MsgSuccessfullyUpdated     = "Successfully updated!"
+	MsgSuccessfullyAddedVendor = "Vendor successfully added to your trip."
+	MsgSuccessfullyCreated     = "Successfully created."
+	MsgSuccessfullyRemoved     = "Successfully deleted."
+	MsgSuccessfullyUpdated     = "Successfully updated."
 	MsgUnsuccessfulLogin       = "Invalid login credentials."
 )

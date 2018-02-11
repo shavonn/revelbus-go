@@ -16,6 +16,7 @@ type Vendor struct {
 	URL     string
 	Notes   string
 	Active  bool
+	Primary bool
 	Brand   string
 }
 
@@ -70,10 +71,17 @@ func (v *Vendor) Get() error {
 	return err
 }
 
-func GetVendors() (Vendors, error) {
+func GetVendors(oa bool) (Vendors, error) {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, name, active FROM vendors ORDER BY active DESC, name`
+	var stmt string
+
+	if oa {
+		stmt = `SELECT id, name, active FROM vendors WHERE active = 1 ORDER BY active DESC, name`
+	} else {
+		stmt = `SELECT id, name, active FROM vendors ORDER BY active DESC, name`
+	}
+
 	rows, err := conn.Query(stmt)
 	if err != nil {
 		return nil, err
