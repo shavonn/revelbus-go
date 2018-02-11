@@ -1,0 +1,25 @@
+{{define "content"}}
+    {{with .Form}}
+    <form action="/auth/reset" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+        <input type="hidden" name="email" value="{{.Email}}">
+        <input type="hidden" name="recovery_hash" value="{{.RecoveryHash}}">
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control{{with .Errors.Password}} is-invalid{{end}}" name="password">
+            {{with .Errors.Password}}
+            <div class="invalid-feedback">{{.}}</div>
+            {{end}}
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" class="form-control{{with .Errors.Password}} is-invalid{{end}}" name="confirm_password">
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </form>
+    {{end}}
+{{end}}

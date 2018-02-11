@@ -25,6 +25,10 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        {{if not .Me}}
+                        <li class="nav-item"><a class="nav-link" href="/auth/signup">Signup</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
+                        {{else}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarTrips" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Trips</a>
                             <div class="dropdown-menu" aria-labelledby="navbarTrips">
@@ -39,6 +43,24 @@
                                 <a class="nav-link" href="/admin/vendor">New Vendor</a>
                             </div>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarUsers" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Users</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarUsers">
+                                <a class="nav-link" href="/admin/users">Users</a>
+                                <a class="nav-link" href="/admin/user">New User</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{.Me.Name}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
+                                <a class="dropdown-item" href="/u/profile">Update Profile</a>
+                                <a class="dropdown-item" href="/u/password">Update Password</a>
+                                <a class="dropdown-item" href="/u/logout">Logout</a>
+                            </div>
+                        </li>
+                        {{end}}
                     </ul>
                 </div>
             </nav>

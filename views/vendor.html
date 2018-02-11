@@ -5,12 +5,18 @@
         {{if .ID}}
         <input type="hidden" name="id" value="{{.ID}}">
         {{end}}
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control{{with .Errors.Name}} is-invalid{{end}}" name="name" value="{{.Name}}">
-            {{with .Errors.Name}}
-            <div class="invalid-feedback">{{.}}</div>
-            {{end}}
+        <div class="row">
+            <div class="form-group col-md-10">
+                <label for="name">Name</label>
+                <input type="text" class="form-control{{with .Errors.Name}} is-invalid{{end}}" name="name" value="{{.Name}}">
+                {{with .Errors.Name}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+            <div class="form-check col-md-2">
+                <input class="form-check-input" type="checkbox" name="active"{{if .Active}} checked{{end}}>
+                <label class="form-check-label" for="active">Active</label>
+            </div>
         </div>
         <div class="form-group">
             <label for="address">Address</label>
@@ -42,26 +48,28 @@
                 {{end}}
             </div>
         </div>
-        <div class="form-group">
-            <label for="phone">Phone</label>
-            <input type="text" class="form-control{{with .Errors.Phone}} is-invalid{{end}}" name="phone" value="{{.Phone}}">
-            {{with .Errors.Phone}}
-            <div class="invalid-feedback">{{.}}</div>
-            {{end}}
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="text" class="form-control{{with .Errors.Email}} is-invalid{{end}}" name="email" value="{{.Email}}">
-            {{with .Errors.Email}}
-            <div class="invalid-feedback">{{.}}</div>
-            {{end}}
-        </div>
-        <div class="form-group">
-            <label for="url">URL</label>
-            <input type="text" class="form-control{{with .Errors.URL}} is-invalid{{end}}" name="url" value="{{.URL}}">
-            {{with .Errors.URL}}
-            <div class="invalid-feedback">{{.}}</div>
-            {{end}}
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control{{with .Errors.Phone}} is-invalid{{end}}" name="phone" value="{{.Phone}}">
+                {{with .Errors.Phone}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+            <div class="form-group col-md-4">
+                <label for="email">Email</label>
+                <input type="text" class="form-control{{with .Errors.Email}} is-invalid{{end}}" name="email" value="{{.Email}}">
+                {{with .Errors.Email}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
+            <div class="form-group col-md-4">
+                <label for="url">URL</label>
+                <input type="text" class="form-control{{with .Errors.URL}} is-invalid{{end}}" name="url" value="{{.URL}}">
+                {{with .Errors.URL}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
+            </div>
         </div>
         <div class="form-group">
             <label for="notes">Notes</label>
@@ -77,7 +85,7 @@
             <img src="/assets/uploads/vendor/{{.Brand}}" />
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="deleteimg">
-                <label class="form-check-label" for="defaultCheck1">Delete</label>
+                <label class="form-check-label" for="deleteimg">Delete</label>
             </div>
             {{end}}
         </div>

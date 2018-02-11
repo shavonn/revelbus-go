@@ -21,13 +21,16 @@ type view struct {
 	Err     appError
 	Flash   flash.Msg
 	Form    forms.Form
+	Me      *db.User
 	Path    string
 	Title   string
 	Token   string
-	Trip    db.Trip
-	Trips   db.Trips
-	Vendor  db.Vendor
-	Vendors db.Vendors
+	Trip    *db.Trip
+	Trips   *db.Trips
+	Vendor  *db.Vendor
+	Vendors *db.Vendors
+	User    *db.User
+	Users   *db.Users
 }
 
 type appError struct {
@@ -45,6 +48,13 @@ func render(w http.ResponseWriter, r *http.Request, tpl string, v *view) {
 		return
 	}
 	v.Flash = flash
+
+	u, err := loggedIn(r)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+	v.Me = u
 
 	f := []string{
 		filepath.Join(viper.GetString("files.tpl"), "app.html"),

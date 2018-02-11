@@ -19,7 +19,11 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	v, err := db.GetVendorByID(id)
+	v := &db.Vendor{
+		ID: toInt(id),
+	}
+
+	err := v.Get()
 	if err != nil {
 		serverError(w, r, err)
 		return
@@ -37,11 +41,12 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		URL:     v.URL,
 		Notes:   v.Notes,
 		Brand:   v.Brand,
+		Active:  v.Active,
 	}
 
 	render(w, r, "vendor.html", &view{
 		Form:   f,
-		Vendor: *v,
+		Vendor: v,
 	})
 }
 
@@ -66,6 +71,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
 		Brand:   r.PostForm.Get("brand"),
+		Active:  (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
 	}
 
 	if !f.Valid() {
@@ -99,7 +105,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 
 	var msg string
 
-	vendor := db.Vendor{
+	v := db.Vendor{
 		Name:    f.Name,
 		Address: f.Address,
 		City:    f.City,
@@ -110,13 +116,13 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     f.URL,
 		Notes:   f.Notes,
 		Brand:   f.Brand,
+		Active:  f.Active,
 	}
 
 	if id != "" {
-		intID, _ := strconv.Atoi(id)
-		vendor.ID = intID
+		v.ID = toInt(id)
 
-		err := vendor.Update()
+		err := v.Update()
 		if err != nil {
 			serverError(w, r, err)
 			return
@@ -124,13 +130,13 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 
 		msg = MsgSuccessfullyUpdated
 	} else {
-		vid, err := vendor.Create()
+		err := v.Create()
 		if err != nil {
 			serverError(w, r, err)
 			return
 		}
 
-		id = strconv.Itoa(vid)
+		id = strconv.Itoa(v.ID)
 		msg = MsgSuccessfullyCreated
 	}
 
@@ -152,23 +158,18 @@ func listVendors(w http.ResponseWriter, r *http.Request) {
 
 	render(w, r, "vendors.html", &view{
 		Title:   "Vendors",
-		Vendors: vendors,
+		Vendors: &vendors,
 	})
 }
 
 func removeVendor(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
-	v, err := db.GetVendorByID(id)
-	if err == db.ErrNotFound {
-		notFound(w, r)
-		return
-	} else if err != nil {
-		serverError(w, r, err)
-		return
+	v := db.Vendor{
+		ID: toInt(id),
 	}
 
-	err = v.Delete()
+	err := v.Delete()
 	if err != nil {
 		serverError(w, r, err)
 		return

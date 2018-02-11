@@ -15,65 +15,65 @@ type Vendor struct {
 	Email   string
 	URL     string
 	Notes   string
+	Active  bool
 	Brand   string
 }
 
 type Vendors []*Vendor
 
-func (v *Vendor) Create() (int, error) {
+func (v *Vendor) Create() error {
 	conn, _ := GetConnection()
 
-	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand)
+	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return int(id), nil
+	v.ID = int(id)
+
+	return nil
 }
 
 func (v *Vendor) Update() error {
 	conn, _ := GetConnection()
 
-	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.ID)
+	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active, v.ID)
 	return err
 }
 
-func (t *Vendor) Delete() error {
+func (v *Vendor) Delete() error {
 	conn, _ := GetConnection()
 
 	stmt := `DELETE FROM vendors WHERE id = ?`
-	_, err := conn.Exec(stmt, t.ID)
+	_, err := conn.Exec(stmt, v.ID)
 	return err
 }
 
-func GetVendorByID(id string) (*Vendor, error) {
+func (v *Vendor) Get() error {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand FROM vendors WHERE id = ?`
-	row := conn.QueryRow(stmt, id)
+	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand, active FROM vendors WHERE id = ?`
+	row := conn.QueryRow(stmt, v.ID)
 
-	v := &Vendor{}
-	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand)
+	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand, &v.Active)
 	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
+		return ErrNotFound
 	}
 
-	return v, nil
+	return err
 }
 
 func GetVendors() (Vendors, error) {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT id, name FROM vendors ORDER BY name`
+	stmt := `SELECT id, name, active FROM vendors ORDER BY active DESC, name`
 	rows, err := conn.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func GetVendors() (Vendors, error) {
 	vendors := Vendors{}
 	for rows.Next() {
 		e := &Vendor{}
-		err := rows.Scan(&e.ID, &e.Name)
+		err := rows.Scan(&e.ID, &e.Name, &e.Active)
 		if err != nil {
 			return nil, err
 		}

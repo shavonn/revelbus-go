@@ -19,7 +19,11 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := db.GetTripByID(id)
+	t := &db.Trip{
+		ID: toInt(id),
+	}
+
+	err := t.Get()
 	if err != nil {
 		serverError(w, r, err)
 		return
@@ -40,7 +44,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 
 	render(w, r, "trip.html", &view{
 		Form: f,
-		Trip: *t,
+		Trip: t,
 	})
 }
 
@@ -97,7 +101,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 
 	var msg string
 
-	trip := db.Trip{
+	t := db.Trip{
 		Title:        f.Title,
 		Slug:         f.Slug,
 		Status:       f.Status,
@@ -110,10 +114,9 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if id != "" {
-		intID, _ := strconv.Atoi(id)
-		trip.ID = intID
+		t.ID = toInt(id)
 
-		err := trip.Update()
+		err := t.Update()
 		if err != nil {
 			serverError(w, r, err)
 			return
@@ -121,13 +124,13 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 
 		msg = MsgSuccessfullyUpdated
 	} else {
-		tid, err := trip.Create()
+		err := t.Create()
 		if err != nil {
 			serverError(w, r, err)
 			return
 		}
 
-		id = strconv.Itoa(tid)
+		id = strconv.Itoa(t.ID)
 		msg = MsgSuccessfullyCreated
 	}
 
@@ -156,16 +159,11 @@ func listTrips(w http.ResponseWriter, r *http.Request) {
 func removeTrip(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
-	t, err := db.GetTripByID(id)
-	if err == db.ErrNotFound {
-		notFound(w, r)
-		return
-	} else if err != nil {
-		serverError(w, r, err)
-		return
+	t := &db.Trip{
+		ID: toInt(id),
 	}
 
-	err = t.Delete()
+	err := t.Delete()
 	if err != nil {
 		serverError(w, r, err)
 		return

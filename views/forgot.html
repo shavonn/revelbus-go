@@ -1,0 +1,19 @@
+{{define "content"}}
+    {{with .Form}}
+    <form action="/auth/forgot" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+        <div class="form-group">
+            <label for="Email">Email</label>
+            <input type="text" class="form-control{{with .Errors.Email}} is-invalid{{end}}" name="email" value="{{.Email}}">
+            {{with .Errors.Email}}
+            <div class="invalid-feedback">{{.}}</div>
+            {{end}}
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </div>
+    </form>
+    {{end}}
+{{end}}

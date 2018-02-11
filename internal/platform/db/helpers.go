@@ -10,7 +10,9 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("Not found")
+	ErrDuplicateEmail     = errors.New("Email address already in use")
+	ErrInvalidCredentials = errors.New("Invalid user credentials")
+	ErrNotFound           = errors.New("Not found")
 )
 
 const (
