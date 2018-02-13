@@ -18,19 +18,20 @@ func humanDate(t time.Time) string {
 }
 
 type view struct {
-	Err     appError
-	Flash   flash.Msg
-	Form    forms.Form
-	Me      *db.User
-	Path    string
-	Title   string
-	Token   string
-	Trip    *db.Trip
-	Trips   *db.Trips
-	Vendor  *db.Vendor
-	Vendors *db.Vendors
-	User    *db.User
-	Users   *db.Users
+	ActiveKey string
+	Err       appError
+	Flash     flash.Msg
+	Form      forms.Form
+	Me        *db.User
+	Path      string
+	Title     string
+	Token     string
+	Trip      *db.Trip
+	Trips     *db.Trips
+	Vendor    *db.Vendor
+	Vendors   *db.Vendors
+	User      *db.User
+	Users     *db.Users
 }
 
 type appError struct {
@@ -58,6 +59,7 @@ func render(w http.ResponseWriter, r *http.Request, tpl string, v *view) {
 
 	f := []string{
 		filepath.Join(viper.GetString("files.tpl"), "app.html"),
+		filepath.Join(viper.GetString("files.tpl"), "trip-nav.html"),
 		filepath.Join(viper.GetString("files.tpl"), tpl),
 	}
 

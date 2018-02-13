@@ -192,8 +192,32 @@ func (t *Trip) AddVendor(r string, vid string) error {
 	return err
 }
 
-func (t *Trip) SetVenueStatus(vid string, isPrimary string) error {
+func (t *Trip) RemoveVendor(r string, vid string) error {
 	conn, _ := GetConnection()
+
+	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
+	_, err := conn.Exec(stmt, t.ID, vid)
+	if err != nil {
+		merr, ok := err.(*mysql.MySQLError)
+
+		if ok && merr.Number == 1062 {
+			return ErrDuplicate
+		}
+	}
+	return err
+}
+
+func (t *Trip) SetVenueStatus(vid string, isPrimary bool) error {
+	conn, _ := GetConnection()
+
+	if isPrimary {
+		stmt := `UPDATE trips_venues SET is_primary = false, updated_at = UTC_TIMESTAMP() WHERE trip_id = ? AND is_primary = true`
+		_, err := conn.Exec(stmt, t.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	stmt := `UPDATE trips_venues SET is_primary = ?, updated_at = UTC_TIMESTAMP() WHERE venue_id = ? AND trip_id = ?`
 	_, err := conn.Exec(stmt, isPrimary, vid, t.ID)
 	return err
