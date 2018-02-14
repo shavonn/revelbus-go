@@ -123,7 +123,7 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/u", http.StatusSeeOther)
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {

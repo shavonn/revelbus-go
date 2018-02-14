@@ -14,9 +14,6 @@ func Routes() http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
 	r.HandleFunc("/", index).Methods("GET")
 
-	admin := r.PathPrefix("/admin").Subrouter()
-	admin.HandleFunc("/", dashboard).Methods("GET").Name("admin.dashboard")
-
 	auth := r.PathPrefix("/auth").Subrouter()
 	auth.HandleFunc("/recover", resetPasswordForm).Queries("email", "{email}").Queries("hash", "{hash}").Methods("GET")
 	auth.HandleFunc("/reset", postPasswordReset).Methods("POST")
@@ -28,12 +25,14 @@ func Routes() http.Handler {
 	auth.HandleFunc("/login", postLogin).Methods("POST")
 
 	user := r.PathPrefix("/u").Subrouter()
+	user.HandleFunc("/", dashboard).Methods("GET")
 	user.HandleFunc("/profile", profileForm).Methods("GET")
 	user.HandleFunc("/profile", postProfile).Methods("POST")
 	user.HandleFunc("/password", passwordForm).Methods("GET")
 	user.HandleFunc("/password", postPassword).Methods("POST")
 	user.HandleFunc("/logout", logout).Methods("GET")
 
+	admin := r.PathPrefix("/admin").Subrouter()
 	// trip funcs
 	admin.HandleFunc("/trip/{id}", updateVenueStatus).Queries("venue", "{vid}").Queries("is_primary", "{is_primary}").Methods("GET")
 	admin.HandleFunc("/trip/{id}", attachVendor).Queries("vendor", "").Methods("POST")
