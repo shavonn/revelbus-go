@@ -12,7 +12,7 @@ import (
 )
 
 func signupForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "signup.html", &view{
+	render(w, r, "signup", &view{
 		Form:  new(forms.UserForm),
 		Title: "Signup",
 	})
@@ -34,7 +34,7 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidSignup() {
-		render(w, r, "signup.html", &view{
+		render(w, r, "signup", &view{
 			Form: f,
 		})
 		return
@@ -50,7 +50,7 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	err = u.Create()
 	if err == db.ErrDuplicateEmail {
 		f.Errors["Email"] = "E-mail address is already in use"
-		render(w, r, "signup.html", &view{
+		render(w, r, "signup", &view{
 			Form:  f,
 			Title: "Signup",
 		})
@@ -70,7 +70,7 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "login.html", &view{
+	render(w, r, "login", &view{
 		Form:  new(forms.UserForm),
 		Title: "Login",
 	})
@@ -89,7 +89,7 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidLogin() {
-		render(w, r, "login.html", &view{
+		render(w, r, "login", &view{
 			Form: f,
 		})
 		return
@@ -107,7 +107,7 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render(w, r, "login.html", &view{
+		render(w, r, "login", &view{
 			Form:  f,
 			Title: "Login",
 		})
@@ -137,7 +137,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func forgotPasswordForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "forgot.html", &view{
+	render(w, r, "forgot", &view{
 		Form:  new(forms.UserForm),
 		Title: "Forgot Password",
 	})
@@ -155,7 +155,7 @@ func postForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidForgot() {
-		render(w, r, "forgot.html", &view{
+		render(w, r, "forgot", &view{
 			Form:  f,
 			Title: "Forgot Password",
 		})
@@ -217,7 +217,7 @@ func resetPasswordForm(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/auth/forgot", http.StatusSeeOther)
 	}
 
-	render(w, r, "reset.html", &view{
+	render(w, r, "reset", &view{
 		Form: &forms.UserForm{
 			Email:        email,
 			RecoveryHash: hash,
@@ -241,7 +241,7 @@ func postPasswordReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidPassword() || !f.ValidForgot() {
-		render(w, r, "reset.html", &view{
+		render(w, r, "reset", &view{
 			Form:  f,
 			Title: "Reset Password",
 		})
@@ -260,7 +260,7 @@ func postPasswordReset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render(w, r, "reset.html", &view{
+		render(w, r, "reset", &view{
 			Form:  f,
 			Title: "Reset Password",
 		})

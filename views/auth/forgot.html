@@ -1,4 +1,5 @@
-{{define "content"}}
+{{define "forgot"}}
+{{template "admin-header" .}}
     {{with .Form}}
     <form action="/auth/forgot" method="post" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
@@ -16,4 +17,5 @@
         </div>
     </form>
     {{end}}
+{{template "admin-footer" .}}
 {{end}}

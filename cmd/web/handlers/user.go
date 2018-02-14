@@ -15,7 +15,7 @@ func userForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "user.html", &view{
+		render(w, r, "user", &view{
 			Form:  new(forms.UserForm),
 			Title: "New User",
 		})
@@ -42,7 +42,7 @@ func userForm(w http.ResponseWriter, r *http.Request) {
 		Role:  u.Role,
 	}
 
-	render(w, r, "user.html", &view{
+	render(w, r, "user", &view{
 		Form: f,
 		User: u,
 	})
@@ -73,7 +73,7 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New User"
 		}
 
-		render(w, r, "user.html", v)
+		render(w, r, "user", v)
 	}
 
 	var msg string
@@ -138,7 +138,7 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "users.html", &view{
+	render(w, r, "users", &view{
 		Title: "Users",
 		Users: &users,
 	})
