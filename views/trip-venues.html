@@ -1,0 +1,33 @@
+{{define "content"}}
+    {{template "trip-nav" .}}
+    {{with .Trip}}
+        {{if .Venues}}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Venues}}
+                <tr>
+                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                    <td>
+                        {{if .Primary}}
+                            <a href="/admin/trip/{{$.Trip.ID}}?venue={{.ID}}&is_primary=0">primary</a>
+                        {{else}}
+                            <a href="/admin/trip/{{$.Trip.ID}}?venue={{.ID}}&is_primary=1">make primary</a>
+                        {{end}}
+                    </td>
+                    <td class="text-right"><a href="/admin/trip/{{$.Trip.ID}}?vendor={{.ID}}&role=venue">x</i></a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="alert alert-primary" role="alert">No venues to be found. Whatever shall we do?</div>
+        {{end}}
+    {{end}}
+{{end}}

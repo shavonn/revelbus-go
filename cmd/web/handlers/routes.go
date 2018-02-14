@@ -34,20 +34,30 @@ func Routes() http.Handler {
 	user.HandleFunc("/password", postPassword).Methods("POST")
 	user.HandleFunc("/logout", logout).Methods("GET")
 
-	admin.HandleFunc("/trip", removeTrip).Queries("remove", "").Methods("GET").Name("admin.trip.delete")
-	admin.HandleFunc("/trip", tripForm).Methods("GET").Name("admin.trip")
-	admin.HandleFunc("/trip", postTrip).Methods("POST").Name("admin.trip")
-	admin.HandleFunc("/trips", listTrips).Methods("GET").Name("admin.trips")
+	// trip funcs
+	admin.HandleFunc("/trip/{id}", updateVenueStatus).Queries("venue", "{vid}").Queries("is_primary", "{is_primary}").Methods("GET")
+	admin.HandleFunc("/trip/{id}", attachVendor).Queries("vendor", "").Methods("POST")
+	admin.HandleFunc("/trip/{id}", detachVendor).Queries("vendor", "{vid}").Queries("role", "{role}").Methods("GET")
+	admin.HandleFunc("/trip/{id}", tripVenues).Queries("venues", "").Methods("GET")
+	admin.HandleFunc("/trip/{id}", tripPartners).Queries("partners", "").Methods("GET")
 
-	admin.HandleFunc("/vendor", removeVendor).Queries("remove", "").Methods("GET").Name("admin.vendor.delete")
-	admin.HandleFunc("/vendor", vendorForm).Methods("GET").Name("admin.vendor")
-	admin.HandleFunc("/vendor", postVendor).Methods("POST").Name("admin.vendor")
-	admin.HandleFunc("/vendors", listVendors).Methods("GET").Name("admin.vendors")
+	// trip crud
+	admin.HandleFunc("/trip/{id}", removeTrip).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/trip", tripForm).Methods("GET")
+	admin.HandleFunc("/trip", postTrip).Methods("POST")
+	admin.HandleFunc("/trips", listTrips).Methods("GET")
 
-	admin.HandleFunc("/user", removeUser).Queries("remove", "").Methods("GET").Name("admin.user.delete")
-	admin.HandleFunc("/user", userForm).Methods("GET").Name("admin.user")
-	admin.HandleFunc("/user", postUser).Methods("POST").Name("admin.user")
-	admin.HandleFunc("/users", listUsers).Methods("GET").Name("admin.users")
+	// vendor crud
+	admin.HandleFunc("/vendor/{id}", removeVendor).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/vendor", vendorForm).Methods("GET")
+	admin.HandleFunc("/vendor", postVendor).Methods("POST")
+	admin.HandleFunc("/vendors", listVendors).Methods("GET")
+
+	//user crud
+	admin.HandleFunc("/user/{id}", removeUser).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/user", userForm).Methods("GET")
+	admin.HandleFunc("/user", postUser).Methods("POST")
+	admin.HandleFunc("/users", listUsers).Methods("GET")
 
 	fs := http.FileServer(http.Dir(viper.GetString("files.static")))
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))

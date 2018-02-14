@@ -1,0 +1,57 @@
+{{define "trip-nav"}}
+    {{with .Trip}}
+    <p>
+        <strong>Trip ID:</strong> {{.ID}}
+        <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#vendorModal">
+            + Vendor
+        </button>
+    </p>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link{{if eq $.ActiveKey "trip"}} active{{end}}" href="/admin/trip?id={{.ID}}">Trip</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{if eq $.ActiveKey "venues"}} active{{end}}" href="/admin/trip/{{.ID}}?venues">Venues</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{{if eq $.ActiveKey "partners"}} active{{end}}" href="/admin/trip/{{.ID}}?partners">Partners</a>
+        </li>
+    </ul>
+
+    <div class="modal fade" id="vendorModal" tabindex="-1" role="dialog" aria-labelledby="vendorModalLabel" aria-hidden="true">
+        <form action="/admin/trip/{{.ID}}?vendor" method="post" novalidate>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vendorModalLabel">Add Vendor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{$.Token}}">
+                    <div class="form-group">
+                        <label for="vendors">Vendors</label>
+                        <select class="form-control" name="vendor">
+                            {{range $.Vendors}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select class="form-control" name="role">
+                            <option value="partner"{{if eq $.ActiveKey "partners"}} selected{{end}}>Partner</option>
+                            <option value="venue"{{if eq $.ActiveKey "venues"}} selected{{end}}>Venue</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    {{end}}
+{{end}}

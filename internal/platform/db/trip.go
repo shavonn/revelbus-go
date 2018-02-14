@@ -3,6 +3,8 @@ package db
 import (
 	"database/sql"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type Trip struct {
@@ -16,6 +18,9 @@ type Trip struct {
 	TicketingURL string
 	Notes        string
 	Image        string
+
+	Partners Vendors
+	Venues   Vendors
 }
 
 type Trips []*Trip
@@ -72,6 +77,8 @@ func (t *Trip) Get() error {
 		return ErrNotFound
 	}
 
+	err = t.GetVendors()
+
 	return err
 }
 
@@ -100,4 +107,118 @@ func GetTrips() (*Trips, error) {
 	}
 
 	return &trips, nil
+}
+
+func (t *Trip) GetPartners() error {
+	conn, _ := GetConnection()
+
+	stmt := `SELECT v.id, v.name FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
+	rows, err := conn.Query(stmt, t.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	partners := Vendors{}
+	for rows.Next() {
+		p := &Vendor{}
+		err := rows.Scan(&p.ID, &p.Name)
+		if err != nil {
+			return err
+		}
+		partners = append(partners, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return err
+	}
+
+	t.Partners = partners
+
+	return nil
+}
+
+func (t *Trip) GetVenues() error {
+	conn, _ := GetConnection()
+
+	stmt := `SELECT v.id, v.name, tv.is_primary FROM trips_venues tv JOIN vendors v ON tv.venue_id = v.id WHERE tv.trip_id = ? AND v.active = 1 ORDER BY name`
+	rows, err := conn.Query(stmt, t.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	venues := Vendors{}
+	for rows.Next() {
+		v := &Vendor{}
+		err := rows.Scan(&v.ID, &v.Name, &v.Primary)
+		if err != nil {
+			return err
+		}
+		venues = append(venues, v)
+	}
+
+	if err = rows.Err(); err != nil {
+		return err
+	}
+
+	t.Venues = venues
+
+	return nil
+}
+
+func (t *Trip) GetVendors() error {
+	err := t.GetPartners()
+	if err != nil {
+		return err
+	}
+
+	err = t.GetVenues()
+	return err
+}
+
+func (t *Trip) AddVendor(r string, vid string) error {
+	conn, _ := GetConnection()
+
+	stmt := `INSERT INTO trips_` + r + `s (trip_id, ` + r + `_id, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	_, err := conn.Exec(stmt, t.ID, vid)
+	if err != nil {
+		merr, ok := err.(*mysql.MySQLError)
+
+		if ok && merr.Number == 1062 {
+			return ErrDuplicate
+		}
+	}
+	return err
+}
+
+func (t *Trip) RemoveVendor(r string, vid string) error {
+	conn, _ := GetConnection()
+
+	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
+	_, err := conn.Exec(stmt, t.ID, vid)
+	if err != nil {
+		merr, ok := err.(*mysql.MySQLError)
+
+		if ok && merr.Number == 1062 {
+			return ErrDuplicate
+		}
+	}
+	return err
+}
+
+func (t *Trip) SetVenueStatus(vid string, isPrimary bool) error {
+	conn, _ := GetConnection()
+
+	if isPrimary {
+		stmt := `UPDATE trips_venues SET is_primary = false, updated_at = UTC_TIMESTAMP() WHERE trip_id = ? AND is_primary = true`
+		_, err := conn.Exec(stmt, t.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	stmt := `UPDATE trips_venues SET is_primary = ?, updated_at = UTC_TIMESTAMP() WHERE venue_id = ? AND trip_id = ?`
+	_, err := conn.Exec(stmt, isPrimary, vid, t.ID)
+	return err
 }

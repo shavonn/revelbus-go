@@ -7,6 +7,8 @@ import (
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func userForm(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +27,10 @@ func userForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := u.Get()
-	if err != nil {
+	if err == db.ErrNotFound {
+		notFound(w, r)
+		return
+	} else if err != nil {
 		serverError(w, r, err)
 		return
 	}
@@ -140,7 +145,8 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeUser(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	u := &db.User{
 		ID: toInt(id),

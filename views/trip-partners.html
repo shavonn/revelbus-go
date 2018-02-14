@@ -1,0 +1,25 @@
+{{define "content"}}
+    {{template "trip-nav" .}}
+    {{with .Trip}}
+        {{if .Partners}}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Partners}}
+                <tr>
+                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                    <td class="text-right"><a href="/admin/trip/{{$.Trip.ID}}?vendor={{.ID}}&role=partner">x</i></a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="alert alert-primary" role="alert">No partners to be found. Whatever shall we do?</div>
+        {{end}}
+    {{end}}
+{{end}}

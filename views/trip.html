@@ -1,6 +1,9 @@
 {{define "content"}}
+    {{if .Trip}}
+        {{template "trip-nav" .}}
+    {{end}}
+
     {{with .Form}}
-    {{if .ID}}<p><strong>Trip ID:</strong> {{.ID}}</p>{{end}}
     <form action="/admin/trip{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
         {{if .ID}}

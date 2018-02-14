@@ -6,6 +6,8 @@ import (
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func tripForm(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +26,15 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := t.Get()
+	if err == db.ErrNotFound {
+		notFound(w, r)
+		return
+	} else if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	vendors, err := db.GetVendors(true)
 	if err != nil {
 		serverError(w, r, err)
 		return
@@ -43,8 +54,10 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render(w, r, "trip.html", &view{
-		Form: f,
-		Trip: t,
+		ActiveKey: "trip",
+		Form:      f,
+		Trip:      t,
+		Vendors:   &vendors,
 	})
 }
 
@@ -157,7 +170,8 @@ func listTrips(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeTrip(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	t := &db.Trip{
 		ID: toInt(id),
@@ -176,4 +190,140 @@ func removeTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/trips", http.StatusSeeOther)
+}
+
+func tripPartners(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	t := &db.Trip{
+		ID: toInt(id),
+	}
+
+	err := t.Get()
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	vendors, err := db.GetVendors(true)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	render(w, r, "trip-partners.html", &view{
+		ActiveKey: "partners",
+		Trip:      t,
+		Vendors:   &vendors,
+	})
+}
+
+func tripVenues(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	t := &db.Trip{
+		ID: toInt(id),
+	}
+
+	err := t.Get()
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	vendors, err := db.GetVendors(true)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	render(w, r, "trip-venues.html", &view{
+		ActiveKey: "venues",
+		Trip:      t,
+		Vendors:   &vendors,
+	})
+}
+
+func attachVendor(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := r.ParseForm()
+	if err != nil {
+		clientError(w, r, http.StatusBadRequest)
+		return
+	}
+
+	vid := r.PostForm.Get("vendor")
+	role := r.PostForm.Get("role")
+
+	t := db.Trip{
+		ID: toInt(id),
+	}
+
+	err = t.AddVendor(role, vid)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, MsgSuccessfullyAddedVendor, "success")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/trip/"+id+"?"+role+"s", http.StatusSeeOther)
+}
+
+func detachVendor(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	vid := vars["vid"]
+	role := vars["role"]
+
+	t := db.Trip{
+		ID: toInt(id),
+	}
+
+	err := t.RemoveVendor(role, vid)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, MsgSuccessfullyRemovedVendor, "success")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/trip/"+id+"?"+role+"s", http.StatusSeeOther)
+}
+
+func updateVenueStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	vid := vars["vid"]
+	isPrimary, _ := strconv.ParseBool(vars["is_primary"])
+
+	t := db.Trip{
+		ID: toInt(id),
+	}
+
+	err := t.SetVenueStatus(vid, isPrimary)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, MsgSuccessfullyUpdated, "success")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/trip/"+id+"?venues", http.StatusSeeOther)
 }

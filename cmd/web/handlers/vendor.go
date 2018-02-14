@@ -24,7 +24,10 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := v.Get()
-	if err != nil {
+	if err == db.ErrNotFound {
+		notFound(w, r)
+		return
+	} else if err != nil {
 		serverError(w, r, err)
 		return
 	}
@@ -45,6 +48,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render(w, r, "vendor.html", &view{
+		Title:  f.Name,
 		Form:   f,
 		Vendor: v,
 	})
@@ -150,7 +154,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 }
 
 func listVendors(w http.ResponseWriter, r *http.Request) {
-	vendors, err := db.GetVendors()
+	vendors, err := db.GetVendors(false)
 	if err != nil {
 		serverError(w, r, err)
 		return
