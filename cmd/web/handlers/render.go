@@ -3,10 +3,12 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+	"os"
 	"path/filepath"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
+	"strings"
 	"time"
 
 	"github.com/justinas/nosurf"
@@ -57,23 +59,38 @@ func render(w http.ResponseWriter, r *http.Request, tpl string, v *view) {
 	}
 	v.Me = u
 
-	f := []string{
-		filepath.Join(viper.GetString("files.tpl"), "app.html"),
-		filepath.Join(viper.GetString("files.tpl"), "trip-nav.html"),
-		filepath.Join(viper.GetString("files.tpl"), tpl),
+	t, err := parseTemplates()
+	if err != nil {
+		serverError(w, r, err)
+		return
 	}
 
+	err = t.ExecuteTemplate(w, tpl, v)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+}
+
+func parseTemplates() (*template.Template, error) {
 	fm := template.FuncMap{
 		"humanDate": humanDate,
 	}
+	templ := template.New("").Funcs(fm)
+	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {
+		if strings.Contains(path, ".html") {
+			_, err = templ.ParseFiles(path)
+			if err != nil {
+				return err
+			}
+		}
 
-	ts, err := template.New("").Funcs(fm).ParseFiles(f...)
+		return err
+	})
+
 	if err != nil {
-		serverError(w, r, err)
+		return nil, err
 	}
 
-	err = ts.ExecuteTemplate(w, "app", v)
-	if err != nil {
-		serverError(w, r, err)
-	}
+	return templ, nil
 }

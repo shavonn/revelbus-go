@@ -14,7 +14,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "trip.html", &view{
+		render(w, r, "trip", &view{
 			Form:  new(forms.TripForm),
 			Title: "New Trip",
 		})
@@ -53,7 +53,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		Image:        t.Image,
 	}
 
-	render(w, r, "trip.html", &view{
+	render(w, r, "trip", &view{
 		ActiveKey: "trip",
 		Form:      f,
 		Trip:      t,
@@ -92,7 +92,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New Trip"
 		}
 
-		render(w, r, "trip.html", v)
+		render(w, r, "trip", v)
 	}
 
 	fn, err := uploadFile(w, r, "trip_image", "uploads/trip/")
@@ -163,7 +163,7 @@ func listTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "trips.html", &view{
+	render(w, r, "trips", &view{
 		Title: "Trips",
 		Trips: trips,
 	})
@@ -212,7 +212,7 @@ func tripPartners(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "trip-partners.html", &view{
+	render(w, r, "trip-partners", &view{
 		ActiveKey: "partners",
 		Trip:      t,
 		Vendors:   &vendors,
@@ -239,7 +239,7 @@ func tripVenues(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "trip-venues.html", &view{
+	render(w, r, "trip-venues", &view{
 		ActiveKey: "venues",
 		Trip:      t,
 		Vendors:   &vendors,

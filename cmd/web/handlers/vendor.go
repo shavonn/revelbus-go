@@ -12,7 +12,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "vendor.html", &view{
+		render(w, r, "vendor", &view{
 			Form:  new(forms.VendorForm),
 			Title: "New Vendor",
 		})
@@ -47,7 +47,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		Active:  v.Active,
 	}
 
-	render(w, r, "vendor.html", &view{
+	render(w, r, "vendor", &view{
 		Title:  f.Name,
 		Form:   f,
 		Vendor: v,
@@ -87,7 +87,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New Vendor"
 		}
 
-		render(w, r, "vendor.html", v)
+		render(w, r, "vendor", v)
 	}
 
 	fn, err := uploadFile(w, r, "brand_image", "uploads/vendor/")
@@ -160,7 +160,7 @@ func listVendors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "vendors.html", &view{
+	render(w, r, "vendors", &view{
 		Title:   "Vendors",
 		Vendors: &vendors,
 	})

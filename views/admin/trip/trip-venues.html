@@ -1,4 +1,5 @@
-{{define "content"}}
+{{define "trip-venues"}}
+{{template "admin-header" .}}
     {{template "trip-nav" .}}
     {{with .Trip}}
         {{if .Venues}}
@@ -30,4 +31,5 @@
         <div class="alert alert-primary" role="alert">No venues to be found. Whatever shall we do?</div>
         {{end}}
     {{end}}
+{{template "admin-footer" .}}
 {{end}}

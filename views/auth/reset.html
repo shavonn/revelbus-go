@@ -1,14 +1,10 @@
-{{define "content"}}
+{{define "reset"}}
+{{template "admin-header" .}}
     {{with .Form}}
-    <form action="/u/password" method="post" novalidate>
+    <form action="/auth/reset" method="post" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
-        <div class="form-group">
-            <label for="old_password">Old Password</label>
-            <input type="password" class="form-control{{with .Errors.OldPassword}} is-invalid{{end}}" name="old_password">
-            {{with .Errors.OldPassword}}
-            <div class="invalid-feedback">{{.}}</div>
-            {{end}}
-        </div>
+        <input type="hidden" name="email" value="{{.Email}}">
+        <input type="hidden" name="recovery_hash" value="{{.RecoveryHash}}">
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control{{with .Errors.Password}} is-invalid{{end}}" name="password">
@@ -27,4 +23,5 @@
         </div>
     </form>
     {{end}}
+{{template "admin-footer" .}}
 {{end}}

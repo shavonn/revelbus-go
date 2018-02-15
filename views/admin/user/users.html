@@ -1,4 +1,5 @@
-{{define "content"}}
+{{define "users"}}
+{{template "admin-header" .}}
     {{if .Users}}
     <table class="table">
         <thead>
@@ -21,4 +22,5 @@
     {{else}}
     <div class="alert alert-primary" role="alert">No users to be found. Whatever shall we do?</div>
     {{end}}
+{{template "admin-footer" .}}
 {{end}}

@@ -1,4 +1,5 @@
-{{define "content"}}
+{{define "vendor"}}
+{{template "admin-header" .}}
     {{with .Form}}
     <form action="/admin/vendor{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
@@ -103,4 +104,5 @@
         </div>
     </form>
     {{end}}
+{{template "admin-footer" .}}
 {{end}}

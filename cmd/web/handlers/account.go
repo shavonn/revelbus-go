@@ -21,7 +21,7 @@ func profileForm(w http.ResponseWriter, r *http.Request) {
 		Email: u.Email,
 	}
 
-	render(w, r, "profile.html", &view{
+	render(w, r, "profile", &view{
 		Form:  f,
 		Title: "Update Profile",
 	})
@@ -40,7 +40,7 @@ func postProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		render(w, r, "profile.html", &view{
+		render(w, r, "profile", &view{
 			Form:  f,
 			Title: "Update Profile",
 		})
@@ -59,7 +59,7 @@ func postProfile(w http.ResponseWriter, r *http.Request) {
 	err = u.Update()
 	if err == db.ErrDuplicateEmail {
 		f.Errors["Email"] = "E-mail address is already in use"
-		render(w, r, "profile.html", &view{
+		render(w, r, "profile", &view{
 			Form:  f,
 			Title: "Update Profile",
 		})
@@ -85,7 +85,7 @@ func postProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func passwordForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "password.html", &view{
+	render(w, r, "password", &view{
 		Form:  new(forms.UserForm),
 		Title: "Update Password",
 	})
@@ -105,7 +105,7 @@ func postPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidPasswordUpdate() {
-		render(w, r, "password.html", &view{
+		render(w, r, "password", &view{
 			Form:  f,
 			Title: "Update Password",
 		})
@@ -126,7 +126,7 @@ func postPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render(w, r, "password.html", &view{
+		render(w, r, "password", &view{
 			Form:  f,
 			Title: "Update Password",
 		})

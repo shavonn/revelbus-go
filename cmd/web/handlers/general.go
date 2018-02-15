@@ -5,9 +5,9 @@ import (
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "index.html", &view{})
+	render(w, r, "home", &view{})
 }
 
 func dashboard(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "dashboard.html", &view{})
+	render(w, r, "dashboard", &view{})
 }
