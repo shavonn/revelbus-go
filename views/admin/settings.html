@@ -35,7 +35,7 @@
                 </div>
                 <div class="form-group">
                     <label for="about_content">About Content</label>
-                    <textarea class="form-control{{with .Errors.AboutContent}} is-invalid{{end}}" name="about_content">{{.AboutContent}}</textarea>
+                    <textarea class="form-control{{with .Errors.AboutContent}} is-invalid{{end}} editor" name="about_content">{{.AboutContent}}</textarea>
                     {{with .Errors.AboutContent}}
                     <div class="invalid-feedback">{{.}}</div>
                     {{end}}

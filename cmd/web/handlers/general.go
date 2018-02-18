@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"html/template"
 	"net/http"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/email"
@@ -44,7 +45,7 @@ func about(w http.ResponseWriter, r *http.Request) {
 	render(w, r, "about", &view{
 		ActiveKey: "about",
 		Blurb:     s.AboutBlurb,
-		Content:   s.AboutContent,
+		Content:   template.HTML(s.AboutContent),
 	})
 }
 
@@ -137,6 +138,7 @@ func trip(w http.ResponseWriter, r *http.Request) {
 		Title:     t.Title,
 		Trip:      t,
 		Trips:     trips,
+		Content:   template.HTML(t.Description),
 	})
 }
 

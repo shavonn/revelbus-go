@@ -43,7 +43,7 @@ func blurb(s string) string {
 type view struct {
 	ActiveKey   string
 	Blurb       string
-	Content     string
+	Content     template.HTML
 	Err         appError
 	FAQ         *db.FAQ
 	FAQs        *db.FAQs
