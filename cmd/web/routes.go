@@ -46,6 +46,11 @@ func Routes() http.Handler {
 	admin.HandleFunc("/settings", handlers.SettingsForm).Methods("GET")
 	admin.HandleFunc("/settings", handlers.PostSettings).Methods("POST")
 
+	admin.HandleFunc("/file/{id}", handlers.RemoveFile).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/files", handlers.ListFiles).Methods("GET")
+	admin.HandleFunc("/upload", handlers.UploadForm).Methods("GET")
+	admin.HandleFunc("/upload", handlers.PostUpload).Methods("POST")
+
 	// trip funcs
 	admin.HandleFunc("/trip/{id}", handlers.UpdateVenueStatus).Queries("venue", "{vid}").Queries("is_primary", "{is_primary}").Methods("GET")
 	admin.HandleFunc("/trip/{id}", handlers.AttachVendor).Queries("vendor", "").Methods("POST")

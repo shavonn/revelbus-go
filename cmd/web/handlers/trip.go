@@ -61,7 +61,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		ActiveKey: "trip",
 		Form:      f,
 		Trip:      t,
-		Vendors:   &vendors,
+		Vendors:   vendors,
 	})
 }
 
@@ -107,10 +107,10 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if fn != "" {
-		f.Image = fn
+	if len(fn) > 0 && fn[0] != "" {
+		f.Image = fn[0]
 	} else if (len(f.Image) != 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile("uploads/trip/" + f.Image)
+		err = utils.DeleteFile(f.Image)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -223,7 +223,7 @@ func TripPartners(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "trip-partners", &view.View{
 		ActiveKey: "partners",
 		Trip:      t,
-		Vendors:   &vendors,
+		Vendors:   vendors,
 	})
 }
 
@@ -250,7 +250,7 @@ func TripVenues(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "trip-venues", &view.View{
 		ActiveKey: "venues",
 		Trip:      t,
-		Vendors:   &vendors,
+		Vendors:   vendors,
 	})
 }
 

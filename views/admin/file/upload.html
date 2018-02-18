@@ -1,0 +1,20 @@
+{{define "upload"}}
+{{template "admin-header" .}}
+    <form action="/admin/upload" method="post" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+        <div class="form-group">
+            <label for="fldr">Folder</label>
+            <input type="text" class="form-control" name="fldr" value="">
+        </div>
+        <div class="form-group">
+            <label for="files">Files</label>
+            <input type="file" class="form-control-file" name="files" multiple="multiple">
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+{{template "admin-footer" .}}
+{{end}}

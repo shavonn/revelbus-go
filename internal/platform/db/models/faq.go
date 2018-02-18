@@ -65,11 +65,11 @@ func (f *FAQ) Update() error {
 	return err
 }
 
-func (s *FAQ) Delete() error {
+func (f *FAQ) Delete() error {
 	conn, _ := db.GetConnection()
 
 	stmt := `DELETE FROM faqs WHERE id = ?`
-	_, err := conn.Exec(stmt, s.ID)
+	_, err := conn.Exec(stmt, f.ID)
 	return err
 }
 

@@ -22,6 +22,7 @@ type View struct {
 	Err          appError
 	FAQ          *models.FAQ
 	FAQs         *models.FAQs
+	Files        *models.Files
 	FAQGrouped   *models.GroupedFAQs
 	TripsGrouped *models.GroupedTrips
 	Flash        flash.Msg

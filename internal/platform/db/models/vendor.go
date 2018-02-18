@@ -98,7 +98,7 @@ func (v *Vendor) Get() error {
 	return err
 }
 
-func GetVendors(oa bool) (Vendors, error) {
+func GetVendors(oa bool) (*Vendors, error) {
 	conn, _ := db.GetConnection()
 
 	var stmt string
@@ -129,5 +129,5 @@ func GetVendors(oa bool) (Vendors, error) {
 		return nil, err
 	}
 
-	return vendors, nil
+	return &vendors, nil
 }

@@ -98,10 +98,10 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if fn != "" {
-		f.Brand = fn
+	if len(fn) > 0 && fn[0] != "" {
+		f.Brand = fn[0]
 	} else if (len(f.Brand) != 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile("uploads/vendor/" + f.Brand)
+		err = utils.DeleteFile(f.Brand)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -164,7 +164,7 @@ func ListVendors(w http.ResponseWriter, r *http.Request) {
 
 	view.Render(w, r, "vendors", &view.View{
 		Title:   "Vendors",
-		Vendors: &vendors,
+		Vendors: vendors,
 	})
 }
 
