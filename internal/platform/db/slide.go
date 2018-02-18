@@ -54,9 +54,7 @@ func (s *Slide) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT id, title, blurb, style, sort_order, active FROM slides WHERE id = ?`
-	row := conn.QueryRow(stmt, s.ID)
-
-	err := row.Scan(&s.ID, &s.Title, &s.Blurb, &s.Style, &s.Order, &s.Active)
+	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.Title, &s.Blurb, &s.Style, &s.Order, &s.Active)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}

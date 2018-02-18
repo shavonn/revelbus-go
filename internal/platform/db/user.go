@@ -78,17 +78,16 @@ func (u *User) Get() error {
 
 	snippet := `SELECT id, name, email, role FROM users WHERE`
 
-	var row *sql.Row
+	var err error
 
 	if u.ID != 0 {
 		stmt := snippet + ` id = ?`
-		row = conn.QueryRow(stmt, u.ID)
+		err = conn.QueryRow(stmt, u.ID).Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	} else {
 		stmt := snippet + ` email = ?`
-		row = conn.QueryRow(stmt, u.Email)
+		err = conn.QueryRow(stmt, u.Email).Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	}
 
-	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}
@@ -127,8 +126,10 @@ func (u *User) VerifyUser(pw string) error {
 	conn, _ := GetConnection()
 
 	var hp []byte
-	row := conn.QueryRow("SELECT id, name, email, role, password FROM users WHERE email = ?", u.Email)
-	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.Role, &hp)
+
+	stmt := `SELECT id, name, email, role, password FROM users WHERE email = ?`
+
+	err := conn.QueryRow(stmt, u.Email).Scan(&u.ID, &u.Name, &u.Email, &u.Role, &hp)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -168,9 +169,7 @@ func (u *User) CheckRecover(h string) error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT email FROM users WHERE email = ? AND recovery_hash = ?`
-	row := conn.QueryRow(stmt, u.Email, h)
-
-	err := row.Scan(&u.Email)
+	err := conn.QueryRow(stmt, u.Email, h).Scan(&u.Email)
 	if err != nil && err == sql.ErrNoRows {
 		return ErrNotFound
 	}

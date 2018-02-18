@@ -43,8 +43,7 @@ func getSlug(str string, t string) string {
 		if num != 0 {
 			sl = s + "-" + strconv.Itoa(num)
 		}
-		row := conn.QueryRow(stmt, sl)
-		err = row.Scan(&id)
+		err = conn.QueryRow(stmt, sl).Scan(&id)
 		num++
 	}
 	return sl

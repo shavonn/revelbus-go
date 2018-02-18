@@ -61,9 +61,7 @@ func (v *Vendor) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand, active FROM vendors WHERE id = ?`
-	row := conn.QueryRow(stmt, v.ID)
-
-	err := row.Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand, &v.Active)
+	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand, &v.Active)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}

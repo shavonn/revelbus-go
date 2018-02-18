@@ -54,9 +54,7 @@ func (f *FAQ) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT question, answer, category, sort_order, active FROM faqs WHERE id = ?`
-	row := conn.QueryRow(stmt, f.ID)
-
-	err := row.Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
+	err := conn.QueryRow(stmt, f.ID).Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}

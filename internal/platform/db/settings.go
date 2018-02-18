@@ -42,9 +42,7 @@ func (s *Settings) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT id, contact_blurb, about_blurb, about_content FROM settings WHERE id = ?`
-	row := conn.QueryRow(stmt, s.ID)
-
-	err := row.Scan(&s.ID, &s.ContactBlurb, &s.AboutBlurb, &s.AboutContent)
+	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.ContactBlurb, &s.AboutBlurb, &s.AboutContent)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}

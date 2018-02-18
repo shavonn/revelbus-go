@@ -73,9 +73,7 @@ func (t *Trip) Get() error {
 	conn, _ := GetConnection()
 
 	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image FROM trips WHERE id = ?`
-	row := conn.QueryRow(stmt, t.ID)
-
-	err := row.Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image)
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}
@@ -90,9 +88,7 @@ func GetBySlug(s string) (*Trip, error) {
 	t := &Trip{}
 
 	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image FROM trips WHERE slug = ?`
-	row := conn.QueryRow(stmt, s)
-
-	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image)
+	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image)
 	if err == sql.ErrNoRows {
 		return nil, ErrNotFound
 	}
