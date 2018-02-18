@@ -30,6 +30,8 @@ type Trip struct {
 
 type Trips []*Trip
 
+type GroupedTrips map[string][]*Trip
+
 type TripForm struct {
 	ID           string
 	Title        string
@@ -163,7 +165,7 @@ func GetTrips() (*Trips, error) {
 func GetUpcomingTrips(limit int) (*Trips, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY end, start`
+	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
 	if limit > 0 {
 		stmt = stmt + ` LIMIT ` + strconv.Itoa(limit)
@@ -183,6 +185,36 @@ func GetUpcomingTrips(limit int) (*Trips, error) {
 			return nil, err
 		}
 		trips = append(trips, t)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &trips, nil
+}
+
+func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
+	conn, _ := db.GetConnection()
+
+	trips := make(GroupedTrips)
+
+	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
+
+	rows, err := conn.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		t := &Trip{}
+		err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Start, &t.End, &t.Image, &t.Blurb)
+		if err != nil {
+			return nil, err
+		}
+		month := t.Start.Format("01")
+		trips[month] = append(trips[month], t)
 	}
 
 	if err = rows.Err(); err != nil {

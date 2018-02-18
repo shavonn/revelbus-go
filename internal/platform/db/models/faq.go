@@ -16,7 +16,8 @@ type FAQ struct {
 }
 
 type FAQs []*FAQ
-type GroupedFAQ map[string][]*FAQ
+
+type GroupedFAQs map[string][]*FAQ
 
 type FAQForm struct {
 	ID       string
@@ -111,10 +112,10 @@ func GetFAQs() (*FAQs, error) {
 	return &faqs, nil
 }
 
-func GetActiveFAQs() (*GroupedFAQ, error) {
+func GetActiveFAQs() (*GroupedFAQs, error) {
 	conn, _ := db.GetConnection()
 
-	faqs := make(GroupedFAQ)
+	faqs := make(GroupedFAQs)
 
 	stmt := `SELECT id, question, answer, category, sort_order, active FROM faqs WHERE active = 1 ORDER BY sort_order`
 	rows, err := conn.Query(stmt)

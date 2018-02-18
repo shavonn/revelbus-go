@@ -1,11 +1,14 @@
 {{define "trips"}}
 {{template "header" .}}
 <div class="trip-listing container">
-    <div class="trips">
-        {{range .Trips}}
-        {{template "trip-pod" .}}
+    {{range $month, $trips := .TripsGrouped }}
+        <h2 class="month"><span class="num">{{$month}}</span> <span class="mo">| {{numToMonth $month}}</span></h2>
+        <div class="trips">
+        {{range $trips}}
+            {{template "trip-pod" .}}
         {{end}}
-    </div>
+        </div>
+    {{end}}
 </div>
 <div class="mailing-list">
     <div class="container">

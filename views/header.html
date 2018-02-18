@@ -40,8 +40,8 @@
 						<h2>{{.Title}}</h2>
 						<div class="info">
 							<div class="date">
-								<div class="month">{{month .Start .End}}</div>
-								<div class="day">{{day .Start .End}}</div>
+								<div class="month">{{getShortMonth .Start .End}}</div>
+								<div class="day">{{getDateRange .Start .End}}</div>
 							</div>
 							<div class="price-ticket">
 								<div class="price">{{.Price}}</div>

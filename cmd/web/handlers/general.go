@@ -105,16 +105,16 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func Trips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetUpcomingTrips(0)
+	trips, err := models.GetUpcomingTripsByMonth()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
 	view.Render(w, r, "trips", &view.View{
-		ActiveKey: "trips",
-		Title:     "Upcoming Trips",
-		Trips:     trips,
+		ActiveKey:    "trips",
+		Title:        "Upcoming Trips",
+		TripsGrouped: trips,
 	})
 }
 

@@ -16,28 +16,29 @@ import (
 )
 
 type View struct {
-	ActiveKey   string
-	Blurb       string
-	Content     template.HTML
-	Err         appError
-	FAQ         *models.FAQ
-	FAQs        *models.FAQs
-	FAQGrouped  *models.GroupedFAQ
-	Flash       flash.Msg
-	Form        forms.Form
-	HeaderStyle string
-	Me          *models.User
-	Path        string
-	Slide       *models.Slide
-	Slides      *models.Slides
-	Title       string
-	Token       string
-	Trip        *models.Trip
-	Trips       *models.Trips
-	Vendor      *models.Vendor
-	Vendors     *models.Vendors
-	User        *models.User
-	Users       *models.Users
+	ActiveKey    string
+	Blurb        string
+	Content      template.HTML
+	Err          appError
+	FAQ          *models.FAQ
+	FAQs         *models.FAQs
+	FAQGrouped   *models.GroupedFAQs
+	TripsGrouped *models.GroupedTrips
+	Flash        flash.Msg
+	Form         forms.Form
+	HeaderStyle  string
+	Me           *models.User
+	Path         string
+	Slide        *models.Slide
+	Slides       *models.Slides
+	Title        string
+	Token        string
+	Trip         *models.Trip
+	Trips        *models.Trips
+	Vendor       *models.Vendor
+	Vendors      *models.Vendors
+	User         *models.User
+	Users        *models.Users
 }
 
 type appError struct {
@@ -79,10 +80,11 @@ func Render(w http.ResponseWriter, r *http.Request, tpl string, v *View) {
 
 func parseTemplates() (*template.Template, error) {
 	fm := template.FuncMap{
-		"humanDate": humanDate,
-		"month":     month,
-		"day":       day,
-		"blurb":     blurb,
+		"humanDate":     humanDate,
+		"getShortMonth": getShortMonth,
+		"getDateRange":  getDateRange,
+		"numToMonth":    numToMonth,
+		"blurb":         blurb,
 	}
 	templ := template.New("").Funcs(fm)
 	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {
