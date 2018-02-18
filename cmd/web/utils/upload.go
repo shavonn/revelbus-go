@@ -45,7 +45,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 		}
 
 		if fldr != "" {
-			fn = fldr + fn
+			fn = fldr + "/" + fn
 		}
 
 		uploaded = append(uploaded, fn)
