@@ -20,9 +20,21 @@ func send(e email) error {
 	m.AddAlternative("text/plain", e.Text)
 	m.SetHeaders(map[string][]string{
 		"From":    []string{viper.GetString("from")},
-		"To":      e.To,
 		"Subject": []string{e.Subject},
 	})
+
+	headers := map[string][]string{
+		"From":    []string{viper.GetString("from")},
+		"Subject": []string{e.Subject},
+	}
+
+	if len(e.To) == 0 {
+		headers["To"] = []string{viper.GetString("from")}
+	} else {
+		headers["To"] = e.To
+	}
+
+	m.SetHeaders(headers)
 
 	err := d.DialAndSend(m)
 	if err != nil {

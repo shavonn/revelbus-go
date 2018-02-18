@@ -16,7 +16,9 @@ func Routes() http.Handler {
 	r.HandleFunc("/trips", trips).Methods("GET")
 	r.HandleFunc("/trip/{slug}", trip).Methods("GET")
 	r.HandleFunc("/faq", faq).Methods("GET")
+	r.HandleFunc("/about", about).Methods("GET")
 	r.HandleFunc("/contact", contact).Methods("GET")
+	r.HandleFunc("/contact", contactPost).Methods("POST")
 
 	auth := r.PathPrefix("/auth").Subrouter()
 	auth.HandleFunc("/recover", resetPasswordForm).Queries("email", "{email}").Queries("hash", "{hash}").Methods("GET")
@@ -37,6 +39,10 @@ func Routes() http.Handler {
 	user.HandleFunc("/logout", logout).Methods("GET")
 
 	admin := r.PathPrefix("/admin").Subrouter()
+
+	admin.HandleFunc("/settings", settingsForm).Methods("GET")
+	admin.HandleFunc("/settings", postSettings).Methods("POST")
+
 	// trip funcs
 	admin.HandleFunc("/trip/{id}", updateVenueStatus).Queries("venue", "{vid}").Queries("is_primary", "{is_primary}").Methods("GET")
 	admin.HandleFunc("/trip/{id}", attachVendor).Queries("vendor", "").Methods("POST")

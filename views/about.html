@@ -1,26 +1,9 @@
-{{define "contact"}}
+{{define "about"}}
 {{template "header" .}}
 <main class="page container">
-    <div class="content contact">
+    <div class="content about">
         <div class="blurb">{{.Blurb}}</div>
-        <form action="/contact" method="post" novalidate>
-            <input type="hidden" name="csrf_token" value="{{$.Token}}">
-            <div class="name">
-                <input name="name" type="text" placeholder="Name" />
-            </div>
-            <div class="phone half">
-                <input name="phone" type="text" placeholder="Phone" />
-            </div>
-            <div class="email half">
-                <input name="email" type="text" placeholder="Email" />
-            </div>
-            <div class="message">
-                <textarea class="form-control" name="message" placeholder="Your message"></textarea>
-            </div>
-            <div class="half offset button">
-                <button type="submit" class="btn">Send</button>
-            </div>
-        </form>
+        {{.Content}}
     </div>
 </main>
 <div class="mailing-list one">

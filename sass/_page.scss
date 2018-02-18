@@ -1,6 +1,10 @@
 .page {
     overflow: auto;
 
+    &.container {
+        margin-bottom: 45px;
+    }
+
     & > div {
         @include box-sizing();
     }
@@ -25,6 +29,18 @@
     h2 {
         font-family: $condensed-font;
         @include font-rem(26);
+        margin-bottom: 35px;
+    }
+
+    .blurb {
+        font-family: $condensed-font;
+        @include font-rem(32);
+        font-weight: 300;
+        line-height: 52px;
+        letter-spacing: 0;
+        padding-bottom: 45px;
+        margin-bottom: 35px;
+        border-bottom: 1px solid #E3E3E3;
     }
 
     &.faq {
@@ -50,6 +66,40 @@
             @include font-rem(16);
             font-weight: 300;
             line-height: 26px;
+        }
+    }
+
+    &.contact {
+        form {
+            width: 70%;
+            margin: 0 auto;
+            overflow: auto;
+        }
+
+        .name, .email, .phone {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-top: 20px;
+        }
+
+        .phone {
+            padding: 0 5px 0 0;
+        }
+
+        .email {
+            padding: 0 0 0 5px;
+        }
+
+        .button {
+            text-align: right;
+            margin-top: 50px;
+        }
+
+        .btn {
+            background-color: #fff;
+            border: 3px solid $turqoise;
         }
     }
 }

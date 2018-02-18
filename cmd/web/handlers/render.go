@@ -42,6 +42,8 @@ func blurb(s string) string {
 
 type view struct {
 	ActiveKey   string
+	Blurb       string
+	Content     string
 	Err         appError
 	FAQ         *db.FAQ
 	FAQs        *db.FAQs
@@ -134,6 +136,8 @@ func getHeaderStyle(t string) string {
 		return "golfers"
 	case "contact":
 		return "swimmers"
+	case "about":
+		return "wine_gals"
 	default:
 		return ""
 	}

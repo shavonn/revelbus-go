@@ -20,30 +20,15 @@ img {
     max-width: 100%;
 }
 
-.container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 20px;
-    position: relative;
-}
-
-footer {
+input[type=text], textarea {
     @include font-rem(14);
-    letter-spacing: 0.9px;
-    text-align: center;
-    color: #989898;
-    height: 300px;
+    color: #9FA3A7;
+    background: #FAFAFA;
+    border: 1px solid #E6E6E6;
+    padding: 20px;
+    @include border-radius(4px);
+    width: 100%;
     @include box-sizing();
-    padding-top: 60px;
-    background-color: rgba(227, 227, 227, .4);
-
-    img {
-        max-width: 300px;
-    }
-
-    a, a:link, a:active, a:visited {
-        color: #989898; 
-    }
 }
 
 @import 'header';

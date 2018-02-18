@@ -3,6 +3,9 @@ package handlers
 import (
 	"net/http"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/email"
+	"revelforce/internal/platform/flash"
+	"revelforce/internal/platform/forms"
 
 	"github.com/gorilla/mux"
 )
@@ -27,10 +30,76 @@ func index(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func about(w http.ResponseWriter, r *http.Request) {
+	s := db.Settings{
+		ID: 1,
+	}
+
+	err := s.Get()
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	render(w, r, "about", &view{
+		ActiveKey: "about",
+		Blurb:     s.AboutBlurb,
+		Content:   s.AboutContent,
+	})
+}
+
 func contact(w http.ResponseWriter, r *http.Request) {
+	s := db.Settings{
+		ID: 1,
+	}
+
+	err := s.Get()
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
 	render(w, r, "contact", &view{
 		ActiveKey: "contact",
+		Blurb:     s.ContactBlurb,
 	})
+}
+
+func contactPost(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		clientError(w, r, http.StatusBadRequest)
+		return
+	}
+
+	f := &forms.ContactForm{
+		Name:    r.PostForm.Get("name"),
+		Phone:   r.PostForm.Get("phone"),
+		Email:   r.PostForm.Get("email"),
+		Message: r.PostForm.Get("message"),
+	}
+
+	if !f.Valid() {
+		v := &view{
+			Form: f,
+		}
+
+		render(w, r, "contact", v)
+	}
+
+	err = email.ContactEmail(f)
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, "Your message has been sent!", "success")
+	if err != nil {
+		serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
 func trips(w http.ResponseWriter, r *http.Request) {

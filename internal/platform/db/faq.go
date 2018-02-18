@@ -37,8 +37,8 @@ func (f *FAQ) Create() error {
 func (f *FAQ) Update() error {
 	conn, _ := GetConnection()
 
-	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = 1`
-	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active)
+	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active, f.ID)
 	return err
 }
 
@@ -53,8 +53,8 @@ func (s *FAQ) Delete() error {
 func (f *FAQ) Get() error {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT question, answer, category, sort_order, active FROM faqs WHERE id = 1`
-	row := conn.QueryRow(stmt)
+	stmt := `SELECT question, answer, category, sort_order, active FROM faqs WHERE id = ?`
+	row := conn.QueryRow(stmt, f.ID)
 
 	err := row.Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
 	if err == sql.ErrNoRows {

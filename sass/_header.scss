@@ -139,14 +139,14 @@
 
     &.swimmers {
         background-color: #91D9F8;
-        background-image: url('../images/headers/swimmers_bg.svg');
-        background-repeat: repeat-x;
-        background-position: left bottom;
-        background-size: 8.96%;
 
         .banner-character {
             width: 92%;
         }
+    }
+
+    &.wine_gals {
+        background-color: #FDDD37;
     }
 
     &.trip {
