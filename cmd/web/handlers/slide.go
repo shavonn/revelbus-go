@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -14,27 +16,27 @@ func slideForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "slide", &view{
-			Form:  new(forms.SlideForm),
+		view.Render(w, r, "slide", &view.View{
+			Form:  new(models.SlideForm),
 			Title: "New Slide",
 		})
 		return
 	}
 
-	s := &db.Slide{
-		ID: toInt(id),
+	s := &models.Slide{
+		ID: utils.ToInt(id),
 	}
 
 	err := s.Get()
 	if err == db.ErrNotFound {
-		notFound(w, r)
+		view.NotFound(w, r)
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	f := &forms.SlideForm{
+	f := &models.SlideForm{
 		ID:     strconv.Itoa(s.ID),
 		Title:  s.Title,
 		Blurb:  s.Blurb,
@@ -43,7 +45,7 @@ func slideForm(w http.ResponseWriter, r *http.Request) {
 		Active: s.Active,
 	}
 
-	render(w, r, "slide", &view{
+	view.Render(w, r, "slide", &view.View{
 		Title: s.Title,
 		Form:  f,
 		Slide: s,
@@ -55,11 +57,11 @@ func postSlide(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.SlideForm{
+	f := &models.SlideForm{
 		ID:     r.PostForm.Get("id"),
 		Title:  r.PostForm.Get("title"),
 		Blurb:  r.PostForm.Get("blurb"),
@@ -69,7 +71,7 @@ func postSlide(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
@@ -77,44 +79,44 @@ func postSlide(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New Slide"
 		}
 
-		render(w, r, "slide", v)
+		view.Render(w, r, "slide", v)
 	}
 
 	var msg string
 
-	s := db.Slide{
-		ID:     toInt(f.ID),
+	s := models.Slide{
+		ID:     utils.ToInt(f.ID),
 		Title:  f.Title,
 		Blurb:  f.Blurb,
 		Style:  f.Style,
-		Order:  toInt(f.Order),
+		Order:  utils.ToInt(f.Order),
 		Active: f.Active,
 	}
 
 	if id != "" {
-		s.ID = toInt(id)
+		s.ID = utils.ToInt(id)
 
 		err := s.Update()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
-		msg = MsgSuccessfullyUpdated
+		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := s.Create()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
 		id = strconv.Itoa(s.ID)
-		msg = MsgSuccessfullyCreated
+		msg = utils.MsgSuccessfullyCreated
 	}
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -122,13 +124,13 @@ func postSlide(w http.ResponseWriter, r *http.Request) {
 }
 
 func listSlides(w http.ResponseWriter, r *http.Request) {
-	slides, err := db.GetSlides()
+	slides, err := models.GetSlides()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "slides", &view{
+	view.Render(w, r, "slides", &view.View{
 		Title:  "Slides",
 		Slides: slides,
 	})
@@ -138,19 +140,19 @@ func removeSlide(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	s := db.Slide{
-		ID: toInt(id),
+	s := models.Slide{
+		ID: utils.ToInt(id),
 	}
 
 	err := s.Delete()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyRemoved, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 

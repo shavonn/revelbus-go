@@ -1,7 +1,9 @@
-package db
+package models
 
 import (
 	"database/sql"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/forms"
 )
 
 type Vendor struct {
@@ -22,8 +24,35 @@ type Vendor struct {
 
 type Vendors []*Vendor
 
+type VendorForm struct {
+	ID      string
+	Name    string
+	Address string
+	City    string
+	State   string
+	Zip     string
+	Phone   string
+	Email   string
+	URL     string
+	Notes   string
+	Brand   string
+	Active  bool
+	Errors  map[string]string
+}
+
+func (f *VendorForm) Valid() bool {
+	v := forms.NewValidator()
+
+	v.Required("Name", f.Name)
+	v.ValidEmail("Email", f.Email)
+	v.ValidURL("URL", f.URL)
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
 func (v *Vendor) Create() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active)
@@ -42,7 +71,7 @@ func (v *Vendor) Create() error {
 }
 
 func (v *Vendor) Update() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active, v.ID)
@@ -50,7 +79,7 @@ func (v *Vendor) Update() error {
 }
 
 func (v *Vendor) Delete() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `DELETE FROM vendors WHERE id = ?`
 	_, err := conn.Exec(stmt, v.ID)
@@ -58,19 +87,19 @@ func (v *Vendor) Delete() error {
 }
 
 func (v *Vendor) Get() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand, active FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand, &v.Active)
 	if err == sql.ErrNoRows {
-		return ErrNotFound
+		return db.ErrNotFound
 	}
 
 	return err
 }
 
 func GetVendors(oa bool) (Vendors, error) {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	var stmt string
 

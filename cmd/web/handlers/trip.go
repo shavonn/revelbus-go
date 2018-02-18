@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -14,33 +16,33 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "admin-trip", &view{
-			Form:  new(forms.TripForm),
+		view.Render(w, r, "admin-trip", &view.View{
+			Form:  new(models.TripForm),
 			Title: "New Trip",
 		})
 		return
 	}
 
-	t := &db.Trip{
-		ID: toInt(id),
+	t := &models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.Get()
 	if err == db.ErrNotFound {
-		notFound(w, r)
+		view.NotFound(w, r)
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := db.GetVendors(true)
+	vendors, err := models.GetVendors(true)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	f := &forms.TripForm{
+	f := &models.TripForm{
 		ID:           id,
 		Title:        t.Title,
 		Slug:         t.Slug,
@@ -55,7 +57,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		Image:        t.Image,
 	}
 
-	render(w, r, "admin-trip", &view{
+	view.Render(w, r, "admin-trip", &view.View{
 		ActiveKey: "trip",
 		Form:      f,
 		Trip:      t,
@@ -68,11 +70,11 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.TripForm{
+	f := &models.TripForm{
 		ID:           r.PostForm.Get("id"),
 		Title:        r.PostForm.Get("title"),
 		Slug:         r.PostForm.Get("slug"),
@@ -88,7 +90,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
@@ -96,21 +98,21 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New Trip"
 		}
 
-		render(w, r, "admin-trip", v)
+		view.Render(w, r, "admin-trip", v)
 	}
 
-	fn, err := uploadFile(w, r, "trip_image", "uploads/trip/")
+	fn, err := utils.UploadFile(w, r, "trip_image", "uploads/trip/")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
 	if fn != "" {
 		f.Image = fn
 	} else if (len(f.Image) != 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = deleteFile("uploads/trip/" + f.Image)
+		err = utils.DeleteFile("uploads/trip/" + f.Image)
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 		f.Image = ""
@@ -118,7 +120,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 
 	var msg string
 
-	t := db.Trip{
+	t := models.Trip{
 		Title:        f.Title,
 		Slug:         f.Slug,
 		Status:       f.Status,
@@ -133,29 +135,29 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if id != "" {
-		t.ID = toInt(id)
+		t.ID = utils.ToInt(id)
 
 		err := t.Update()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
-		msg = MsgSuccessfullyUpdated
+		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := t.Create()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
 		id = strconv.Itoa(t.ID)
-		msg = MsgSuccessfullyCreated
+		msg = utils.MsgSuccessfullyCreated
 	}
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -163,13 +165,13 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func listTrips(w http.ResponseWriter, r *http.Request) {
-	trips, err := db.GetTrips()
+	trips, err := models.GetTrips()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "admin-trips", &view{
+	view.Render(w, r, "admin-trips", &view.View{
 		Title: "Trips",
 		Trips: trips,
 	})
@@ -179,19 +181,19 @@ func removeTrip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	t := &db.Trip{
-		ID: toInt(id),
+	t := &models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.Delete()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyRemoved, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -202,23 +204,23 @@ func tripPartners(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	t := &db.Trip{
-		ID: toInt(id),
+	t := &models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.Get()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := db.GetVendors(true)
+	vendors, err := models.GetVendors(true)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "trip-partners", &view{
+	view.Render(w, r, "trip-partners", &view.View{
 		ActiveKey: "partners",
 		Trip:      t,
 		Vendors:   &vendors,
@@ -229,23 +231,23 @@ func tripVenues(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	t := &db.Trip{
-		ID: toInt(id),
+	t := &models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.Get()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := db.GetVendors(true)
+	vendors, err := models.GetVendors(true)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "trip-venues", &view{
+	view.Render(w, r, "trip-venues", &view.View{
 		ActiveKey: "venues",
 		Trip:      t,
 		Vendors:   &vendors,
@@ -258,26 +260,26 @@ func attachVendor(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
 	vid := r.PostForm.Get("vendor")
 	role := r.PostForm.Get("role")
 
-	t := db.Trip{
-		ID: toInt(id),
+	t := models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err = t.AddVendor(role, vid)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyAddedVendor, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyAddedVendor, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -290,19 +292,19 @@ func detachVendor(w http.ResponseWriter, r *http.Request) {
 	vid := vars["vid"]
 	role := vars["role"]
 
-	t := db.Trip{
-		ID: toInt(id),
+	t := models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.RemoveVendor(role, vid)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyRemovedVendor, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemovedVendor, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -315,19 +317,19 @@ func updateVenueStatus(w http.ResponseWriter, r *http.Request) {
 	vid := vars["vid"]
 	isPrimary, _ := strconv.ParseBool(vars["is_primary"])
 
-	t := db.Trip{
-		ID: toInt(id),
+	t := models.Trip{
+		ID: utils.ToInt(id),
 	}
 
 	err := t.SetVenueStatus(vid, isPrimary)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyUpdated, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyUpdated, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 

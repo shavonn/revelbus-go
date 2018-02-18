@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -15,34 +17,34 @@ func userForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "user", &view{
-			Form:  new(forms.UserForm),
+		view.Render(w, r, "user", &view.View{
+			Form:  new(models.UserForm),
 			Title: "New User",
 		})
 		return
 	}
 
-	u := &db.User{
-		ID: toInt(id),
+	u := &models.User{
+		ID: utils.ToInt(id),
 	}
 
 	err := u.Get()
 	if err == db.ErrNotFound {
-		notFound(w, r)
+		view.NotFound(w, r)
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		ID:    id,
 		Name:  u.Name,
 		Email: u.Email,
 		Role:  u.Role,
 	}
 
-	render(w, r, "user", &view{
+	view.Render(w, r, "user", &view.View{
 		Form: f,
 		User: u,
 	})
@@ -53,11 +55,11 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		ID:    r.PostForm.Get("id"),
 		Name:  r.PostForm.Get("name"),
 		Email: r.PostForm.Get("email"),
@@ -65,7 +67,7 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
@@ -73,58 +75,58 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New User"
 		}
 
-		render(w, r, "user", v)
+		view.Render(w, r, "user", v)
 	}
 
 	var msg string
 
-	u := db.User{
+	u := models.User{
 		Name:  f.Name,
 		Email: f.Email,
 		Role:  f.Role,
 	}
 
 	if id != "" {
-		u.ID = toInt(id)
+		u.ID = utils.ToInt(id)
 
 		err := u.Update()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
 		if len(r.Form["reset_password"]) == 1 {
-			pw := randomString(14)
+			pw := utils.RandomString(14)
 
 			err := u.UpdatePassword(pw)
 			if err != nil {
-				serverError(w, r, err)
+				view.ServerError(w, r, err)
 				return
 			}
 
 			email.NewPassword(u.Email, pw)
 		}
 
-		msg = MsgSuccessfullyUpdated
+		msg = utils.MsgSuccessfullyUpdated
 	} else {
-		pw := randomString(14)
+		pw := utils.RandomString(14)
 		u.Password = pw
 
 		err := u.Create()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
 		email.NewPassword(u.Email, pw)
 
 		id = strconv.Itoa(u.ID)
-		msg = MsgSuccessfullyCreated
+		msg = utils.MsgSuccessfullyCreated
 	}
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -132,13 +134,13 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func listUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := db.GetUsers()
+	users, err := models.GetUsers()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "users", &view{
+	view.Render(w, r, "users", &view.View{
 		Title: "Users",
 		Users: &users,
 	})
@@ -148,19 +150,19 @@ func removeUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	u := &db.User{
-		ID: toInt(id),
+	u := &models.User{
+		ID: utils.ToInt(id),
 	}
 
 	err := u.Delete()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfullyRemoved, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 

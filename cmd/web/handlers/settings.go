@@ -2,37 +2,39 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 	"strconv"
 )
 
 func settingsForm(w http.ResponseWriter, r *http.Request) {
-	s := &db.Settings{
+	s := &models.Settings{
 		ID: 1,
 	}
 
 	err := s.Get()
 	if err == db.ErrNotFound {
-		render(w, r, "settings", &view{
-			Form:  new(forms.SettingsForm),
+		view.Render(w, r, "settings", &view.View{
+			Form:  new(models.SettingsForm),
 			Title: "Settings",
 		})
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	f := &forms.SettingsForm{
+	f := &models.SettingsForm{
 		ID:           strconv.Itoa(s.ID),
 		ContactBlurb: s.ContactBlurb,
 		AboutBlurb:   s.AboutBlurb,
 		AboutContent: s.AboutContent,
 	}
 
-	render(w, r, "settings", &view{
+	view.Render(w, r, "settings", &view.View{
 		Title: "Settings",
 		Form:  f,
 	})
@@ -41,11 +43,11 @@ func settingsForm(w http.ResponseWriter, r *http.Request) {
 func postSettings(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.SettingsForm{
+	f := &models.SettingsForm{
 		ID:           r.PostForm.Get("id"),
 		ContactBlurb: r.PostForm.Get("contact_blurb"),
 		AboutBlurb:   r.PostForm.Get("about_blurb"),
@@ -53,17 +55,17 @@ func postSettings(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
-		render(w, r, "settings", v)
+		view.Render(w, r, "settings", v)
 	}
 
 	var msg string
 
-	s := db.Settings{
-		ID:           toInt(f.ID),
+	s := models.Settings{
+		ID:           utils.ToInt(f.ID),
 		ContactBlurb: f.ContactBlurb,
 		AboutBlurb:   f.AboutBlurb,
 		AboutContent: f.AboutContent,
@@ -72,22 +74,22 @@ func postSettings(w http.ResponseWriter, r *http.Request) {
 	if f.ID != "" {
 		err := s.Update()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
-		msg = MsgSuccessfullyUpdated
+		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := s.Create()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
-		msg = MsgSuccessfullyCreated
+		msg = utils.MsgSuccessfullyCreated
 	}
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 

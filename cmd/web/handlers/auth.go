@@ -2,18 +2,20 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func signupForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "signup", &view{
-		Form:  new(forms.UserForm),
+	view.Render(w, r, "signup", &view.View{
+		Form:  new(models.UserForm),
 		Title: "Signup",
 	})
 }
@@ -21,11 +23,11 @@ func signupForm(w http.ResponseWriter, r *http.Request) {
 func postSignup(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		Name:            r.PostForm.Get("name"),
 		Email:           r.PostForm.Get("email"),
 		Password:        r.PostForm.Get("password"),
@@ -34,13 +36,13 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidSignup() {
-		render(w, r, "signup", &view{
+		view.Render(w, r, "signup", &view.View{
 			Form: f,
 		})
 		return
 	}
 
-	u := db.User{
+	u := models.User{
 		Name:     f.Name,
 		Email:    f.Email,
 		Password: f.Password,
@@ -50,19 +52,19 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	err = u.Create()
 	if err == db.ErrDuplicateEmail {
 		f.Errors["Email"] = "E-mail address is already in use"
-		render(w, r, "signup", &view{
+		view.Render(w, r, "signup", &view.View{
 			Form:  f,
 			Title: "Signup",
 		})
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgSuccessfulSignup, "success")
+	err = flash.Add(w, r, utils.MsgSuccessfulSignup, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -70,8 +72,8 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "login", &view{
-		Form:  new(forms.UserForm),
+	view.Render(w, r, "login", &view.View{
+		Form:  new(models.UserForm),
 		Title: "Login",
 	})
 }
@@ -79,47 +81,47 @@ func loginForm(w http.ResponseWriter, r *http.Request) {
 func postLogin(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		Email:    r.PostForm.Get("email"),
 		Password: r.PostForm.Get("password"),
 	}
 
 	if !f.ValidLogin() {
-		render(w, r, "login", &view{
+		view.Render(w, r, "login", &view.View{
 			Form: f,
 		})
 		return
 	}
 
-	u := &db.User{
+	u := &models.User{
 		Email: f.Email,
 	}
 
 	err = u.VerifyUser(f.Password)
 	if err == db.ErrInvalidCredentials {
-		err = flash.Add(w, r, MsgUnsuccessfulLogin, "danger")
+		err = flash.Add(w, r, utils.MsgUnsuccessfulLogin, "danger")
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
-		render(w, r, "login", &view{
+		view.Render(w, r, "login", &view.View{
 			Form:  f,
 			Title: "Login",
 		})
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = setUserSession(w, r, u)
+	err = utils.SetUserSession(w, r, u)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -127,9 +129,9 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	err := removeUserSession(w, r)
+	err := utils.RemoveUserSession(w, r)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -137,8 +139,8 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func forgotPasswordForm(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "forgot", &view{
-		Form:  new(forms.UserForm),
+	view.Render(w, r, "forgot", &view.View{
+		Form:  new(models.UserForm),
 		Title: "Forgot Password",
 	})
 }
@@ -146,42 +148,42 @@ func forgotPasswordForm(w http.ResponseWriter, r *http.Request) {
 func postForgotPassword(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		Email: r.PostForm.Get("email"),
 	}
 
 	if !f.ValidForgot() {
-		render(w, r, "forgot", &view{
+		view.Render(w, r, "forgot", &view.View{
 			Form:  f,
 			Title: "Forgot Password",
 		})
 		return
 	}
 
-	u := db.User{
+	u := models.User{
 		Email: f.Email,
 	}
 
 	err = u.Get()
 	if err == nil {
-		rh := randomString(20)
+		rh := utils.RandomString(20)
 
 		err = u.SetRecover(rh)
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
 		email.RecoverAccount(u.Email, rh)
 	}
 
-	err = flash.Add(w, r, MsgRecoverySent, "success")
+	err = flash.Add(w, r, utils.MsgRecoverySent, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
@@ -195,30 +197,30 @@ func resetPasswordForm(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	if email == "" || hash == "" {
-		err := flash.Add(w, r, MsgInvalidRecovery, "warning")
+		err := flash.Add(w, r, utils.MsgInvalidRecovery, "warning")
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 		http.Redirect(w, r, "/auth/forgot", http.StatusSeeOther)
 	}
 
-	u := &db.User{
+	u := &models.User{
 		Email: email,
 	}
 
 	err := u.CheckRecover(hash)
 	if err != nil {
-		err := flash.Add(w, r, MsgInvalidRecovery, "warning")
+		err := flash.Add(w, r, utils.MsgInvalidRecovery, "warning")
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 		http.Redirect(w, r, "/auth/forgot", http.StatusSeeOther)
 	}
 
-	render(w, r, "reset", &view{
-		Form: &forms.UserForm{
+	view.Render(w, r, "reset", &view.View{
+		Form: &models.UserForm{
 			Email:        email,
 			RecoveryHash: hash,
 		},
@@ -229,11 +231,11 @@ func resetPasswordForm(w http.ResponseWriter, r *http.Request) {
 func postPasswordReset(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.UserForm{
+	f := &models.UserForm{
 		Email:           r.PostForm.Get("email"),
 		Password:        r.PostForm.Get("password"),
 		ConfirmPassword: r.PostForm.Get("confirm_password"),
@@ -241,109 +243,40 @@ func postPasswordReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.ValidPassword() || !f.ValidForgot() {
-		render(w, r, "reset", &view{
+		view.Render(w, r, "reset", &view.View{
 			Form:  f,
 			Title: "Reset Password",
 		})
 		return
 	}
 
-	u := &db.User{
+	u := &models.User{
 		Email: f.Email,
 	}
 
 	err = u.Recover(f.RecoveryHash, f.Password)
 	if err == db.ErrInvalidCredentials || err == bcrypt.ErrHashTooShort {
-		err = flash.Add(w, r, MsgInvalidCredentials, "danger")
+		err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 
-		render(w, r, "reset", &view{
+		view.Render(w, r, "reset", &view.View{
 			Form:  f,
 			Title: "Reset Password",
 		})
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	err = flash.Add(w, r, MsgPasswordResetSuccessful, "success")
+	err = flash.Add(w, r, utils.MsgPasswordResetSuccessful, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
 	http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
-}
-
-func requireLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := loggedIn(r)
-	if err != nil {
-		serverError(w, r, err)
-		return
-	}
-
-	if u == nil {
-		err = flash.Add(w, r, MsgMustBeLoggedIn, "warning")
-		if err != nil {
-			serverError(w, r, err)
-			return
-		}
-
-		http.Redirect(w, r, "/auth/login", 302)
-		return
-	}
-	next(w, r)
-}
-
-func requireAdmin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := loggedIn(r)
-	if err != nil {
-		serverError(w, r, err)
-		return
-	}
-
-	if u == nil {
-		err = flash.Add(w, r, MsgMustBeLoggedIn, "warning")
-		if err != nil {
-			serverError(w, r, err)
-			return
-		}
-
-		http.Redirect(w, r, "/auth/login", 302)
-		return
-	} else if u.Role != "admin" {
-		err = flash.Add(w, r, MsgMustBeAdmin, "warning")
-		if err != nil {
-			serverError(w, r, err)
-			return
-		}
-
-		http.Redirect(w, r, "/u", 302)
-		return
-	}
-	next(w, r)
-}
-
-func requireGuest(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := loggedIn(r)
-	if err != nil {
-		serverError(w, r, err)
-		return
-	}
-
-	if u != nil {
-		err = flash.Add(w, r, MsgAlreadyAuthenticated, "warning")
-		if err != nil {
-			serverError(w, r, err)
-			return
-		}
-
-		http.Redirect(w, r, "/", 302)
-		return
-	}
-	next(w, r)
 }

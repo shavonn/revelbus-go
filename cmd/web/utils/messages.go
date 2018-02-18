@@ -1,4 +1,4 @@
-package handlers
+package utils
 
 const (
 	MsgAlreadyAuthenticated      = "You are already logged in!"

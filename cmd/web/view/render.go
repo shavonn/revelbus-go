@@ -1,68 +1,43 @@
-package handlers
+package view
 
 import (
 	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
-	"revelforce/internal/platform/db"
+	"revelforce/cmd/web/utils"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"strings"
-	"time"
 
 	"github.com/justinas/nosurf"
 	"github.com/spf13/viper"
 )
 
-func humanDate(t time.Time) string {
-	return t.Format("Mon, Jan 2, 2006 at 3:04 PM")
-}
-
-func month(s time.Time, e time.Time) string {
-	if s.Month() == e.Month() {
-		return s.Format("Jan")
-	}
-	return s.Format("Jan") + " - " + e.Format("Jan")
-}
-
-func day(s time.Time, e time.Time) string {
-	if s.Month() == e.Month() && s.Day() != e.Day() {
-		return s.Format("2") + " - " + e.Format("2")
-	}
-	return s.Format("2")
-}
-
-func blurb(s string) string {
-	if len(s) > 105 {
-		return s[:105]
-	}
-	return s
-}
-
-type view struct {
+type View struct {
 	ActiveKey   string
 	Blurb       string
 	Content     template.HTML
 	Err         appError
-	FAQ         *db.FAQ
-	FAQs        *db.FAQs
-	FAQGrouped  *db.GroupedFAQ
+	FAQ         *models.FAQ
+	FAQs        *models.FAQs
+	FAQGrouped  *models.GroupedFAQ
 	Flash       flash.Msg
 	Form        forms.Form
 	HeaderStyle string
-	Me          *db.User
+	Me          *models.User
 	Path        string
-	Slide       *db.Slide
-	Slides      *db.Slides
+	Slide       *models.Slide
+	Slides      *models.Slides
 	Title       string
 	Token       string
-	Trip        *db.Trip
-	Trips       *db.Trips
-	Vendor      *db.Vendor
-	Vendors     *db.Vendors
-	User        *db.User
-	Users       *db.Users
+	Trip        *models.Trip
+	Trips       *models.Trips
+	Vendor      *models.Vendor
+	Vendors     *models.Vendors
+	User        *models.User
+	Users       *models.Users
 }
 
 type appError struct {
@@ -70,34 +45,34 @@ type appError struct {
 	Message string
 }
 
-func render(w http.ResponseWriter, r *http.Request, tpl string, v *view) {
+func Render(w http.ResponseWriter, r *http.Request, tpl string, v *View) {
 	v.Path = r.URL.Path
 	v.Token = nosurf.Token(r)
 	v.HeaderStyle = getHeaderStyle(tpl)
 
 	flash, err := flash.Fetch(w, r)
 	if err != nil {
-		serverError(w, r, err)
+		ServerError(w, r, err)
 		return
 	}
 	v.Flash = flash
 
-	u, err := loggedIn(r)
+	u, err := utils.LoggedIn(r)
 	if err != nil {
-		serverError(w, r, err)
+		ServerError(w, r, err)
 		return
 	}
 	v.Me = u
 
 	t, err := parseTemplates()
 	if err != nil {
-		serverError(w, r, err)
+		ServerError(w, r, err)
 		return
 	}
 
 	err = t.ExecuteTemplate(w, tpl, v)
 	if err != nil {
-		serverError(w, r, err)
+		ServerError(w, r, err)
 		return
 	}
 }
@@ -130,14 +105,14 @@ func parseTemplates() (*template.Template, error) {
 
 func getHeaderStyle(t string) string {
 	switch t {
-	case "trips":
-		return "game_guys"
-	case "faq":
-		return "golfers"
-	case "contact":
-		return "swimmers"
 	case "about":
 		return "wine_gals"
+	case "contact":
+		return "swimmers"
+	case "faq":
+		return "golfers"
+	case "trips":
+		return "game_guys"
 	default:
 		return ""
 	}

@@ -28,7 +28,7 @@ func ToTime(t string) time.Time {
 	return dt
 }
 
-func getSlug(str string, t string) string {
+func GetSlug(str string, t string) string {
 	var id int
 	var err error
 
