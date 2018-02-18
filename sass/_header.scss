@@ -1,0 +1,337 @@
+.header {
+    padding-top: 22px;
+    margin-bottom: 35px;
+
+    h2 {
+        @include font-rem(60);
+        font-weight: 300;
+        line-height: 64px;
+        color: #fff;
+    }
+}
+
+.main-nav {
+    .rb_logo {
+        text-indent: -9999px;
+        display: inline-block;
+        width: 224px;
+        height: 69px;
+        background: url('../images/RevBus_Logo_Type.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    .toggle, [id^=drop] {
+        visibility: hidden;
+    }
+
+    .toggle {
+        color: $turqoise;
+    }
+
+    ul {
+        margin-top: 16px;
+        padding-left: 0;
+        float: right;
+
+        li {
+            display: inline-block;
+            margin-right: 40px;
+
+            &.facebook {
+                margin-left: 60px;
+            }
+
+            &.social a {
+                @include font-rem(18);
+                color: $turqoise;
+            }
+
+            a {
+                @include font-rem(12);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 2.4px;
+                color: #989898;
+
+                &.active {
+                    color: $turqoise;
+                }
+            }
+        }
+    }
+}
+
+.home {
+    .header {
+        padding-top: 25px;
+        background-color: $sea-foam;
+    } 
+
+    .main-nav {
+        .rb_logo {
+            width: 289px;
+            height: 89px;
+        }
+
+        .toggle, ul li a {
+            color: #fff;
+        }
+    }
+}
+
+.hero {
+    height: 520px;
+    margin-bottom: 45px;
+
+    h2 {
+        width: 65%;
+        margin-top: 25px;
+        line-height: 74px;
+    }
+
+    .bus {
+        position: absolute;
+        bottom: 65px;
+        right: 0;
+        max-width: 85%;
+    }
+}
+
+.banner {
+    margin-top: 20px;
+    padding-top: 75px;
+    height: 282px;
+    @include  box-sizing();
+    position: relative;
+    @include box-shadow(inset, 0px 4px 13px 0, 50, 50, 50, 0.2);
+
+    .container {
+        padding-right: 0;
+        min-height: 100%;
+    }
+
+    .banner-character {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    h2 {
+        max-width: 380px;
+    }
+
+    &.game_guys {
+        background-color: #58C9F3;
+    }
+
+    &.golfers {
+        background-color: #91D9F8;
+
+        .container {
+            position: inherit;
+        }
+
+        .banner-character {
+            left: 0;
+        }
+    }
+
+    &.swimmers {
+        background-color: #91D9F8;
+        background-image: url('../images/headers/swimmers_bg.svg');
+        background-repeat: repeat-x;
+        background-position: left bottom;
+        background-size: 8.96%;
+
+        .banner-character {
+            width: 92%;
+        }
+    }
+
+    &.trip {
+        height: 545px;
+        padding: 50px 40px 0;
+        @include  box-sizing();
+        overflow: hidden;
+
+        background-size: cover;
+        border-top: 4px solid #44B4A8;
+
+        .container {
+            padding: 0;
+        }
+
+        img {
+            min-width: 100%;
+        }
+
+        h2 {
+            @include font-rem(80);
+            line-height: 74px;
+            letter-spacing: 1px;
+            position: initial;
+            margin-bottom: 100px;
+            max-width: 600px;
+        }
+
+        .info {
+            position: relative;
+        }
+
+        .date, .price-ticket {
+            float: left;
+        }
+
+        .date {
+            margin-right: 40px;
+
+            .month {
+                @include font-rem(22);
+                letter-spacing: 4.73px;
+                line-height: 25px;
+            }
+        
+            .day {
+                @include font-rem(52);
+                letter-spacing: 0;
+                line-height: 61px;
+            }
+        }
+
+        .price {
+            color: #fff;
+            @include font-rem(22);
+            font-weight: 300;
+            letter-spacing: 0;
+            line-height: 25px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+    }
+}
+
+@media only screen and (max-width: $min-desktop) {
+    .main-nav {
+        .rb_logo {
+            width: 240px;
+        }
+
+        ul {
+    
+            li {
+                margin-right: 20px;
+    
+                &.facebook {
+                    margin-left: 20px;
+                }
+            }
+        }
+    }
+
+    .home {
+        .main-nav {
+            .rb_logo {
+                width: 240px;
+            }
+        }
+    }
+
+    .hero {
+        height: 435px;
+
+        h2 {
+            @include font-rem(48);
+            line-height: 65px;
+            width: 70%;
+            margin-top: 10px;
+        }
+
+        .bus {
+            bottom: 40px;
+        }
+    }
+
+    .banner {
+        height: 230px;
+        padding-top: 60px;
+        
+        h2 {
+            @include font-rem(45);
+            line-height: 51px;
+            max-width: 250px;
+        }
+    }
+}
+
+@media only screen and (max-width: $min-tablet) {
+    .main-nav {
+        .toggle + a, ul {
+            visibility: hidden;
+        }
+        
+        .toggle {
+            visibility: visible;
+            float: right;
+        }
+
+        [id^=drop]:checked + ul {
+            visibility: visible;
+            float: none;
+            height: auto;
+            transition: all 0.5s;
+        }
+
+        ul {
+            margin-bottom: 25px;
+            height: 0;
+
+            li {
+                display: block;
+                margin: 0;
+                border-bottom: 1px solid $turqoise;
+
+                &.facebook {
+                    margin: 0;
+                }
+
+                &.social {
+                    width: 32%;
+                    display: inline-block;
+                    border-bottom: none;
+                    text-align: center;
+                }
+
+                a {
+                    display: block;
+                    padding: 10px;
+                }
+            }
+        }
+
+        a {
+            color: $turqoise;
+        }
+    }
+
+    .home .main-nav {
+        ul li {
+            border-bottom: 1px solid #fff;
+
+            &.social {
+                border-bottom: none;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $min-mobile) {
+    .hero {
+        height: 390px;
+
+        h2 {
+            width: 100%;
+            line-height: 58px;
+        }
+    }
+}

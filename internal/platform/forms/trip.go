@@ -5,6 +5,7 @@ type TripForm struct {
 	Title        string
 	Slug         string
 	Status       string
+	Blurb        string
 	Description  string
 	Start        string
 	End          string

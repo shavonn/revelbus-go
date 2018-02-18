@@ -1,0 +1,139 @@
+.trip-listing {
+    h2 {
+        font-family: $condensed-font;
+        @include font-rem(48);
+        font-weight: 300;
+        letter-spacing: 0;
+        line-height: 74px;
+
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    h4 {
+        font-family: $condensed-font;
+        @include font-rem(28);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 32px;
+        margin-bottom: 30px;
+    }
+
+    a.all-trips {
+        @include font-rem(12);
+        letter-spacing: 2.4px;
+        line-height: 14px;
+        text-transform: uppercase;
+        color: #000;
+
+        position: absolute;
+        top: 21px;
+        right: 0;
+    }
+
+    .trips {
+        overflow: auto;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    &.widget .trip-pod {
+        width: 100%;
+        margin: 0 0 20px;
+    }
+
+    &.horizontal .trip-pod {
+        position: relative;
+        width: 49%;
+        height: 151px;
+        margin-bottom: 0;
+        overflow: auto;
+
+        header, .info {
+            height: 151px;
+            float: left;
+        }
+
+        header {
+            width: 35%;
+            @include border-radius(5px 0 0 5px);
+        }
+    
+        .info {
+            width: 65%;
+            padding: 15px;
+            @include box-sizing();
+            @include border-radius(0 5px 5px 0);
+        }
+    }
+}
+
+.trip-pod {
+    float: left;
+    width: 32.31%;
+    height: 364px;
+    margin: 0 5px 20px;
+    @include  box-sizing();
+    @include border-radius(5px 5px 5px 5px);
+    background-color: #F7F8F9;
+
+    & > a {
+        display: block;
+    }
+
+    header {
+        height: 179px;
+        position: relative;
+        @include border-radius(5px 5px 0 0);
+        background-repeat: no-repeat;
+        background-size: cover;
+
+        .date {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+    }
+
+    .info {
+        padding: 25px;
+    }
+
+    h3 {
+        font-family: $condensed-font;
+        @include font-rem(22);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 32px;
+
+        a {
+            color: #474747;
+        }
+    }
+}
+
+@media only screen and (max-width: $min-desktop) {
+    .trip-pod {
+        width: 31.96%;
+    }
+}
+
+@media only screen and (max-width: $min-tablet) {
+    .trip-pod {
+        width: 48%;
+    }
+}
+
+@media only screen and (max-width: $min-mobile) {
+    .trip-listing {
+        a.all-trips {
+            position: relative;
+            display: block;
+            top: 8px;
+        }
+    }
+
+    .trip-pod {
+        width: 100%;
+    }
+}

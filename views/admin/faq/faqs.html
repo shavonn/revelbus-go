@@ -1,0 +1,28 @@
+{{define "faqs-admin"}}
+{{template "admin-header" .}}
+    {{if .FAQs}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Order</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .FAQs}}
+            <tr>
+                <td><a href="/admin/faq?id={{.ID}}">{{.Question}}</a></td>
+                <td>{{.Active}}</td>
+                <td>{{.Order}}</td>
+                <td class="text-right"><a href="/admin/faq/{{.ID}}?remove">x</i></a></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="alert alert-primary" role="alert">No faqs to be found. Whatever shall we do?</div>
+    {{end}}
+{{template "admin-footer" .}}
+{{end}}

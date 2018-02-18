@@ -13,6 +13,10 @@ import (
 func Routes() http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
 	r.HandleFunc("/", index).Methods("GET")
+	r.HandleFunc("/trips", trips).Methods("GET")
+	r.HandleFunc("/trip/{slug}", trip).Methods("GET")
+	r.HandleFunc("/faq", faq).Methods("GET")
+	r.HandleFunc("/contact", contact).Methods("GET")
 
 	auth := r.PathPrefix("/auth").Subrouter()
 	auth.HandleFunc("/recover", resetPasswordForm).Queries("email", "{email}").Queries("hash", "{hash}").Methods("GET")
@@ -51,6 +55,18 @@ func Routes() http.Handler {
 	admin.HandleFunc("/vendor", vendorForm).Methods("GET")
 	admin.HandleFunc("/vendor", postVendor).Methods("POST")
 	admin.HandleFunc("/vendors", listVendors).Methods("GET")
+
+	// faq crud
+	admin.HandleFunc("/faq/{id}", removeFAQ).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/faq", faqForm).Methods("GET")
+	admin.HandleFunc("/faq", postFAQ).Methods("POST")
+	admin.HandleFunc("/faqs", listFAQs).Methods("GET")
+
+	// slide crud
+	admin.HandleFunc("/slide/{id}", removeSlide).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/slide", slideForm).Methods("GET")
+	admin.HandleFunc("/slide", postSlide).Methods("POST")
+	admin.HandleFunc("/slides", listSlides).Methods("GET")
 
 	//user crud
 	admin.HandleFunc("/user/{id}", removeUser).Queries("remove", "").Methods("GET")

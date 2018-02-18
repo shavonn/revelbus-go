@@ -1,0 +1,139 @@
+.mailing-list {
+    height: 247px;
+    background-color: $turqoise;
+    color: #fff;
+
+    .container {
+        min-height: 100%;
+    }
+
+    h3 {
+        font-family: $condensed-font;
+        @include font-rem(36);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 74px;
+        text-transform: uppercase;
+        padding-top: 35px;
+    }
+
+    p {
+        @include font-rem(18);
+        letter-spacing: 0.43px;
+        line-height: 21px;
+        margin: 0;
+    }
+
+    img {
+        position: absolute;
+        bottom: 0;
+        z-index: 9;
+
+        &.one {
+            left: 15px;
+        }
+    
+        &.two {
+            right: 15px;
+        }
+    }
+
+    input[type=email] {
+        padding: 18px 30px;
+        width: 100%;
+        @include box-sizing();
+        border-radius: 23.5px;
+        border: none;
+    }
+
+    input[type=submit] {
+        text-indent: -99999px;
+        height: 41px;
+        width: 41px;
+        border: 0;
+        position: absolute;
+        top: 4px;
+        right: 3px;
+        background: url('../images/submit_ml.svg');
+        background-repeat: no-repeat;
+    }
+
+    .input {
+        width: 300px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    form {
+        float: right;
+        display: table;
+        width: 73%;
+        margin-top: 30px;
+
+        .txt-grp, .field {
+            display: table-cell;
+        }
+    }
+
+    &.duo {
+        text-align: center;
+
+        form {
+            float: none;
+            display: block;
+            margin-top: auto;
+            width: auto;
+        }
+
+        p {
+            margin: 20px 0;
+        }
+    }
+}
+
+@media only screen and (max-width: $min-desktop) {
+    .mailing-list {
+        img {
+            width: 22%;
+
+            &.golf_gal {
+                width: 30%;
+            }
+        }
+
+        form {
+            display: block;
+            text-align: center;
+
+            .txt-grp, .field {
+                display: block;
+
+                h3 {
+                    padding-top: 0;
+                }
+            }
+
+            .txt-grp {
+                margin-bottom: 22px;
+            }
+        }
+
+        &.duo {
+            height: 332px;
+        }
+    }
+}
+
+@media only screen and (max-width: $min-mobile) {
+    .mailing-list {
+        height: 320px;
+
+        .input {
+            width: 270px;
+        }
+
+        form {
+            width: 100%;
+        }
+    }
+}

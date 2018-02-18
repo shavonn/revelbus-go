@@ -1,0 +1,28 @@
+{{define "slides"}}
+{{template "admin-header" .}}
+    {{if .Slides}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Active</th>
+                <th>Order</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Slides}}
+            <tr>
+                <td><a href="/admin/slide?id={{.ID}}">{{.Title}}</a></td>
+                <td>{{.Active}}</td>
+                <td>{{.Order}}</td>
+                <td class="text-right"><a href="/admin/slide/{{.ID}}?remove">x</i></a></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="alert alert-primary" role="alert">No slides to be found. Whatever shall we do?</div>
+    {{end}}
+{{template "admin-footer" .}}
+{{end}}

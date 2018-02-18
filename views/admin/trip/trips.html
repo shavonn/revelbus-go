@@ -1,4 +1,4 @@
-{{define "trips"}}
+{{define "admin-trips"}}
 {{template "admin-header" .}}
     {{if .Trips}}
     <table class="table">
@@ -20,7 +20,7 @@
                 <td>{{humanDate .Start}}</td>
                 <td>{{humanDate .End}}</td>
                 <td>{{.Status}}</td>
-                <td class="text-right"><a href="/admin/trip?id={{.ID}}&remove">x</a></td>
+                <td class="text-right"><a href="/admin/trip/{{.ID}}?remove">x</a></td>
             </tr>
             {{end}}
         </tbody>

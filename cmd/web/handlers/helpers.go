@@ -9,6 +9,7 @@ import (
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/session"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -46,7 +47,9 @@ func uploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 		return "", err
 	}
 
-	dst, err := os.Create(filepath.Join(viper.GetString("files.static")+fldr, h.Filename))
+	fn := strings.Replace(h.Filename, " ", "", -1)
+
+	dst, err := os.Create(filepath.Join(viper.GetString("files.static")+fldr, fn))
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +59,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 	if err != nil {
 		return "", err
 	}
-	return h.Filename, err
+	return fn, err
 }
 
 func deleteFile(fn string) error {

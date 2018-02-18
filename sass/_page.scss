@@ -1,0 +1,55 @@
+.page {
+    overflow: auto;
+
+    & > div {
+        @include box-sizing();
+    }
+
+    &.with-sidebar {
+        .content, .sidebar {
+            float: left;
+        }
+
+        .content {
+            width: 70%;
+            padding-right: 40px;
+        }
+
+        .sidebar {
+            width: 30%;
+        }
+    }
+}
+
+.content {
+    h2 {
+        font-family: $condensed-font;
+        @include font-rem(26);
+    }
+
+    &.faq {
+        letter-spacing: 0;
+
+        ul {
+            list-style-type: none;
+            margin-bottom: 40px;
+
+            li {
+                margin-bottom: 10px;
+            }
+        }
+
+        h3 {
+            font-family: $condensed-font;
+            @include font-rem(22);
+            text-transform: uppercase;
+            line-height: 34px;
+        }
+
+        p {
+            @include font-rem(16);
+            font-weight: 300;
+            line-height: 26px;
+        }
+    }
+}

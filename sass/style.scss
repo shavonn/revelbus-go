@@ -1,0 +1,54 @@
+@import 'variables';
+@import 'mixins';
+
+body {
+    font-family: $primary-font;
+    font-weight: 300;
+    color: #474747;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5 {
+    margin: 0;
+}
+
+a, a:link, a:active, a:visited {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+footer {
+    @include font-rem(14);
+    letter-spacing: 0.9px;
+    text-align: center;
+    color: #989898;
+    height: 300px;
+    @include box-sizing();
+    padding-top: 60px;
+    background-color: rgba(227, 227, 227, .4);
+
+    img {
+        max-width: 300px;
+    }
+
+    a, a:link, a:active, a:visited {
+        color: #989898; 
+    }
+}
+
+@import 'header';
+@import 'page';
+@import 'shared';
+@import 'trips';
+@import 'slider';
+@import 'mailing_list';
