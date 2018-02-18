@@ -1,0 +1,143 @@
+.page {
+    overflow: auto;
+
+    &.container {
+        margin-bottom: 45px;
+    }
+
+    & > div {
+        @include box-sizing();
+    }
+
+    &.with-sidebar {
+        .content, .sidebar {
+            float: left;
+        }
+
+        .content {
+            width: 70%;
+            padding-right: 40px;
+        }
+
+        .sidebar {
+            width: 30%;
+        }
+    }
+}
+
+.content {
+    h2 {
+        font-family: $condensed-font;
+        @include font-rem(26);
+        margin-bottom: 35px;
+    }
+
+    .blurb {
+        font-family: $condensed-font;
+        @include font-rem(32);
+        font-weight: 300;
+        line-height: 52px;
+        letter-spacing: 0;
+        padding-bottom: 45px;
+        margin-bottom: 35px;
+        border-bottom: 1px solid #E3E3E3;
+    }
+
+    &.faq {
+        letter-spacing: 0;
+
+        ul {
+            list-style-type: none;
+            margin-bottom: 40px;
+
+            li {
+                margin-bottom: 10px;
+            }
+        }
+
+        h3 {
+            font-family: $condensed-font;
+            @include font-rem(22);
+            text-transform: uppercase;
+            line-height: 34px;
+        }
+
+        p {
+            @include font-rem(16);
+            font-weight: 300;
+            line-height: 26px;
+        }
+    }
+
+    &.contact {
+        form {
+            width: 70%;
+            margin: 0 auto;
+            overflow: auto;
+        }
+
+        .name, .email, .phone {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-top: 20px;
+        }
+
+        .phone {
+            padding: 0 5px 0 0;
+        }
+
+        .email {
+            padding: 0 0 0 5px;
+        }
+
+        .button {
+            text-align: right;
+            margin-top: 50px;
+        }
+
+        .btn {
+            background-color: #fff;
+            border: 3px solid $turqoise;
+        }
+    }
+}
+
+.widget {
+    margin-bottom: 42px;
+    
+    &.with-icon {
+        padding-left: 30px;
+
+        h3 {
+            background-repeat: no-repeat;
+            background-position: 0 5px;
+            padding-left: 30px;
+            margin-left: -30px;
+        
+            &.date-and-time {
+                background-image: url('../images/cal_icon.svg');
+            }
+            
+            &.locale {
+                background-image: url('../images/locale_marker.svg');
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $min-tablet) {
+    .page {
+        &.with-sidebar {
+            .content, .sidebar {
+                width: 100%;
+                float: none;
+            }
+
+            .content {
+                margin-bottom: 50px;
+            }
+        }
+    }
+}

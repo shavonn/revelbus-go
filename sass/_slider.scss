@@ -1,0 +1,132 @@
+.slider {
+    .caption {
+        color: #2E2E2E;
+        letter-spacing: 0;
+        font-weight: 300;
+        top: 15%;
+        left: 90px;
+        width: 40%;
+        position: absolute;
+
+        h3 {
+
+            font-family: $condensed-font;
+            @include font-rem(60);
+            line-height: 74px;
+            font-weight: 300;
+        }
+
+        p {
+            @include font-rem(16);
+            line-height: 35px;
+        }
+    }
+
+    .slide {
+
+        .inner {
+            height: 520px;
+        }
+
+        img {
+            position: absolute;
+            bottom: 0;
+            right: 75px;
+            max-width: 435px;
+        }
+
+        &.sport_guy {
+            background-color: #58C9F4;
+        }
+
+        &.wine_gal {
+            background-color: #C6B2D7;
+        }
+        
+        &.swim_gal {
+            background-color: #B8E986;
+    
+            img {
+                left: 70px;
+                max-width: 910px;
+            }
+    
+            .caption {
+                top: 38%;
+                right: 70px;
+                left: initial;
+                width: 50%;
+            }
+        }
+    }
+}
+
+.owl-nav div {
+    height: 49px;
+    width: 49px;
+    position: absolute;
+    top: 45%;
+    text-indent: -99999px;
+}
+
+.owl-prev {
+    background: url('../images/prev.svg');
+    left: 18px;
+}
+
+.owl-next {
+    background: url('../images/next.svg');
+    right: 18px;
+}
+
+@media only screen and (max-width: $min-desktop) {
+    .slider {
+        .caption {
+            width: 50%;
+        }
+    
+        .slide {
+            img {
+                width: 40%;
+            }
+
+            &.swim_gal {
+                .caption {
+                    top: 12%;
+                }
+                
+                img {
+                    width: 50%;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $min-tablet) {
+    .slider {
+        .caption {
+            width: 50%;
+        }
+    
+        .slide {
+    
+            img {
+                width: 40%;
+            }
+
+            &.swim_gal {
+                .caption {
+                    top: 12%;
+                    left: 85px;
+                    right: 0;
+                    width: 70%;
+                }
+                
+                img {
+                    width: 60%;
+                }
+            }
+        }
+    }
+}

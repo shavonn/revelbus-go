@@ -1,0 +1,40 @@
+@import 'variables';
+@import 'mixins';
+
+body {
+    font-family: $primary-font;
+    font-weight: 300;
+    line-height: 26px;
+    color: #474747;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5 {
+    margin: 0;
+}
+
+a, a:link, a:active, a:visited {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+input[type=text], textarea {
+    @include font-rem(14);
+    color: #9FA3A7;
+    background: #FAFAFA;
+    border: 1px solid #E6E6E6;
+    padding: 20px;
+    @include border-radius(4px);
+    width: 100%;
+    @include box-sizing();
+}
+
+@import 'header';
+@import 'page';
+@import 'shared';
+@import 'trips';
+@import 'slider';
+@import 'mailing_list';

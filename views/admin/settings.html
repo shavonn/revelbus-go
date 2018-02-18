@@ -1,0 +1,53 @@
+{{define "settings"}}
+{{template "admin-header" .}}
+    {{with .Form}}
+    <form action="/admin/settings" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+        {{if .ID}}
+        <input type="hidden" name="id" value="{{.ID}}">
+        {{end}}
+
+        <ul class="nav nav-tabs" id="settings" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="true">Contact</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="about-tab" data-toggle="tab" href="#about" role="tab" aria-controls="about" aria-selected="false">About</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="settingsContent">
+            <div class="tab-pane fade show active" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="form-group">
+                    <label for="contact_blurb">Contact Blurb</label>
+                    <textarea class="form-control{{with .Errors.ContactBlurb}} is-invalid{{end}}" name="contact_blurb">{{.ContactBlurb}}</textarea>
+                    {{with .Errors.ContactBlurb}}
+                    <div class="invalid-feedback">{{.}}</div>
+                    {{end}}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">
+                <div class="form-group">
+                    <label for="about_blurb">About Blurb</label>
+                    <textarea class="form-control{{with .Errors.AboutBlurb}} is-invalid{{end}}" name="about_blurb">{{.AboutBlurb}}</textarea>
+                    {{with .Errors.AboutBlurb}}
+                    <div class="invalid-feedback">{{.}}</div>
+                    {{end}}
+                </div>
+                <div class="form-group">
+                    <label for="about_content">About Content</label>
+                    <textarea class="form-control{{with .Errors.AboutContent}} is-invalid{{end}} editor" name="about_content">{{.AboutContent}}</textarea>
+                    {{with .Errors.AboutContent}}
+                    <div class="invalid-feedback">{{.}}</div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+    {{end}}
+{{template "admin-footer" .}}
+{{end}}

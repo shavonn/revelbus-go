@@ -1,0 +1,16 @@
+{{define "trip-pod"}}
+<article class="trip-pod">
+    <a href="/trip/{{.Slug}}">
+        <header style="background-image: url('/assets/uploads/trip/{{.Image}}')">
+            <div class="date">
+                <div class="month">{{month .Start .End}}</div>
+                <div class="day">{{day .Start .End}}</div>
+            </div>
+        </header>
+    </a>
+    <div class="info">
+        <h3><a href="/trip/{{.Slug}}">{{.Title}}</a></h3>
+        <p>{{blurb .Blurb}}...</p>
+    </div>
+</article>
+{{end}}

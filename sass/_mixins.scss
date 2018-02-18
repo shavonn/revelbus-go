@@ -1,0 +1,26 @@
+@mixin border-radius($radius: 2px) {
+    -webkit-border-radius: $radius;
+       -moz-border-radius: $radius;
+            border-radius: $radius;
+}
+
+@mixin box-shadow($orientation, $position, $r, $g, $b, $alpha) {
+    -webkit-box-shadow: $orientation $position rgba($r, $g, $b, $alpha);
+    -moz-box-shadow:    $orientation $position rgba($r, $g, $b, $alpha);
+    box-shadow:         $orientation $position rgba($r, $g, $b, $alpha);
+}
+
+@mixin box-sizing($box-model: border-box) {
+    -webkit-box-sizing: $box-model; // Safari <= 5
+    -moz-box-sizing:    $box-model; // Firefox <= 19
+    -ms-box-sizing:     $box-model;
+    box-sizing:         $box-model;
+}
+
+@mixin font-rem( $font-size-px ) {
+    $rem-font-size: ( $font-size-px / 14.66 );
+    font-size: #{$font-size-px}#{'px'};
+    font-size: #{$rem-font-size}#{'rem'};
+}
+
+

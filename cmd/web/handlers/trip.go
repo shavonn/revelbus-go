@@ -14,7 +14,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "trip", &view{
+		render(w, r, "admin-trip", &view{
 			Form:  new(forms.TripForm),
 			Title: "New Trip",
 		})
@@ -45,15 +45,17 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		Title:        t.Title,
 		Slug:         t.Slug,
 		Status:       t.Status,
+		Blurb:        t.Blurb,
 		Description:  t.Description,
 		Start:        t.Start.Format(db.TimeFormat),
 		End:          t.End.Format(db.TimeFormat),
+		Price:        t.Price,
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
 		Image:        t.Image,
 	}
 
-	render(w, r, "trip", &view{
+	render(w, r, "admin-trip", &view{
 		ActiveKey: "trip",
 		Form:      f,
 		Trip:      t,
@@ -75,10 +77,12 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		Title:        r.PostForm.Get("title"),
 		Slug:         r.PostForm.Get("slug"),
 		Status:       r.PostForm.Get("status"),
+		Blurb:        r.PostForm.Get("blurb"),
 		Description:  r.PostForm.Get("description"),
 		Start:        r.PostForm.Get("start"),
 		End:          r.PostForm.Get("end"),
 		TicketingURL: r.PostForm.Get("ticketing_url"),
+		Price:        r.PostForm.Get("price"),
 		Notes:        r.PostForm.Get("notes"),
 		Image:        r.PostForm.Get("image"),
 	}
@@ -92,7 +96,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 			v.Title = "New Trip"
 		}
 
-		render(w, r, "trip", v)
+		render(w, r, "admin-trip", v)
 	}
 
 	fn, err := uploadFile(w, r, "trip_image", "uploads/trip/")
@@ -118,10 +122,12 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		Title:        f.Title,
 		Slug:         f.Slug,
 		Status:       f.Status,
+		Blurb:        f.Blurb,
 		Description:  f.Description,
 		Start:        db.ToTime(f.Start),
 		End:          db.ToTime(f.End),
 		TicketingURL: f.TicketingURL,
+		Price:        f.Price,
 		Notes:        f.Notes,
 		Image:        f.Image,
 	}
@@ -163,7 +169,7 @@ func listTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(w, r, "trips", &view{
+	render(w, r, "admin-trips", &view{
 		Title: "Trips",
 		Trips: trips,
 	})

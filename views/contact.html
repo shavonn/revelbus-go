@@ -1,0 +1,49 @@
+{{define "contact"}}
+{{template "header" .}}
+<main class="page container">
+    <div class="content contact">
+        <div class="blurb">{{.Blurb}}</div>
+        <form action="/contact" method="post" novalidate>
+            <input type="hidden" name="csrf_token" value="{{$.Token}}">
+            <div class="name">
+                <input name="name" type="text" placeholder="Name" />
+            </div>
+            <div class="phone half">
+                <input name="phone" type="text" placeholder="Phone" />
+            </div>
+            <div class="email half">
+                <input name="email" type="text" placeholder="Email" />
+            </div>
+            <div class="message">
+                <textarea class="form-control" name="message" placeholder="Your message"></textarea>
+            </div>
+            <div class="half offset button">
+                <button type="submit" class="btn">Send</button>
+            </div>
+        </form>
+    </div>
+</main>
+<div class="mailing-list one">
+        <div class="container">
+            <img src="/assets/images/chars/swim_guy.svg" class="one swim_guy" />
+            <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+            <div class="txt-grp">
+                <h3>Join the Party</h3>
+                <p>Get notified about upcoming events in your area.</p>
+            </div>
+            <div class="field">
+                <div class="input">
+                    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+                    <div id="mce-responses" class="clear">
+                        <div class="response" id="mce-error-response" style="display:none"></div>
+                        <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ce6905f609353633857e2d198_9ab582054e" tabindex="-1" value=""></div>
+                    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+{{template "footer" .}}
+{{end}}
