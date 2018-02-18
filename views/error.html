@@ -1,5 +1,31 @@
 {{define "error"}}
 {{template "header" .}}
-{{.Err.Message}}
+<main class="page container">
+    <div class="content error">
+        {{with .Err}}
+        <h2>{{.Code}}</h2>
+        <p>{{.Message}}</p>
+        {{end}}
+    </div>
+</main>
+<div class="mailing-list duo">
+    <div class="container">
+        <img src="assets/images/chars/wine_gal2.svg" class="one" />
+        <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <h3>Join the Party</h3>
+        <div class="input">
+            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+            <div id="mce-responses" class="clear">
+                <div class="response" id="mce-error-response" style="display:none"></div>
+                <div class="response" id="mce-success-response" style="display:none"></div>
+            </div>
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ce6905f609353633857e2d198_9ab582054e" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+        </div>
+        <p>Get notified about upcoming trips in your area.</p>
+        </form>
+        <img src="assets/images/chars/golf_guy.svg" class="two" />
+    </div>
+</div>
 {{template "footer" .}}
 {{end}}
