@@ -75,6 +75,15 @@ footer {
     }
 }
 
+@media only screen and (max-width: $min-tablet) {
+    .date {
+        .day {
+            @include font-rem(32);
+            line-height: 41px;
+        }
+    }
+}
+
 @media only screen and (max-width: $min-mobile) {
     .half {
         width: 100%;

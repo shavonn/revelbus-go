@@ -10,13 +10,14 @@ import (
 
 type Trip struct {
 	ID           int
-	Title        string
-	Slug         string
 	Status       string
+	Slug         string
+	Title        string
 	Blurb        string
 	Description  string
 	Start        time.Time
 	End          time.Time
+	Price        string
 	TicketingURL string
 	Notes        string
 	Image        string
@@ -32,8 +33,8 @@ func (t *Trip) Create() error {
 
 	slug := getSlug(t.Title, "trips")
 
-	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, ticketing_url, notes, image, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.Image)
+	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image)
 	if err != nil {
 		return err
 	}
@@ -55,8 +56,8 @@ func (t *Trip) Update() error {
 		t.Slug = getSlug(t.Title, "trips")
 	}
 
-	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, ticketing_url = ?, notes = ?, image = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.TicketingURL, t.Notes, t.Image, t.ID)
+	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.ID)
 	return err
 }
 
@@ -71,10 +72,10 @@ func (t *Trip) Delete() error {
 func (t *Trip) Get() error {
 	conn, _ := GetConnection()
 
-	stmt := `SELECT title, slug, status, blurb, description, start, end, ticketing_url, notes, image FROM trips WHERE id = ?`
+	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image FROM trips WHERE id = ?`
 	row := conn.QueryRow(stmt, t.ID)
 
-	err := row.Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Notes, &t.Image)
+	err := row.Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image)
 	if err == sql.ErrNoRows {
 		return ErrNotFound
 	}
@@ -88,10 +89,10 @@ func GetBySlug(s string) (*Trip, error) {
 	conn, _ := GetConnection()
 	t := &Trip{}
 
-	stmt := `SELECT id, title, slug, status, blurb, description, start, end, ticketing_url, image FROM trips WHERE slug = ?`
+	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image FROM trips WHERE slug = ?`
 	row := conn.QueryRow(stmt, s)
 
-	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.TicketingURL, &t.Image)
+	err := row.Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image)
 	if err == sql.ErrNoRows {
 		return nil, ErrNotFound
 	}

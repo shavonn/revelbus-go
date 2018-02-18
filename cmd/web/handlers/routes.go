@@ -31,7 +31,7 @@ func Routes() http.Handler {
 	auth.HandleFunc("/login", postLogin).Methods("POST")
 
 	user := r.PathPrefix("/u").Subrouter()
-	user.HandleFunc("/", dashboard).Methods("GET")
+	user.HandleFunc("/", userDashboard).Methods("GET")
 	user.HandleFunc("/profile", profileForm).Methods("GET")
 	user.HandleFunc("/profile", postProfile).Methods("POST")
 	user.HandleFunc("/password", passwordForm).Methods("GET")
@@ -39,6 +39,7 @@ func Routes() http.Handler {
 	user.HandleFunc("/logout", logout).Methods("GET")
 
 	admin := r.PathPrefix("/admin").Subrouter()
+	admin.HandleFunc("/", adminDashboard).Methods("GET")
 
 	admin.HandleFunc("/settings", settingsForm).Methods("GET")
 	admin.HandleFunc("/settings", postSettings).Methods("POST")

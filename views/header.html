@@ -36,17 +36,23 @@
 			{{with .Trip}}
             <div class="banner trip" style="background-image: url('/assets/uploads/trip/{{.Image}}');">
                 <div class="container">
-                    <h2>{{.Title}}</h2>
-                    <div class="info">
-                        <div class="date">
-                            <div class="month">{{month .Start .End}}</div>
-                            <div class="day">{{day .Start .End}}</div>
-                        </div>
-                        <div class="price-ticket">
-                            <div class="price">$90 - $306</div>
-                            <a href="" class="btn">Buy Tickets</a>
-                        </div>
-                    </div>
+					<div class="details">
+						<h2>{{.Title}}</h2>
+						<div class="info">
+							<div class="date">
+								<div class="month">{{month .Start .End}}</div>
+								<div class="day">{{day .Start .End}}</div>
+							</div>
+							<div class="price-ticket">
+								<div class="price">{{.Price}}</div>
+								{{if .TicketingURL}}
+									<a href="{{.TicketingURL}}" class="btn">Buy Tickets</a>
+								{{else}}
+									<span class="btn">Tickets Coming Soon!</span>
+								{{end}}
+							</div>
+						</div>
+					</div>
                 </div>
 			</div>
 			{{end}}

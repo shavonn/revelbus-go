@@ -103,3 +103,41 @@
         }
     }
 }
+
+.widget {
+    margin-bottom: 42px;
+    
+    &.with-icon {
+        padding-left: 30px;
+
+        h3 {
+            background-repeat: no-repeat;
+            background-position: 0 5px;
+            padding-left: 30px;
+            margin-left: -30px;
+        
+            &.date-and-time {
+                background-image: url('../images/cal_icon.svg');
+            }
+            
+            &.locale {
+                background-image: url('../images/locale_marker.svg');
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $min-tablet) {
+    .page {
+        &.with-sidebar {
+            .content, .sidebar {
+                width: 100%;
+                float: none;
+            }
+
+            .content {
+                margin-bottom: 50px;
+            }
+        }
+    }
+}

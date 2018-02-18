@@ -161,6 +161,6 @@ func faq(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func dashboard(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "dashboard", &view{})
+func userDashboard(w http.ResponseWriter, r *http.Request) {
+	render(w, r, "user-dashboard", &view{})
 }

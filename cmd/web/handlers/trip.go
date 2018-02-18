@@ -49,6 +49,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 		Description:  t.Description,
 		Start:        t.Start.Format(db.TimeFormat),
 		End:          t.End.Format(db.TimeFormat),
+		Price:        t.Price,
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
 		Image:        t.Image,
@@ -81,6 +82,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		Start:        r.PostForm.Get("start"),
 		End:          r.PostForm.Get("end"),
 		TicketingURL: r.PostForm.Get("ticketing_url"),
+		Price:        r.PostForm.Get("price"),
 		Notes:        r.PostForm.Get("notes"),
 		Image:        r.PostForm.Get("image"),
 	}
@@ -125,6 +127,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 		Start:        db.ToTime(f.Start),
 		End:          db.ToTime(f.End),
 		TicketingURL: f.TicketingURL,
+		Price:        f.Price,
 		Notes:        f.Notes,
 		Image:        f.Image,
 	}

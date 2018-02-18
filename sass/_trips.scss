@@ -122,6 +122,12 @@
     .trip-pod {
         width: 48%;
     }
+    .trip-listing {
+        &.horizontal .trip-pod {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    }
 }
 
 @media only screen and (max-width: $min-mobile) {

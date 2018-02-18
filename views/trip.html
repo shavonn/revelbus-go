@@ -7,14 +7,14 @@
                 {{.Description}}
         </div>
         <div class="sidebar">
-            <div class="widget">
-                <h3 class="with-icon date-and-time">DATE AND TIME</h3>
+            <div class="widget with-icon">
+                <h3 class="date-and-time">DATE AND TIME</h3>
                 {{humanDate .Start}}<br />
                 {{humanDate .End}}<br />
                 Add to Calendar
             </div>
                 
-            <div class="widget">
+            <div class="widget with-icon">
                 <h3 class="with-icon locale">LOCATION</h3>
                 {{range .Venues}}
                     {{if .Primary}}

@@ -175,8 +175,15 @@
             max-width: 600px;
         }
 
+        .details {
+            overflow: auto;
+            position: absolute;
+            bottom: 50px;
+        }
+
         .info {
             position: relative;
+            overflow: auto;
         }
 
         .date, .price-ticket {
@@ -285,6 +292,7 @@
         ul {
             margin-bottom: 25px;
             height: 0;
+            float: none;
 
             li {
                 display: block;
@@ -320,6 +328,22 @@
 
             &.social {
                 border-bottom: none;
+            }
+        }
+    }
+
+    .banner {
+        &.trip {
+            .info {
+                max-width: 200px;
+            }
+            
+            .date, .price-ticket {
+                float: none;
+            }
+
+            .date {
+                margin-right: 0;
             }
         }
     }
