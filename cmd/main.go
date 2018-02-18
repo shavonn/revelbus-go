@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"revelforce/cmd/web"
-	"revelforce/cmd/web/handlers"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/session"
 	"time"
@@ -32,7 +31,7 @@ func main() {
 
 	srv := http.Server{
 		Addr:           viper.GetString("addr"),
-		Handler:        sesh.Use(handlers.Routes()),
+		Handler:        sesh.Use(web.Routes()),
 		IdleTimeout:    time.Minute,
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,

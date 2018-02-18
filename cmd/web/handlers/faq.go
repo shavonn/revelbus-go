@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func faqForm(w http.ResponseWriter, r *http.Request) {
+func FaqForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
@@ -52,7 +52,7 @@ func faqForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postFAQ(w http.ResponseWriter, r *http.Request) {
+func PostFAQ(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	err := r.ParseForm()
@@ -123,7 +123,7 @@ func postFAQ(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/faq?id="+id, http.StatusSeeOther)
 }
 
-func listFAQs(w http.ResponseWriter, r *http.Request) {
+func ListFAQs(w http.ResponseWriter, r *http.Request) {
 	faqs, err := models.GetFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -136,7 +136,7 @@ func listFAQs(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func removeFAQ(w http.ResponseWriter, r *http.Request) {
+func RemoveFAQ(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

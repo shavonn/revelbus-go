@@ -13,14 +13,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func signupForm(w http.ResponseWriter, r *http.Request) {
+func SignupForm(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "signup", &view.View{
 		Form:  new(models.UserForm),
 		Title: "Signup",
 	})
 }
 
-func postSignup(w http.ResponseWriter, r *http.Request) {
+func PostSignup(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -71,14 +71,14 @@ func postSignup(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func loginForm(w http.ResponseWriter, r *http.Request) {
+func LoginForm(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "login", &view.View{
 		Form:  new(models.UserForm),
 		Title: "Login",
 	})
 }
 
-func postLogin(w http.ResponseWriter, r *http.Request) {
+func PostLogin(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -128,7 +128,7 @@ func postLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/u", http.StatusSeeOther)
 }
 
-func logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	err := utils.RemoveUserSession(w, r)
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -138,14 +138,14 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 303)
 }
 
-func forgotPasswordForm(w http.ResponseWriter, r *http.Request) {
+func ForgotPasswordForm(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "forgot", &view.View{
 		Form:  new(models.UserForm),
 		Title: "Forgot Password",
 	})
 }
 
-func postForgotPassword(w http.ResponseWriter, r *http.Request) {
+func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -190,7 +190,7 @@ func postForgotPassword(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func resetPasswordForm(w http.ResponseWriter, r *http.Request) {
+func ResetPasswordForm(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	email := vars["email"]
@@ -228,7 +228,7 @@ func resetPasswordForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postPasswordReset(w http.ResponseWriter, r *http.Request) {
+func PostPasswordReset(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)

@@ -2,9 +2,100 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/flash"
+	"strconv"
 )
 
 func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "admin-dashboard", &view.View{})
+}
+
+func SettingsForm(w http.ResponseWriter, r *http.Request) {
+	s := &models.Settings{
+		ID: 1,
+	}
+
+	err := s.Get()
+	if err == db.ErrNotFound {
+		view.Render(w, r, "settings", &view.View{
+			Form:  new(models.SettingsForm),
+			Title: "Settings",
+		})
+		return
+	} else if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	f := &models.SettingsForm{
+		ID:           strconv.Itoa(s.ID),
+		ContactBlurb: s.ContactBlurb,
+		AboutBlurb:   s.AboutBlurb,
+		AboutContent: s.AboutContent,
+	}
+
+	view.Render(w, r, "settings", &view.View{
+		Title: "Settings",
+		Form:  f,
+	})
+}
+
+func PostSettings(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		view.ClientError(w, r, http.StatusBadRequest)
+		return
+	}
+
+	f := &models.SettingsForm{
+		ID:           r.PostForm.Get("id"),
+		ContactBlurb: r.PostForm.Get("contact_blurb"),
+		AboutBlurb:   r.PostForm.Get("about_blurb"),
+		AboutContent: r.PostForm.Get("about_content"),
+	}
+
+	if !f.Valid() {
+		v := &view.View{
+			Form: f,
+		}
+
+		view.Render(w, r, "settings", v)
+	}
+
+	var msg string
+
+	s := models.Settings{
+		ID:           utils.ToInt(f.ID),
+		ContactBlurb: f.ContactBlurb,
+		AboutBlurb:   f.AboutBlurb,
+		AboutContent: f.AboutContent,
+	}
+
+	if f.ID != "" {
+		err := s.Update()
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+		msg = utils.MsgSuccessfullyUpdated
+	} else {
+		err := s.Create()
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+		msg = utils.MsgSuccessfullyCreated
+	}
+
+	err = flash.Add(w, r, msg, "success")
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/settings", http.StatusSeeOther)
 }

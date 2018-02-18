@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func tripForm(w http.ResponseWriter, r *http.Request) {
+func TripForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
@@ -65,7 +65,7 @@ func tripForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postTrip(w http.ResponseWriter, r *http.Request) {
+func PostTrip(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	err := r.ParseForm()
@@ -164,7 +164,7 @@ func postTrip(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/trip?id="+id, http.StatusSeeOther)
 }
 
-func listTrips(w http.ResponseWriter, r *http.Request) {
+func ListTrips(w http.ResponseWriter, r *http.Request) {
 	trips, err := models.GetTrips()
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -177,7 +177,7 @@ func listTrips(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func removeTrip(w http.ResponseWriter, r *http.Request) {
+func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -200,7 +200,7 @@ func removeTrip(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/trips", http.StatusSeeOther)
 }
 
-func tripPartners(w http.ResponseWriter, r *http.Request) {
+func TripPartners(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -227,7 +227,7 @@ func tripPartners(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func tripVenues(w http.ResponseWriter, r *http.Request) {
+func TripVenues(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -254,7 +254,7 @@ func tripVenues(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func attachVendor(w http.ResponseWriter, r *http.Request) {
+func AttachVendor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -286,7 +286,7 @@ func attachVendor(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/trip/"+id+"?"+role+"s", http.StatusSeeOther)
 }
 
-func detachVendor(w http.ResponseWriter, r *http.Request) {
+func DetachVendor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	vid := vars["vid"]
@@ -311,7 +311,7 @@ func detachVendor(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/trip/"+id+"?"+role+"s", http.StatusSeeOther)
 }
 
-func updateVenueStatus(w http.ResponseWriter, r *http.Request) {
+func UpdateVenueStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	vid := vars["vid"]

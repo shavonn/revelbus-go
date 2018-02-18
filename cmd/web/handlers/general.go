@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
+func Index(w http.ResponseWriter, r *http.Request) {
 	trips, err := models.GetUpcomingTrips(3)
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -32,7 +32,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func about(w http.ResponseWriter, r *http.Request) {
+func About(w http.ResponseWriter, r *http.Request) {
 	s := models.Settings{
 		ID: 1,
 	}
@@ -50,7 +50,7 @@ func about(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func contact(w http.ResponseWriter, r *http.Request) {
+func Contact(w http.ResponseWriter, r *http.Request) {
 	s := models.Settings{
 		ID: 1,
 	}
@@ -67,7 +67,7 @@ func contact(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func contactPost(w http.ResponseWriter, r *http.Request) {
+func ContactPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -104,7 +104,7 @@ func contactPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
-func trips(w http.ResponseWriter, r *http.Request) {
+func Trips(w http.ResponseWriter, r *http.Request) {
 	trips, err := models.GetUpcomingTrips(0)
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -118,7 +118,7 @@ func trips(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func trip(w http.ResponseWriter, r *http.Request) {
+func Trip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
@@ -143,7 +143,7 @@ func trip(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func faq(w http.ResponseWriter, r *http.Request) {
+func Faq(w http.ResponseWriter, r *http.Request) {
 	faqs, err := models.GetActiveFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)

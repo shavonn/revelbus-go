@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func userForm(w http.ResponseWriter, r *http.Request) {
+func UserForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
@@ -50,7 +50,7 @@ func userForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postUser(w http.ResponseWriter, r *http.Request) {
+func PostUser(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	err := r.ParseForm()
@@ -133,7 +133,7 @@ func postUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/user?id="+id, http.StatusSeeOther)
 }
 
-func listUsers(w http.ResponseWriter, r *http.Request) {
+func ListUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := models.GetUsers()
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -146,7 +146,7 @@ func listUsers(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func removeUser(w http.ResponseWriter, r *http.Request) {
+func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

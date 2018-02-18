@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func vendorForm(w http.ResponseWriter, r *http.Request) {
+func VendorForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
@@ -56,7 +56,7 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postVendor(w http.ResponseWriter, r *http.Request) {
+func PostVendor(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	err := r.ParseForm()
@@ -155,7 +155,7 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/vendor?id="+id, http.StatusSeeOther)
 }
 
-func listVendors(w http.ResponseWriter, r *http.Request) {
+func ListVendors(w http.ResponseWriter, r *http.Request) {
 	vendors, err := models.GetVendors(false)
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -168,7 +168,7 @@ func listVendors(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func removeVendor(w http.ResponseWriter, r *http.Request) {
+func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	v := models.Vendor{

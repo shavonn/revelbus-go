@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func slideForm(w http.ResponseWriter, r *http.Request) {
+func SlideForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
@@ -52,7 +52,7 @@ func slideForm(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func postSlide(w http.ResponseWriter, r *http.Request) {
+func PostSlide(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	err := r.ParseForm()
@@ -123,7 +123,7 @@ func postSlide(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/slide?id="+id, http.StatusSeeOther)
 }
 
-func listSlides(w http.ResponseWriter, r *http.Request) {
+func ListSlides(w http.ResponseWriter, r *http.Request) {
 	slides, err := models.GetSlides()
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -136,7 +136,7 @@ func listSlides(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func removeSlide(w http.ResponseWriter, r *http.Request) {
+func RemoveSlide(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

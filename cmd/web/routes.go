@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"revelforce/cmd/web/handlers"
 	"revelforce/cmd/web/middleware"
-	"revelforce/cmd/web/trip"
+	"revelforce/cmd/web/view"
 
 	"github.com/spf13/viper"
 
@@ -54,10 +54,10 @@ func Routes() http.Handler {
 	admin.HandleFunc("/trip/{id}", handlers.TripPartners).Queries("partners", "").Methods("GET")
 
 	// trip crud
-	admin.HandleFunc("/trip/{id}", trip.RemoveTrip).Queries("remove", "").Methods("GET")
-	admin.HandleFunc("/trip", trip.TripForm).Methods("GET")
-	admin.HandleFunc("/trip", trip.PostTrip).Methods("POST")
-	admin.HandleFunc("/trips", trip.ListTrips).Methods("GET")
+	admin.HandleFunc("/trip/{id}", handlers.RemoveTrip).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/trip", handlers.TripForm).Methods("GET")
+	admin.HandleFunc("/trip", handlers.PostTrip).Methods("POST")
+	admin.HandleFunc("/trips", handlers.ListTrips).Methods("GET")
 
 	// vendor crud
 	admin.HandleFunc("/vendor/{id}", handlers.RemoveVendor).Queries("remove", "").Methods("GET")
@@ -86,23 +86,23 @@ func Routes() http.Handler {
 	fs := http.FileServer(http.Dir(viper.GetString("files.static")))
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
 
-	r.NotFoundHandler = http.HandlerFunc(NotFound)
+	r.NotFoundHandler = http.HandlerFunc(view.NotFound)
 
 	sirMuxalot := http.NewServeMux()
 	sirMuxalot.Handle("/", r)
 
 	sirMuxalot.Handle("/u/", negroni.New(
-		negroni.HandlerFunc(requireLogin),
+		negroni.HandlerFunc(middleware.RequireLogin),
 		negroni.Wrap(r),
 	))
 
 	sirMuxalot.Handle("/admin/", negroni.New(
-		negroni.HandlerFunc(requireAdmin),
+		negroni.HandlerFunc(middleware.RequireAdmin),
 		negroni.Wrap(r),
 	))
 
 	sirMuxalot.Handle("/auth/", negroni.New(
-		negroni.HandlerFunc(requireGuest),
+		negroni.HandlerFunc(middleware.RequireGuest),
 		negroni.Wrap(r),
 	))
 
