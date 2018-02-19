@@ -43,8 +43,8 @@ func (f *File) Delete() error {
 func (f *File) Get() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT name FROM files WHERE id = ?`
-	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name)
+	stmt := `SELECT name, created_at FROM files WHERE id = ?`
+	err := conn.QueryRow(stmt, f.ID, f.Created).Scan(&f.Name)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}
@@ -55,7 +55,7 @@ func (f *File) Get() error {
 func GetFiles() (*Files, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, name FROM files ORDER BY name`
+	stmt := `SELECT id, name, created_at FROM files ORDER BY name`
 	rows, err := conn.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func GetFiles() (*Files, error) {
 	files := Files{}
 	for rows.Next() {
 		f := &File{}
-		err := rows.Scan(&f.ID, &f.Name)
+		err := rows.Scan(&f.ID, &f.Name, &f.Created)
 		if err != nil {
 			return nil, err
 		}

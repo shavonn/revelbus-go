@@ -37,6 +37,12 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	files, err := models.GetFiles()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
 	f := &models.GalleryForm{
 		ID:   strconv.Itoa(g.ID),
 		Name: g.Name,
@@ -46,6 +52,7 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		Title:   g.Name,
 		Form:    f,
 		Gallery: g,
+		Files:   files,
 	})
 }
 
@@ -170,6 +177,37 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/galleries", http.StatusSeeOther)
+}
+
+func AttachImage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := r.ParseForm()
+	if err != nil {
+		view.ClientError(w, r, http.StatusBadRequest)
+		return
+	}
+
+	fid := r.PostForm.Get("file")
+
+	g := models.Gallery{
+		ID: utils.ToInt(id),
+	}
+
+	err = g.AttachImage(fid)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, utils.MsgSuccessfullyAddedImage, "success")
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/gallery?id="+id, http.StatusSeeOther)
 }
 
 func DetachImage(w http.ResponseWriter, r *http.Request) {
