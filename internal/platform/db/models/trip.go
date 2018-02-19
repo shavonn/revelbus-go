@@ -23,6 +23,7 @@ type Trip struct {
 	TicketingURL string
 	Notes        string
 	Image        string
+	Gallery      int
 
 	Partners Vendors
 	Venues   Vendors
@@ -45,6 +46,7 @@ type TripForm struct {
 	TicketingURL string
 	Notes        string
 	Image        string
+	Gallery      int
 	Errors       map[string]string
 }
 
@@ -67,8 +69,8 @@ func (t *Trip) Create() error {
 
 	slug := db.GetSlug(t.Title, "trips")
 
-	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image)
+	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, gallery, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.Gallery)
 	if err != nil {
 		return err
 	}
@@ -90,8 +92,8 @@ func (t *Trip) Update() error {
 		t.Slug = db.GetSlug(t.Title, "trips")
 	}
 
-	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.ID)
+	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image = ?, gallery = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.Gallery, t.ID)
 	return err
 }
 
@@ -106,8 +108,8 @@ func (t *Trip) Delete() error {
 func (t *Trip) Get() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image FROM trips WHERE id = ?`
-	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image)
+	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, gallery FROM trips WHERE id = ?`
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image, &t.Gallery)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}
@@ -121,8 +123,8 @@ func GetBySlug(s string) (*Trip, error) {
 	conn, _ := db.GetConnection()
 	t := &Trip{}
 
-	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image FROM trips WHERE slug = ?`
-	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image)
+	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image, gallery FROM trips WHERE slug = ?`
+	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image, &t.Gallery)
 	if err == sql.ErrNoRows {
 		return nil, db.ErrNotFound
 	}
@@ -138,7 +140,7 @@ func GetBySlug(s string) (*Trip, error) {
 func GetTrips() (*Trips, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, title, status, start, end, blurb FROM trips ORDER BY end, start`
+	stmt := `SELECT id, title, status, start, end FROM trips ORDER BY start, end`
 	rows, err := conn.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -148,7 +150,7 @@ func GetTrips() (*Trips, error) {
 	trips := Trips{}
 	for rows.Next() {
 		t := &Trip{}
-		err := rows.Scan(&t.ID, &t.Title, &t.Status, &t.Start, &t.End, &t.Blurb)
+		err := rows.Scan(&t.ID, &t.Title, &t.Status, &t.Start, &t.End)
 		if err != nil {
 			return nil, err
 		}
