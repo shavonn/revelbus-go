@@ -77,7 +77,6 @@ func Routes() http.Handler {
 	admin.HandleFunc("/faqs", handlers.ListFAQs).Methods("GET")
 
 	// gallery crud
-	admin.HandleFunc("/gallery/{id}", handlers.AttachImage).Queries("attach", "").Methods("POST")
 	admin.HandleFunc("/gallery/{id}", handlers.DetachImage).Queries("file", "{fid}").Methods("GET")
 	admin.HandleFunc("/gallery/{id}", handlers.RemoveGallery).Queries("remove", "").Methods("GET")
 	admin.HandleFunc("/gallery", handlers.GalleryForm).Methods("GET")

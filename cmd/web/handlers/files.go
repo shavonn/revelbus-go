@@ -26,22 +26,10 @@ func PostUpload(w http.ResponseWriter, r *http.Request) {
 
 	fldr := r.PostForm.Get("fldr")
 
-	uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr)
+	_, err = utils.UploadFile(w, r, "files", "uploads/files/"+fldr, false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
-	}
-
-	for _, upload := range uploads {
-		f := models.File{
-			Name: upload,
-		}
-
-		err := f.Create()
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
 	}
 
 	http.Redirect(w, r, "/admin/files", http.StatusSeeOther)
@@ -63,7 +51,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	f := models.File{
+	f := &models.File{
 		ID: utils.ToInt(id),
 	}
 
@@ -73,7 +61,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = utils.DeleteFile(f.Name)
+	err = utils.DeleteFile(f)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

@@ -82,7 +82,7 @@ func (g *Gallery) Get() error {
 func (g *Gallery) GetFiles() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT f.id, f.name FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
+	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
 	rows, err := conn.Query(stmt, g.ID)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (g *Gallery) GetFiles() error {
 	files := Files{}
 	for rows.Next() {
 		f := &File{}
-		err := rows.Scan(&f.ID, &f.Name)
+		err := rows.Scan(&f.ID, &f.Name, &f.Thumb)
 		if err != nil {
 			return err
 		}
