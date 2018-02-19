@@ -1,7 +1,9 @@
-package db
+package models
 
 import (
 	"database/sql"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/forms"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
@@ -18,8 +20,92 @@ type User struct {
 
 type Users []*User
 
+type UserForm struct {
+	ID              string
+	Name            string
+	Email           string
+	OldPassword     string
+	Password        string
+	ConfirmPassword string
+	Role            string
+	RecoveryHash    string
+	Errors          map[string]string
+}
+
+func (f *UserForm) Valid() bool {
+	v := forms.NewValidator()
+
+	v.Required("Name", f.Name)
+	v.Required("Email", f.Email)
+	v.ValidEmail("Email", f.Email)
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
+func (f *UserForm) ValidSignup() bool {
+	v := forms.NewValidator()
+
+	v.Required("Name", f.Name)
+	v.Required("Email", f.Email)
+	v.ValidEmail("Email", f.Email)
+	v.Required("Password", f.Password)
+	if f.Password != f.ConfirmPassword {
+		v.Errors["Password"] = "Passwords must match."
+	}
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
+func (f *UserForm) ValidLogin() bool {
+	v := forms.NewValidator()
+
+	v.Required("Email", f.Email)
+	v.ValidEmail("Email", f.Email)
+	v.Required("Password", f.Password)
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
+func (f *UserForm) ValidForgot() bool {
+	v := forms.NewValidator()
+
+	v.Required("Email", f.Email)
+	v.ValidEmail("Email", f.Email)
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
+func (f *UserForm) ValidPasswordUpdate() bool {
+	v := forms.NewValidator()
+
+	v.Required("OldPassword", f.OldPassword)
+	v.Required("Password", f.Password)
+	if f.Password != f.ConfirmPassword {
+		v.Errors["Password"] = "Passwords must match."
+	}
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
+func (f *UserForm) ValidPassword() bool {
+	v := forms.NewValidator()
+
+	v.Required("Password", f.Password)
+	if f.Password != f.ConfirmPassword {
+		v.Errors["Password"] = "Passwords must match."
+	}
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
+
 func (u *User) Create() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), viper.GetInt("cost"))
 	if err != nil {
@@ -32,7 +118,7 @@ func (u *User) Create() error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1062 {
-			return ErrDuplicateEmail
+			return db.ErrDuplicateEmail
 		}
 
 		return err
@@ -49,7 +135,7 @@ func (u *User) Create() error {
 }
 
 func (u *User) Update() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `UPDATE users SET name = ?, email = ?, role = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, u.Name, u.Email, u.Role, u.ID)
@@ -57,7 +143,7 @@ func (u *User) Update() error {
 }
 
 func (u *User) UpdatePassword(pw string) error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 	pass, err := bcrypt.GenerateFromPassword([]byte(pw), viper.GetInt("cost"))
 
 	stmt := `UPDATE users SET password = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
@@ -66,7 +152,7 @@ func (u *User) UpdatePassword(pw string) error {
 }
 
 func (u *User) Delete() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `DELETE FROM users WHERE id = ?`
 	_, err := conn.Exec(stmt, u.ID)
@@ -74,30 +160,29 @@ func (u *User) Delete() error {
 }
 
 func (u *User) Get() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	snippet := `SELECT id, name, email, role FROM users WHERE`
 
-	var row *sql.Row
+	var err error
 
 	if u.ID != 0 {
 		stmt := snippet + ` id = ?`
-		row = conn.QueryRow(stmt, u.ID)
+		err = conn.QueryRow(stmt, u.ID).Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	} else {
 		stmt := snippet + ` email = ?`
-		row = conn.QueryRow(stmt, u.Email)
+		err = conn.QueryRow(stmt, u.Email).Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	}
 
-	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.Role)
 	if err == sql.ErrNoRows {
-		return ErrNotFound
+		return db.ErrNotFound
 	}
 
 	return err
 }
 
 func GetUsers() (Users, error) {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `SELECT id, name, role FROM users ORDER BY name`
 	rows, err := conn.Query(stmt)
@@ -124,18 +209,20 @@ func GetUsers() (Users, error) {
 }
 
 func (u *User) VerifyUser(pw string) error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	var hp []byte
-	row := conn.QueryRow("SELECT id, name, email, role, password FROM users WHERE email = ?", u.Email)
-	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.Role, &hp)
+
+	stmt := `SELECT id, name, email, role, password FROM users WHERE email = ?`
+
+	err := conn.QueryRow(stmt, u.Email).Scan(&u.ID, &u.Name, &u.Email, &u.Role, &hp)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
 	err = bcrypt.CompareHashAndPassword(hp, []byte(pw))
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return ErrInvalidCredentials
+		return db.ErrInvalidCredentials
 	} else if err != nil {
 		return err
 	}
@@ -157,7 +244,7 @@ func (u *User) VerifyAndUpdatePassword(old string, new string) error {
 }
 
 func (u *User) SetRecover(h string) error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `UPDATE users SET recovery_hash = ?, updated_at = UTC_TIMESTAMP() WHERE email = ?`
 	_, err := conn.Exec(stmt, h, u.Email)
@@ -165,14 +252,12 @@ func (u *User) SetRecover(h string) error {
 }
 
 func (u *User) CheckRecover(h string) error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `SELECT email FROM users WHERE email = ? AND recovery_hash = ?`
-	row := conn.QueryRow(stmt, u.Email, h)
-
-	err := row.Scan(&u.Email)
+	err := conn.QueryRow(stmt, u.Email, h).Scan(&u.Email)
 	if err != nil && err == sql.ErrNoRows {
-		return ErrNotFound
+		return db.ErrNotFound
 	}
 
 	return err
@@ -182,7 +267,7 @@ func (u *User) Recover(h string, pw string) error {
 	err := u.Get()
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return ErrNotFound
+			return db.ErrNotFound
 		}
 		return err
 	}
@@ -190,7 +275,7 @@ func (u *User) Recover(h string, pw string) error {
 	err = u.CheckRecover(h)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return ErrNotFound
+			return db.ErrNotFound
 		}
 		return err
 	}

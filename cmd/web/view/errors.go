@@ -1,4 +1,4 @@
-package handlers
+package view
 
 import (
 	"log"
@@ -6,8 +6,8 @@ import (
 	"runtime/debug"
 )
 
-func clientError(w http.ResponseWriter, r *http.Request, status int) {
-	render(w, r, "error", &view{
+func ClientError(w http.ResponseWriter, r *http.Request, status int) {
+	Render(w, r, "error", &View{
 		Err: appError{
 			Code:    status,
 			Message: http.StatusText(status),
@@ -15,10 +15,10 @@ func clientError(w http.ResponseWriter, r *http.Request, status int) {
 	})
 }
 
-func serverError(w http.ResponseWriter, r *http.Request, err error) {
+func ServerError(w http.ResponseWriter, r *http.Request, err error) {
 	//stack trace appended to logging of error
 	log.Printf("%s\n%s", err.Error(), debug.Stack())
-	render(w, r, "error", &view{
+	Render(w, r, "error", &View{
 		Err: appError{
 			Code:    http.StatusInternalServerError,
 			Message: "Internal Server Error",
@@ -26,8 +26,8 @@ func serverError(w http.ResponseWriter, r *http.Request, err error) {
 	})
 }
 
-func notFound(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "error", &view{
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, "error", &View{
 		Err: appError{
 			Code:    404,
 			Message: "Not found",

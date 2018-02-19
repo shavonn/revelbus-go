@@ -1,4 +1,4 @@
-package handlers
+package utils
 
 const (
 	MsgAlreadyAuthenticated      = "You are already logged in!"
@@ -9,10 +9,13 @@ const (
 	MsgPasswordResetSuccessful   = "Reset successful. You may now login with your new password."
 	MsgRecoverySent              = "If an account exists with that email, a password recovery email will be sent."
 	MsgSuccessfulSignup          = "Your account has been successfully created!"
-	MsgSuccessfullyAddedVendor   = "Vendor successfully added to your trip."
-	MsgSuccessfullyRemovedVendor = "Vendor successfully removed from your trip."
+	MsgSuccessfullyAddedVendor   = "Vendor successfully added to trip."
+	MsgSuccessfullyRemovedVendor = "Vendor successfully removed from trip."
+	MsgSuccessfullyAddedImage    = "Image successfully added to gallery."
+	MsgSuccessfullyRemovedImage  = "Image successfully removed from gallery."
 	MsgSuccessfullyCreated       = "Successfully created."
 	MsgSuccessfullyRemoved       = "Successfully deleted."
 	MsgSuccessfullyUpdated       = "Successfully updated."
 	MsgUnsuccessfulLogin         = "Invalid login credentials."
+	MsgCannotRemove              = "Cannot delete because of association."
 )

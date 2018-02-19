@@ -19,7 +19,7 @@ Add flash message
 ```
 err := flash.Add(w, r, "it's me", "success")
 if err != nil {
-	serverError(w, r, err)
+	view.ServerError(w, r, err)
 	return
 }
 ```

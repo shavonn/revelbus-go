@@ -89,7 +89,7 @@
             {{if not .Image}}
             <input type="file" class="form-control-file" name="trip_image">
             {{else}}
-            <img src="/assets/uploads/trip/{{.Image}}" />
+            <img src="/assets/{{.Image}}" />
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="deleteimg">
                 <label class="form-check-label" for="deleteimg">Delete</label>
@@ -103,7 +103,7 @@
             <div class="col-6">
                 {{if .ID}}
                 <div class="float-right">
-                    <a href="/admin/trip?id={{.ID}}&remove"><i class="fas fa-trash-alt"></i></a>
+                    <a href="/admin/trip/{{.ID}}?remove"><i class="fas fa-trash-alt"></i></a>
                 </div>
                 {{end}}
             </div>

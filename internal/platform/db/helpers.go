@@ -14,6 +14,7 @@ var (
 	ErrDuplicateEmail     = errors.New("Email address already in use")
 	ErrInvalidCredentials = errors.New("Invalid user credentials")
 	ErrNotFound           = errors.New("Not found")
+	ErrCannotDelete       = errors.New("Cannot delete entity")
 )
 
 const (
@@ -28,7 +29,7 @@ func ToTime(t string) time.Time {
 	return dt
 }
 
-func getSlug(str string, t string) string {
+func GetSlug(str string, t string) string {
 	var id int
 	var err error
 
@@ -43,8 +44,7 @@ func getSlug(str string, t string) string {
 		if num != 0 {
 			sl = s + "-" + strconv.Itoa(num)
 		}
-		row := conn.QueryRow(stmt, sl)
-		err = row.Scan(&id)
+		err = conn.QueryRow(stmt, sl).Scan(&id)
 		num++
 	}
 	return sl

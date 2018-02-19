@@ -79,11 +79,11 @@
         
         <div class="form-group">
             <label for="brand">Brand</label>
-            {{if not .Brand}}
             <input type="hidden" name="brand" value="{{.Brand}}" />
+            {{if not .Brand}}
             <input type="file" class="form-control-file" name="brand_image">
             {{else}}
-            <img src="/assets/uploads/vendor/{{.Brand}}" />
+            <img src="/assets/{{.Brand}}" />
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="deleteimg">
                 <label class="form-check-label" for="deleteimg">Delete</label>
@@ -97,7 +97,7 @@
             <div class="col-6">
                 {{if .ID}}
                 <div class="float-right">
-                    <a href="/admin/vendor?id={{.ID}}&remove"><i class="fas fa-trash-alt"></i></a>
+                    <a href="/admin/vendor/{{.ID}}?remove"><i class="fas fa-trash-alt"></i></a>
                 </div>
                 {{end}}
             </div>

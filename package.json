@@ -8,10 +8,11 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "simplelightbox": "^1.12.1"
+  },
   "devDependencies": {
     "grunt": "^1.0.1",
-    "grunt-contrib-cssmin": "^2.2.1",
     "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0"
   }

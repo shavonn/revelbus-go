@@ -3,7 +3,8 @@ package handlers
 import (
 	"html/template"
 	"net/http"
-	"revelforce/internal/platform/db"
+	"revelforce/cmd/web/view"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
@@ -11,65 +12,91 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
-	trips, err := db.GetUpcomingTrips(3)
+func Index(w http.ResponseWriter, r *http.Request) {
+	trips, err := models.GetUpcomingTrips(3)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	slides, err := db.GetActiveSlides()
+	slides, err := models.GetActiveSlides()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "home", &view{
+	s := &models.Settings{
+		ID: 1,
+	}
+
+	err = s.Get()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	v := &view.View{
 		ActiveKey: "home",
 		Trips:     trips,
 		Slides:    slides,
-	})
+	}
+
+	if s.HomeGalleryActive {
+		g := &models.Gallery{
+			ID: s.HomeGallery,
+		}
+
+		err = g.Get()
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		v.Gallery = g
+	}
+
+	view.Render(w, r, "home", v)
 }
 
-func about(w http.ResponseWriter, r *http.Request) {
-	s := db.Settings{
+func About(w http.ResponseWriter, r *http.Request) {
+	s := models.Settings{
 		ID: 1,
 	}
 
 	err := s.Get()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "about", &view{
+	view.Render(w, r, "about", &view.View{
 		ActiveKey: "about",
 		Blurb:     s.AboutBlurb,
 		Content:   template.HTML(s.AboutContent),
 	})
 }
 
-func contact(w http.ResponseWriter, r *http.Request) {
-	s := db.Settings{
+func Contact(w http.ResponseWriter, r *http.Request) {
+	s := models.Settings{
 		ID: 1,
 	}
 
 	err := s.Get()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "contact", &view{
+	view.Render(w, r, "contact", &view.View{
 		ActiveKey: "contact",
 		Blurb:     s.ContactBlurb,
 	})
 }
 
-func contactPost(w http.ResponseWriter, r *http.Request) {
+func ContactPost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
@@ -81,59 +108,59 @@ func contactPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
-		render(w, r, "contact", v)
+		view.Render(w, r, "contact", v)
 	}
 
 	err = email.ContactEmail(f)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
 	err = flash.Add(w, r, "Your message has been sent!", "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
 	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
-func trips(w http.ResponseWriter, r *http.Request) {
-	trips, err := db.GetUpcomingTrips(0)
+func Trips(w http.ResponseWriter, r *http.Request) {
+	trips, err := models.GetUpcomingTripsByMonth()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "trips", &view{
-		ActiveKey: "trips",
-		Title:     "Upcoming Trips",
-		Trips:     trips,
+	view.Render(w, r, "trips", &view.View{
+		ActiveKey:    "trips",
+		Title:        "Upcoming Trips",
+		TripsGrouped: trips,
 	})
 }
 
-func trip(w http.ResponseWriter, r *http.Request) {
+func Trip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
-	t, err := db.GetBySlug(slug)
+	t, err := models.GetBySlug(slug)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	trips, err := db.GetUpcomingTrips(2)
+	trips, err := models.GetUpcomingTrips(2)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "trip", &view{
+	view.Render(w, r, "trip", &view.View{
 		ActiveKey: "trip",
 		Title:     t.Title,
 		Trip:      t,
@@ -142,27 +169,23 @@ func trip(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func faq(w http.ResponseWriter, r *http.Request) {
-	faqs, err := db.GetActiveFAQs()
+func Faq(w http.ResponseWriter, r *http.Request) {
+	faqs, err := models.GetActiveFAQs()
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	trips, err := db.GetUpcomingTrips(2)
+	trips, err := models.GetUpcomingTrips(2)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "faq", &view{
+	view.Render(w, r, "faq", &view.View{
 		ActiveKey:  "faq",
 		Title:      "FAQ",
 		FAQGrouped: faqs,
 		Trips:      trips,
 	})
-}
-
-func userDashboard(w http.ResponseWriter, r *http.Request) {
-	render(w, r, "user-dashboard", &view{})
 }

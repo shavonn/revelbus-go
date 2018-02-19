@@ -2,37 +2,41 @@ package handlers
 
 import (
 	"net/http"
+	"revelforce/cmd/web/utils"
+	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-func vendorForm(w http.ResponseWriter, r *http.Request) {
+func VendorForm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	if id == "" {
-		render(w, r, "vendor", &view{
-			Form:  new(forms.VendorForm),
+		view.Render(w, r, "vendor", &view.View{
+			Form:  new(models.VendorForm),
 			Title: "New Vendor",
 		})
 		return
 	}
 
-	v := &db.Vendor{
-		ID: toInt(id),
+	v := &models.Vendor{
+		ID: utils.ToInt(id),
 	}
 
 	err := v.Get()
 	if err == db.ErrNotFound {
-		notFound(w, r)
+		view.NotFound(w, r)
 		return
 	} else if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	f := &forms.VendorForm{
+	f := &models.VendorForm{
 		ID:      strconv.Itoa(v.ID),
 		Name:    v.Name,
 		Address: v.Address,
@@ -47,23 +51,20 @@ func vendorForm(w http.ResponseWriter, r *http.Request) {
 		Active:  v.Active,
 	}
 
-	render(w, r, "vendor", &view{
-		Title:  f.Name,
-		Form:   f,
-		Vendor: v,
+	view.Render(w, r, "vendor", &view.View{
+		Title: f.Name,
+		Form:  f,
 	})
 }
 
-func postVendor(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
+func PostVendor(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		clientError(w, r, http.StatusBadRequest)
+		view.ClientError(w, r, http.StatusBadRequest)
 		return
 	}
 
-	f := &forms.VendorForm{
+	f := &models.VendorForm{
 		ID:      r.PostForm.Get("id"),
 		Name:    r.PostForm.Get("name"),
 		Address: r.PostForm.Get("address"),
@@ -75,33 +76,33 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
 		Brand:   r.PostForm.Get("brand"),
-		Active:  (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
+		Active:  (len(r.Form["active"]) == 1),
 	}
 
 	if !f.Valid() {
-		v := &view{
+		v := &view.View{
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New Vendor"
 		}
 
-		render(w, r, "vendor", v)
+		view.Render(w, r, "vendor", v)
 	}
 
-	fn, err := uploadFile(w, r, "brand_image", "uploads/vendor/")
+	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	if fn != "" {
-		f.Brand = fn
-	} else if (len(f.Brand) != 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = deleteFile("uploads/vendor/" + f.Brand)
+	if len(fn) > 0 && fn[0] != "" {
+		f.Brand = fn[0]
+	} else if (len(f.Brand) > 0) && (len(r.Form["deleteimg"]) == 1) {
+		err = utils.DeleteFile(f.Brand)
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
 		f.Brand = ""
@@ -109,7 +110,8 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 
 	var msg string
 
-	v := db.Vendor{
+	v := models.Vendor{
+		ID:      utils.ToInt(f.ID),
 		Name:    f.Name,
 		Address: f.Address,
 		City:    f.City,
@@ -123,66 +125,70 @@ func postVendor(w http.ResponseWriter, r *http.Request) {
 		Active:  f.Active,
 	}
 
-	if id != "" {
-		v.ID = toInt(id)
-
+	if v.ID != 0 {
 		err := v.Update()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
-
-		msg = MsgSuccessfullyUpdated
+		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := v.Create()
 		if err != nil {
-			serverError(w, r, err)
+			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(v.ID)
-		msg = MsgSuccessfullyCreated
+		msg = utils.MsgSuccessfullyCreated
 	}
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(v.ID)
 
 	http.Redirect(w, r, "/admin/vendor?id="+id, http.StatusSeeOther)
 }
 
-func listVendors(w http.ResponseWriter, r *http.Request) {
-	vendors, err := db.GetVendors(false)
+func ListVendors(w http.ResponseWriter, r *http.Request) {
+	vendors, err := models.GetVendors(false)
 	if err != nil {
-		serverError(w, r, err)
+		view.ServerError(w, r, err)
 		return
 	}
 
-	render(w, r, "vendors", &view{
+	view.Render(w, r, "vendors", &view.View{
 		Title:   "Vendors",
-		Vendors: &vendors,
+		Vendors: vendors,
 	})
 }
 
-func removeVendor(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+func RemoveVendor(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-	v := db.Vendor{
-		ID: toInt(id),
+	v := models.Vendor{
+		ID: utils.ToInt(id),
 	}
 
 	err := v.Delete()
-	if err != nil {
-		serverError(w, r, err)
+	if err == db.ErrCannotDelete {
+		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+	} else if err != nil {
+		view.ServerError(w, r, err)
 		return
-	}
-
-	err = flash.Add(w, r, MsgSuccessfullyRemoved, "success")
-	if err != nil {
-		serverError(w, r, err)
-		return
+	} else {
+		err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
 	}
 
 	http.Redirect(w, r, "/admin/vendors", http.StatusSeeOther)

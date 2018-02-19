@@ -8,6 +8,22 @@
 
         position: relative;
         margin-bottom: 30px;
+
+        &.month {
+            font-family: $primary-font;
+            @include font-rem(24);
+            line-height: 28px;
+            text-transform: uppercase;
+    
+            .num {
+                font-family: $condensed-font;
+                font-weight: 400;
+            }
+    
+            .mo {
+                font-weight: 300;
+            }
+        }
     }
 
     h4 {
@@ -90,8 +106,8 @@
 
         .date {
             position: absolute;
-            bottom: 5px;
-            right: 10px;
+            bottom: 2px;
+            right: 8px;
         }
     }
 

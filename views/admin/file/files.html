@@ -1,0 +1,26 @@
+{{define "files"}}
+{{template "admin-header" .}}
+    {{if .Files}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Files}}
+            <tr>
+                <td><a href="/assets/{{.Name}}" target="_new">{{.Name}}</td>
+                <td>{{humanDate .Created}}</td>
+                <td class="text-right"><a href="/admin/file/{{.ID}}?remove">x</i></a></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="alert alert-primary" role="alert">No files to be found. Whatever shall we do?</div>
+    {{end}}
+{{template "admin-footer" .}}
+{{end}}

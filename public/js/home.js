@@ -6,6 +6,19 @@ $(document).ready(function(){
         nav:true,
         dots: true
     });
-    
-    var $gallery = $('.gallery a').simpleLightbox();
+
+	$('.gallery a').magnificPopup({
+		type: 'image',
+		closeOnContentClick: true,
+		closeBtnInside: false,
+		fixedContentPos: true,
+		mainClass: 'mfp-no-margins mfp-with-zoom',
+		image: {
+			verticalFit: true
+		},
+		zoom: {
+			enabled: true,
+			duration: 300
+		}
+	});
 });

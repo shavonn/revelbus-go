@@ -9,7 +9,7 @@ type ContactForm struct {
 }
 
 func (f *ContactForm) Valid() bool {
-	v := newValidator()
+	v := NewValidator()
 
 	v.Required("Name", f.Name)
 	v.Required("Email", f.Email)

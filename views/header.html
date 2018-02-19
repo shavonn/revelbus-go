@@ -7,8 +7,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title>{{if .Title}}{{.Title}} | {{end}}Revel Force</title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed|Roboto:300,400" rel="stylesheet">
-		<link rel="stylesheet" href="/assets/css/simplelightbox.min.css">        
-		<link rel="stylesheet" href="/assets/css/owl/owl.carousel.min.css">
+		<link rel="stylesheet" href="/assets/lib/owl/owl.carousel.min.css">
+		<link rel="stylesheet" href="/assets/lib/magnific/magnific-popup.css">
 		<link href="/assets/css/style.css" rel="stylesheet">
 	</head>
 	<body class="{{.ActiveKey}}">
@@ -34,14 +34,14 @@
 			</div>
 			{{else if eq .ActiveKey "trip"}}
 			{{with .Trip}}
-            <div class="banner trip" style="background-image: url('/assets/uploads/trip/{{.Image}}');">
+            <div class="banner trip" style="background-image: url('/assets/{{.Image}}');">
                 <div class="container">
 					<div class="details">
 						<h2>{{.Title}}</h2>
 						<div class="info">
 							<div class="date">
-								<div class="month">{{month .Start .End}}</div>
-								<div class="day">{{day .Start .End}}</div>
+								<div class="month">{{getShortMonth .Start .End}}</div>
+								<div class="day">{{getDateRange .Start .End}}</div>
 							</div>
 							<div class="price-ticket">
 								<div class="price">{{.Price}}</div>
@@ -56,7 +56,7 @@
                 </div>
 			</div>
 			{{end}}
-			{{else}}
+			{{else if .ActiveKey}}
             <div class="banner {{.HeaderStyle}}">
 				<div class="container">
 					<h2>{{.Title}}</h2>

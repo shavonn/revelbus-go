@@ -1,7 +1,9 @@
-package db
+package models
 
 import (
 	"database/sql"
+	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/forms"
 )
 
 type FAQ struct {
@@ -14,10 +16,31 @@ type FAQ struct {
 }
 
 type FAQs []*FAQ
-type GroupedFAQ map[string][]*FAQ
+
+type GroupedFAQs map[string][]*FAQ
+
+type FAQForm struct {
+	ID       string
+	Question string
+	Answer   string
+	Category string
+	Active   bool
+	Order    string
+	Errors   map[string]string
+}
+
+func (f *FAQForm) Valid() bool {
+	v := forms.NewValidator()
+
+	v.Required("Question", f.Question)
+	v.Required("Answer", f.Answer)
+
+	f.Errors = v.Errors
+	return len(f.Errors) == 0
+}
 
 func (f *FAQ) Create() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `INSERT INTO faqs (question, answer, category, sort_order, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active)
@@ -35,37 +58,35 @@ func (f *FAQ) Create() error {
 }
 
 func (f *FAQ) Update() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active, f.ID)
 	return err
 }
 
-func (s *FAQ) Delete() error {
-	conn, _ := GetConnection()
+func (f *FAQ) Delete() error {
+	conn, _ := db.GetConnection()
 
 	stmt := `DELETE FROM faqs WHERE id = ?`
-	_, err := conn.Exec(stmt, s.ID)
+	_, err := conn.Exec(stmt, f.ID)
 	return err
 }
 
 func (f *FAQ) Get() error {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `SELECT question, answer, category, sort_order, active FROM faqs WHERE id = ?`
-	row := conn.QueryRow(stmt, f.ID)
-
-	err := row.Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
+	err := conn.QueryRow(stmt, f.ID).Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
 	if err == sql.ErrNoRows {
-		return ErrNotFound
+		return db.ErrNotFound
 	}
 
 	return err
 }
 
 func GetFAQs() (*FAQs, error) {
-	conn, _ := GetConnection()
+	conn, _ := db.GetConnection()
 
 	stmt := `SELECT id, question, answer, category, sort_order, active FROM faqs ORDER BY sort_order`
 	rows, err := conn.Query(stmt)
@@ -91,10 +112,10 @@ func GetFAQs() (*FAQs, error) {
 	return &faqs, nil
 }
 
-func GetActiveFAQs() (*GroupedFAQ, error) {
-	conn, _ := GetConnection()
+func GetActiveFAQs() (*GroupedFAQs, error) {
+	conn, _ := db.GetConnection()
 
-	faqs := make(GroupedFAQ)
+	faqs := make(GroupedFAQs)
 
 	stmt := `SELECT id, question, answer, category, sort_order, active FROM faqs WHERE active = 1 ORDER BY sort_order`
 	rows, err := conn.Query(stmt)

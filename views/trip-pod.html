@@ -3,8 +3,8 @@
     <a href="/trip/{{.Slug}}">
         <header style="background-image: url('/assets/uploads/trip/{{.Image}}')">
             <div class="date">
-                <div class="month">{{month .Start .End}}</div>
-                <div class="day">{{day .Start .End}}</div>
+                <div class="month">{{getShortMonth .Start .End}}</div>
+                <div class="day">{{getDateRange .Start .End}}</div>
             </div>
         </header>
     </a>
