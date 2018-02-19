@@ -31,16 +31,25 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	galleries, err := models.GetGalleries()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
 	f := &models.SettingsForm{
-		ID:           strconv.Itoa(s.ID),
-		ContactBlurb: s.ContactBlurb,
-		AboutBlurb:   s.AboutBlurb,
-		AboutContent: s.AboutContent,
+		ID:                strconv.Itoa(s.ID),
+		ContactBlurb:      s.ContactBlurb,
+		AboutBlurb:        s.AboutBlurb,
+		AboutContent:      s.AboutContent,
+		HomeGallery:       s.HomeGallery,
+		HomeGalleryActive: s.HomeGalleryActive,
 	}
 
 	view.Render(w, r, "settings", &view.View{
-		Title: "Settings",
-		Form:  f,
+		Title:     "Settings",
+		Form:      f,
+		Galleries: galleries,
 	})
 }
 
@@ -52,10 +61,12 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.SettingsForm{
-		ID:           r.PostForm.Get("id"),
-		ContactBlurb: r.PostForm.Get("contact_blurb"),
-		AboutBlurb:   r.PostForm.Get("about_blurb"),
-		AboutContent: r.PostForm.Get("about_content"),
+		ID:                r.PostForm.Get("id"),
+		ContactBlurb:      r.PostForm.Get("contact_blurb"),
+		AboutBlurb:        r.PostForm.Get("about_blurb"),
+		AboutContent:      r.PostForm.Get("about_content"),
+		HomeGallery:       utils.ToInt(r.PostForm.Get("home_gallery")),
+		HomeGalleryActive: (len(r.Form["home_gallery_active"]) == 1),
 	}
 
 	if !f.Valid() {
@@ -69,10 +80,12 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 	var msg string
 
 	s := models.Settings{
-		ID:           utils.ToInt(f.ID),
-		ContactBlurb: f.ContactBlurb,
-		AboutBlurb:   f.AboutBlurb,
-		AboutContent: f.AboutContent,
+		ID:                utils.ToInt(f.ID),
+		ContactBlurb:      f.ContactBlurb,
+		AboutBlurb:        f.AboutBlurb,
+		AboutContent:      f.AboutContent,
+		HomeGallery:       f.HomeGallery,
+		HomeGalleryActive: f.HomeGalleryActive,
 	}
 
 	if f.ID != "" {

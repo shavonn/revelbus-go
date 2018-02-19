@@ -1,11 +1,5 @@
 {{define "gallery"}}
 {{template "admin-header" .}}
-    {{if .Gallery}}
-    <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#imageModal">
-        + Image
-    </button>
-    {{end}}
-
     {{with .Form}}
     <form action="/admin/gallery{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
@@ -40,6 +34,13 @@
     </form>
     {{end}}
     {{with .Gallery}}
+        <hr/>
+        <h2>
+            Images
+            <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#imageModal">
+                + Image
+            </button>
+        </h2>
         {{if .Images}}
         <table class="table">
             <thead>

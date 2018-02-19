@@ -25,11 +25,37 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view.Render(w, r, "home", &view.View{
+	s := &models.Settings{
+		ID: 1,
+	}
+
+	err = s.Get()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	v := &view.View{
 		ActiveKey: "home",
 		Trips:     trips,
 		Slides:    slides,
-	})
+	}
+
+	if s.HomeGalleryActive {
+		g := &models.Gallery{
+			ID: s.HomeGallery,
+		}
+
+		err = g.Get()
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		v.Gallery = g
+	}
+
+	view.Render(w, r, "home", v)
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
