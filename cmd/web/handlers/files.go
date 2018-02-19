@@ -55,19 +55,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := f.Get()
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	err = utils.DeleteFile(f)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	err = f.Delete()
+	err := utils.DeleteFile(f)
 	if err == db.ErrCannotDelete {
 		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
 		if err != nil {

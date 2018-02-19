@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"image"
 	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -52,26 +54,29 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 		}
 
 		f.Name = filepath.Join(folder, fn)
-		err = f.Create()
-		if err != nil {
-			return uploaded, err
-		}
 
 		if makeThumb {
 			rn := "thumb_" + fn
+			ext := filepath.Ext(fn)
 
 			file, err := os.Open(filepath.Join(uploadDir, fn))
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			img, err := jpeg.Decode(file)
+			var img image.Image
+
+			if ext == ".png" {
+				img, err = png.Decode(file)
+			} else {
+				img, err = jpeg.Decode(file)
+			}
 			if err != nil {
 				log.Fatal(err)
 			}
 			file.Close()
 
-			m := resize.Resize(400, 0, img, resize.Lanczos3)
+			m := resize.Resize(200, 0, img, resize.NearestNeighbor)
 
 			out, err := os.Create(filepath.Join(uploadDir, rn))
 			if err != nil {
@@ -79,7 +84,18 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 			}
 			defer out.Close()
 
-			jpeg.Encode(out, m, nil)
+			if ext == ".png" {
+				png.Encode(out, m)
+			} else {
+				jpeg.Encode(out, m, nil)
+			}
+
+			f.Thumb = filepath.Join(folder, rn)
+		}
+
+		err = f.Create()
+		if err != nil {
+			return uploaded, err
 		}
 
 		uploaded = append(uploaded, f)
@@ -89,12 +105,22 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 }
 
 func DeleteFile(f *models.File) error {
-	err := os.Remove(viper.GetString("files.static") + f.Name)
+	err := f.Get()
+	if err != nil {
+		return err
+	}
+
+	err = f.Delete()
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(viper.GetString("files.static") + f.Name)
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	if f.Thumb != "" {
+	if len(f.Thumb) > 0 {
 		err := os.Remove(viper.GetString("files.static") + f.Thumb)
 		if err != nil && !os.IsNotExist(err) {
 			return err

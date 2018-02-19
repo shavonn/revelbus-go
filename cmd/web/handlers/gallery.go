@@ -174,6 +174,22 @@ func DetachImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	f := &models.File{
+		ID: utils.ToInt(fid),
+	}
+
+	err = utils.DeleteFile(f)
+	if err == db.ErrCannotDelete {
+		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+	} else if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
 	err = flash.Add(w, r, utils.MsgSuccessfullyRemovedImage, "success")
 	if err != nil {
 		view.ServerError(w, r, err)
