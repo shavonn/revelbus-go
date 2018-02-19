@@ -42,6 +42,12 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	galleries, err := models.GetGalleries()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
 	f := &models.TripForm{
 		ID:           id,
 		Title:        t.Title,
@@ -55,6 +61,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
 		Image:        t.Image,
+		Gallery:      t.Gallery,
 	}
 
 	view.Render(w, r, "admin-trip", &view.View{
@@ -62,6 +69,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		Form:      f,
 		Trip:      t,
 		Vendors:   vendors,
+		Galleries: galleries,
 	})
 }
 
@@ -85,6 +93,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		Price:        r.PostForm.Get("price"),
 		Notes:        r.PostForm.Get("notes"),
 		Image:        r.PostForm.Get("image"),
+		Gallery:      utils.ToInt(r.PostForm.Get("gallery")),
 	}
 
 	if !f.Valid() {
@@ -131,6 +140,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		Price:        f.Price,
 		Notes:        f.Notes,
 		Image:        f.Image,
+		Gallery:      f.Gallery,
 	}
 
 	if t.ID != 0 {

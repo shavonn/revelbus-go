@@ -160,13 +160,29 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view.Render(w, r, "trip", &view.View{
+	v := &view.View{
 		ActiveKey: "trip",
 		Title:     t.Title,
 		Trip:      t,
 		Trips:     trips,
 		Content:   template.HTML(t.Description),
-	})
+	}
+
+	if t.Gallery != 0 {
+		g := &models.Gallery{
+			ID: t.Gallery,
+		}
+
+		err = g.Get()
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		v.Gallery = g
+	}
+
+	view.Render(w, r, "trip", v)
 }
 
 func Faq(w http.ResponseWriter, r *http.Request) {

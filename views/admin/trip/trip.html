@@ -63,6 +63,14 @@
             <label for="description">Description</label>
             <textarea class="description form-control editor" name="description" rows="8">{{.Description}}</textarea>
         </div>
+        <div class="form-group">
+            <label for="gallery">Gallery</label>
+            <select class="form-control" name="gallery">
+                {{range $.Galleries}}
+                <option value="{{.ID}}"{{if eq $.Form.Gallery .ID}} selected{{end}}>{{.Name}}</option>
+                {{end}}
+            </select>
+        </div>
         <div class="row">
             <div class="col-6 form-group">
                 <label for="external_ticketing_url">Ticketing URL</label>
