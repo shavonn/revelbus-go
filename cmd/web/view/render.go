@@ -24,6 +24,8 @@ type View struct {
 	FAQs         *models.FAQs
 	Files        *models.Files
 	FAQGrouped   *models.GroupedFAQs
+	Gallery      *models.Gallery
+	Galleries    *models.Galleries
 	TripsGrouped *models.GroupedTrips
 	Flash        flash.Msg
 	Form         forms.Form

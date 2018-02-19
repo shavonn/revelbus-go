@@ -76,6 +76,12 @@ func Routes() http.Handler {
 	admin.HandleFunc("/faq", handlers.PostFAQ).Methods("POST")
 	admin.HandleFunc("/faqs", handlers.ListFAQs).Methods("GET")
 
+	// gallery crud
+	admin.HandleFunc("/gallery/{id}", handlers.RemoveGallery).Queries("remove", "").Methods("GET")
+	admin.HandleFunc("/gallery", handlers.GalleryForm).Methods("GET")
+	admin.HandleFunc("/gallery", handlers.PostGallery).Methods("POST")
+	admin.HandleFunc("/galleries", handlers.ListGalleries).Methods("GET")
+
 	// slide crud
 	admin.HandleFunc("/slide/{id}", handlers.RemoveSlide).Queries("remove", "").Methods("GET")
 	admin.HandleFunc("/slide", handlers.SlideForm).Methods("GET")
