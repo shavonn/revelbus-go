@@ -11,6 +11,7 @@ const (
 	MsgSuccessfulSignup          = "Your account has been successfully created!"
 	MsgSuccessfullyAddedVendor   = "Vendor successfully added to your trip."
 	MsgSuccessfullyRemovedVendor = "Vendor successfully removed from your trip."
+	MsgSuccessfullyRemovedImage  = "Image successfully removed from gallery."
 	MsgSuccessfullyCreated       = "Successfully created."
 	MsgSuccessfullyRemoved       = "Successfully deleted."
 	MsgSuccessfullyUpdated       = "Successfully updated."

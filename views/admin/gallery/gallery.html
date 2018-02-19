@@ -1,7 +1,7 @@
 {{define "gallery"}}
 {{template "admin-header" .}}
     {{with .Form}}
-    <form action="/admin/gallery{{if .ID}}?id={{.ID}}{{end}}" method="post" novalidate>
+    <form action="/admin/gallery{{if .ID}}?id={{.ID}}{{end}}" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
         {{if .ID}}
         <input type="hidden" name="id" value="{{.ID}}">
@@ -13,6 +13,12 @@
             <div class="invalid-feedback">{{.}}</div>
             {{end}}
         </div>
+        {{if .ID}}
+        <div class="form-group">
+            <label for="files">Files</label>
+            <input type="file" class="form-control-file" name="files" multiple="multiple">
+        </div>
+        {{end}}
         <div class="row">
             <div class="col-6">
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -26,6 +32,28 @@
             </div>
         </div>
     </form>
+    {{end}}
+    {{with .Gallery}}
+        {{if .Images}}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Images}}
+                <tr>
+                    <td><a href="/assets/{{.Name}}" target="_new">{{.Name}}</td>
+                    <td class="text-right"><a href="/admin/gallery/{{$.Gallery.ID}}?file={{.ID}}">x</i></a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="alert alert-primary" role="alert">No images to be found. Whatever shall we do?</div>
+        {{end}}
     {{end}}
 {{template "admin-footer" .}}
 {{end}}

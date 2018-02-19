@@ -12,6 +12,7 @@ import (
 
 func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr string) ([]string, error) {
 	uploaded := []string{}
+	dir := filepath.Join(viper.GetString("files.static") + fldr)
 
 	err := r.ParseMultipartForm(100000)
 	if err != nil {
@@ -19,7 +20,6 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 	}
 
 	m := r.MultipartForm
-	dir := filepath.Join(viper.GetString("files.static") + fldr)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.Mkdir(dir, 0755)
 	}
@@ -34,7 +34,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 
 		fn := slug.Make(files[i].Filename)
 
-		dst, err := os.Create(filepath.Join(viper.GetString("files.static")+fldr, fn))
+		dst, err := os.Create(filepath.Join(dir, fn))
 		defer dst.Close()
 		if err != nil {
 			return uploaded, err
@@ -56,5 +56,9 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 
 func DeleteFile(fn string) error {
 	err := os.Remove(viper.GetString("files.static") + fn)
-	return err
+
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return nil
 }

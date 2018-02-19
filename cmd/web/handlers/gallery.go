@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/gosimple/slug"
 )
 
 func GalleryForm(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +89,32 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		fldr := slug.Make(g.Name)
+
+		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr)
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		for _, upload := range uploads {
+			f := models.File{
+				Name: upload,
+			}
+
+			err := f.Create()
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
+
+			g.AttachImage(strconv.Itoa(f.ID))
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
+		}
+
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := g.Create()
@@ -142,5 +169,29 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/admin/gallerys", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/galleries", http.StatusSeeOther)
+}
+
+func DetachImage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	fid := vars["fid"]
+
+	g := models.Gallery{
+		ID: utils.ToInt(id),
+	}
+
+	err := g.DetachImage(fid)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemovedImage, "success")
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/gallery/?id="+id, http.StatusSeeOther)
 }

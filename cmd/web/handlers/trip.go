@@ -271,7 +271,7 @@ func AttachVendor(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err = t.AddVendor(role, vid)
+	err = t.AttachVendor(role, vid)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -296,7 +296,7 @@ func DetachVendor(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.RemoveVendor(role, vid)
+	err := t.DetachVendor(role, vid)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

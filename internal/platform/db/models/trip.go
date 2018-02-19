@@ -292,7 +292,7 @@ func (t *Trip) GetVendors() error {
 	return err
 }
 
-func (t *Trip) AddVendor(r string, vid string) error {
+func (t *Trip) AttachVendor(r string, vid string) error {
 	conn, _ := db.GetConnection()
 
 	stmt := `INSERT INTO trips_` + r + `s (trip_id, ` + r + `_id, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
@@ -307,7 +307,7 @@ func (t *Trip) AddVendor(r string, vid string) error {
 	return err
 }
 
-func (t *Trip) RemoveVendor(r string, vid string) error {
+func (t *Trip) DetachVendor(r string, vid string) error {
 	conn, _ := db.GetConnection()
 
 	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
