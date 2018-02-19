@@ -227,7 +227,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 func (t *Trip) GetPartners() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT v.id, v.name FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
+	stmt := `SELECT v.id, v.name, v.brand, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
 	rows, err := conn.Query(stmt, t.ID)
 	if err != nil {
 		return err
@@ -237,7 +237,7 @@ func (t *Trip) GetPartners() error {
 	partners := Vendors{}
 	for rows.Next() {
 		p := &Vendor{}
-		err := rows.Scan(&p.ID, &p.Name)
+		err := rows.Scan(&p.ID, &p.Name, &p.Brand, &p.URL)
 		if err != nil {
 			return err
 		}

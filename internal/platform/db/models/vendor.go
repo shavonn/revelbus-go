@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/forms"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type Vendor struct {
@@ -83,6 +85,13 @@ func (v *Vendor) Delete() error {
 
 	stmt := `DELETE FROM vendors WHERE id = ?`
 	_, err := conn.Exec(stmt, v.ID)
+	if err != nil {
+		merr, ok := err.(*mysql.MySQLError)
+
+		if ok && merr.Number == 1451 {
+			return db.ErrCannotDelete
+		}
+	}
 	return err
 }
 

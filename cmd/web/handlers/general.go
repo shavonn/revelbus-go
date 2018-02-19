@@ -52,7 +52,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		v.Galleries = &models.Galleries{g}
+		v.Gallery = g
 	}
 
 	view.Render(w, r, "home", v)

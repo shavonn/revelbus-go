@@ -79,6 +79,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	var msg string
 
 	u := models.User{
+		ID:    utils.ToInt(f.ID),
 		Name:  f.Name,
 		Email: f.Email,
 		Role:  f.Role,

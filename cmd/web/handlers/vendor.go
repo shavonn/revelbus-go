@@ -8,6 +8,8 @@ import (
 	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func VendorForm(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +91,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "vendor", v)
 	}
 
-	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor/")
+	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor")
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -97,7 +99,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 
 	if len(fn) > 0 && fn[0] != "" {
 		f.Brand = fn[0]
-	} else if (len(f.Brand) != 0) && (len(r.Form["deleteimg"]) == 1) {
+	} else if (len(f.Brand) > 0) && (len(r.Form["deleteimg"]) == 1) {
 		err = utils.DeleteFile(f.Brand)
 		if err != nil {
 			view.ServerError(w, r, err)
@@ -109,6 +111,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	var msg string
 
 	v := models.Vendor{
+		ID:      utils.ToInt(f.ID),
 		Name:    f.Name,
 		Address: f.Address,
 		City:    f.City,
@@ -163,22 +166,29 @@ func ListVendors(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveVendor(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	v := models.Vendor{
 		ID: utils.ToInt(id),
 	}
 
 	err := v.Delete()
-	if err != nil {
+	if err == db.ErrCannotDelete {
+		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
-	}
-
-	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
+	} else {
+		err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
 	}
 
 	http.Redirect(w, r, "/admin/vendors", http.StatusSeeOther)

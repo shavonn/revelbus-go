@@ -34,7 +34,7 @@
 			</div>
 			{{else if eq .ActiveKey "trip"}}
 			{{with .Trip}}
-            <div class="banner trip" style="background-image: url('/assets/uploads/trip/{{.Image}}');">
+            <div class="banner trip" style="background-image: url('/assets/{{.Image}}');">
                 <div class="container">
 					<div class="details">
 						<h2>{{.Title}}</h2>

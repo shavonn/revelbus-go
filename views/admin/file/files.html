@@ -5,6 +5,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Created</th>
                 <th></th>
             </tr>
         </thead>
@@ -12,6 +13,7 @@
             {{range .Files}}
             <tr>
                 <td><a href="/assets/{{.Name}}" target="_new">{{.Name}}</td>
+                <td>{{humanDate .Created}}</td>
                 <td class="text-right"><a href="/admin/file/{{.ID}}?remove">x</i></a></td>
             </tr>
             {{end}}

@@ -14,6 +14,7 @@ var (
 	ErrDuplicateEmail     = errors.New("Email address already in use")
 	ErrInvalidCredentials = errors.New("Invalid user credentials")
 	ErrNotFound           = errors.New("Not found")
+	ErrCannotDelete       = errors.New("Cannot delete entity")
 )
 
 const (

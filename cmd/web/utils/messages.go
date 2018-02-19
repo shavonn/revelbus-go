@@ -17,4 +17,5 @@ const (
 	MsgSuccessfullyRemoved       = "Successfully deleted."
 	MsgSuccessfullyUpdated       = "Successfully updated."
 	MsgUnsuccessfulLogin         = "Invalid login credentials."
+	MsgCannotRemove              = "Cannot delete because of association."
 )

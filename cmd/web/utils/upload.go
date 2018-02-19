@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gosimple/slug"
+	"github.com/kennygrant/sanitize"
 	"github.com/spf13/viper"
 )
 
@@ -32,7 +32,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, fldr s
 			return uploaded, err
 		}
 
-		fn := slug.Make(files[i].Filename)
+		fn := sanitize.Name(files[i].Filename)
 
 		dst, err := os.Create(filepath.Join(dir, fn))
 		defer dst.Close()

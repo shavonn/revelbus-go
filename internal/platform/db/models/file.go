@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"revelforce/internal/platform/db"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type File struct {
@@ -37,6 +39,13 @@ func (f *File) Delete() error {
 
 	stmt := `DELETE FROM files WHERE id = ?`
 	_, err := conn.Exec(stmt, f.ID)
+	if err != nil {
+		merr, ok := err.(*mysql.MySQLError)
+
+		if ok && merr.Number == 1451 {
+			return db.ErrCannotDelete
+		}
+	}
 	return err
 }
 
@@ -44,7 +53,7 @@ func (f *File) Get() error {
 	conn, _ := db.GetConnection()
 
 	stmt := `SELECT name, created_at FROM files WHERE id = ?`
-	err := conn.QueryRow(stmt, f.ID, f.Created).Scan(&f.Name)
+	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name, &f.Created)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}

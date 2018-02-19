@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
+	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/flash"
 
@@ -79,15 +80,21 @@ func RemoveFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = f.Delete()
-	if err != nil {
+	if err == db.ErrCannotDelete {
+		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
-	}
-
-	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
+	} else {
+		err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
 	}
 
 	http.Redirect(w, r, "/admin/files", http.StatusSeeOther)
