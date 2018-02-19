@@ -76,7 +76,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 			}
 			file.Close()
 
-			m := resize.Resize(200, 0, img, resize.NearestNeighbor)
+			m := resize.Resize(500, 0, img, resize.Lanczos3)
 
 			out, err := os.Create(filepath.Join(uploadDir, rn))
 			if err != nil {
