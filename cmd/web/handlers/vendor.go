@@ -50,9 +50,8 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	view.Render(w, r, "vendor", &view.View{
-		Title:  f.Name,
-		Form:   f,
-		Vendor: v,
+		Title: f.Name,
+		Form:  f,
 	})
 }
 

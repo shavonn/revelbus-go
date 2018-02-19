@@ -20,7 +20,6 @@ type View struct {
 	Blurb        string
 	Content      template.HTML
 	Err          appError
-	FAQ          *models.FAQ
 	FAQs         *models.FAQs
 	Files        *models.Files
 	FAQGrouped   *models.GroupedFAQs
@@ -32,15 +31,12 @@ type View struct {
 	HeaderStyle  string
 	Me           *models.User
 	Path         string
-	Slide        *models.Slide
 	Slides       *models.Slides
 	Title        string
 	Token        string
 	Trip         *models.Trip
 	Trips        *models.Trips
-	Vendor       *models.Vendor
 	Vendors      *models.Vendors
-	User         *models.User
 	Users        *models.Users
 }
 

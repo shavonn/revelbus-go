@@ -45,8 +45,8 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	view.Render(w, r, "user", &view.View{
-		Form: f,
-		User: u,
+		Title: f.Name,
+		Form:  f,
 	})
 }
 

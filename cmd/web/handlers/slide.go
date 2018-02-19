@@ -48,7 +48,6 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "slide", &view.View{
 		Title: s.Title,
 		Form:  f,
-		Slide: s,
 	})
 }
 

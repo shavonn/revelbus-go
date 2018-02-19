@@ -48,7 +48,6 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "faq-admin", &view.View{
 		Title: faq.Question,
 		Form:  f,
-		FAQ:   faq,
 	})
 }
 

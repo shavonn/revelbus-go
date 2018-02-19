@@ -33,7 +33,7 @@
         </div>
     </form>
     {{end}}
-    {{with .Gallery}}
+    {{with .Gallery }}
         <hr/>
         <h2>
             Images
@@ -62,34 +62,34 @@
         <div class="alert alert-primary" role="alert">No images to be found. Whatever shall we do?</div>
         {{end}}
 
-    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <form action="/admin/gallery/{{.ID}}?attach" method="post" novalidate>
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Add Vendor</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{$.Token}}">
-                    <div class="form-group">
-                        <label for="file">Files</label>
-                        <select class="form-control" name="file">
-                            {{range $.Files}}
-                            <option value="{{.ID}}">{{.Name}}</option>
-                            {{end}}
-                        </select>
+        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <form action="/admin/gallery/{{.ID}}?attach" method="post" novalidate>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">Add Vendor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="csrf_token" value="{{$.Token}}">
+                        <div class="form-group">
+                            <label for="file">Files</label>
+                            <select class="form-control" name="file">
+                                {{range $.Files}}
+                                <option value="{{.ID}}">{{.Name}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Add</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Add</button>
-                </div>
             </div>
+            </form>
         </div>
-        </form>
-    </div>
     {{end}}
 {{template "admin-footer" .}}
 {{end}}
