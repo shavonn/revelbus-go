@@ -57,8 +57,6 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostGallery(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -75,7 +73,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New Gallery"
 		}
 
@@ -89,7 +87,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 		Name: f.Name,
 	}
 
-	if id != "" {
+	if g.ID != 0 {
 		err := g.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
@@ -121,7 +119,6 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := g.Create()
@@ -129,8 +126,6 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(g.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -139,6 +134,8 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(g.ID)
 
 	http.Redirect(w, r, "/admin/gallery?id="+id, http.StatusSeeOther)
 }

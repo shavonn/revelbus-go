@@ -66,8 +66,6 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostTrip(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -94,7 +92,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New Trip"
 		}
 
@@ -134,9 +132,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		Image:        f.Image,
 	}
 
-	if id != "" {
-		t.ID = utils.ToInt(id)
-
+	if t.ID != 0 {
 		err := t.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
@@ -150,8 +146,6 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(t.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -160,6 +154,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(t.ID)
 
 	http.Redirect(w, r, "/admin/trip?id="+id, http.StatusSeeOther)
 }

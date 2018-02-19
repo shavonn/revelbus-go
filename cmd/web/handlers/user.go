@@ -51,8 +51,6 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -71,7 +69,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New User"
 		}
 
@@ -86,9 +84,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		Role:  f.Role,
 	}
 
-	if id != "" {
-		u.ID = utils.ToInt(id)
-
+	if u.ID != 0 {
 		err := u.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
@@ -119,8 +115,6 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		email.NewPassword(u.Email, pw)
-
-		id = strconv.Itoa(u.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -129,6 +123,8 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(u.ID)
 
 	http.Redirect(w, r, "/admin/user?id="+id, http.StatusSeeOther)
 }

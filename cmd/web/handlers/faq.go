@@ -53,8 +53,6 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostFAQ(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -67,7 +65,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Category: r.PostForm.Get("category"),
 		Answer:   r.PostForm.Get("answer"),
 		Order:    r.PostForm.Get("order"),
-		Active:   (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
+		Active:   (len(r.Form["active"]) == 1),
 	}
 
 	if !f.Valid() {
@@ -75,7 +73,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New FAQ"
 		}
 
@@ -93,15 +91,12 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Active:   f.Active,
 	}
 
-	if id != "" {
-		faq.ID = utils.ToInt(id)
-
+	if faq.ID != 0 {
 		err := faq.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
 		}
-
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := faq.Create()
@@ -109,8 +104,6 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(faq.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -119,6 +112,8 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(faq.ID)
 
 	http.Redirect(w, r, "/admin/faq?id="+id, http.StatusSeeOther)
 }

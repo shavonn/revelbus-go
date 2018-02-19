@@ -53,8 +53,6 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostSlide(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -67,7 +65,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Blurb:  r.PostForm.Get("blurb"),
 		Style:  r.PostForm.Get("style"),
 		Order:  r.PostForm.Get("order"),
-		Active: (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
+		Active: (len(r.Form["active"]) == 1),
 	}
 
 	if !f.Valid() {
@@ -75,7 +73,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New Slide"
 		}
 
@@ -93,15 +91,12 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Active: f.Active,
 	}
 
-	if id != "" {
-		s.ID = utils.ToInt(id)
-
+	if s.ID != 0 {
 		err := s.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
 		}
-
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := s.Create()
@@ -109,8 +104,6 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(s.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -119,6 +112,8 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(s.ID)
 
 	http.Redirect(w, r, "/admin/slide?id="+id, http.StatusSeeOther)
 }

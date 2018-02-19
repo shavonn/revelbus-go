@@ -57,8 +57,6 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostVendor(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
-
 	err := r.ParseForm()
 	if err != nil {
 		view.ClientError(w, r, http.StatusBadRequest)
@@ -77,7 +75,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
 		Brand:   r.PostForm.Get("brand"),
-		Active:  (id == "" || ((len(r.Form["active"]) == 1) && id != "")),
+		Active:  (len(r.Form["active"]) == 1),
 	}
 
 	if !f.Valid() {
@@ -85,7 +83,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 			Form: f,
 		}
 
-		if id == "" {
+		if f.ID == "" {
 			v.Title = "New Vendor"
 		}
 
@@ -125,15 +123,12 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		Active:  f.Active,
 	}
 
-	if id != "" {
-		v.ID = utils.ToInt(id)
-
+	if v.ID != 0 {
 		err := v.Update()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
 		}
-
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		err := v.Create()
@@ -141,8 +136,6 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 			view.ServerError(w, r, err)
 			return
 		}
-
-		id = strconv.Itoa(v.ID)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -151,6 +144,8 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	id := strconv.Itoa(v.ID)
 
 	http.Redirect(w, r, "/admin/vendor?id="+id, http.StatusSeeOther)
 }
