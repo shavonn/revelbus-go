@@ -18,10 +18,10 @@
                 </div>
                 {{end}}
                 
-                {{if .Gallery}}
+                {{if and $.Gallery $.Gallery.Images}}
                 <hr />
                 <h2>Gallery</h2>
-                    {{template "gallery-partial" .}}
+                {{template "gallery-partial" .}}
                 {{end}}
         </div>
         <div class="sidebar">
