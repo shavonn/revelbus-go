@@ -21,14 +21,7 @@
         </div>
         {{end}}
     </div>
-    {{with .Gallery}}
-    <div class="gallery">
-        {{range .Images}}
-        <a href="/assets/{{.Name}}"><img src="/assets/{{.Thumb}}" alt="" title="" /></a>
-        {{end}}
-        <div class="clear"></div>
-    </div>
-    {{end}}
+    {{template "gallery-partial" .}}
     <div class="mailing-list duo">
         <div class="container">
             <img src="/assets/images/chars/wine_gal2.svg" class="one" />

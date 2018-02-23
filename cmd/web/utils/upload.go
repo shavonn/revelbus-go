@@ -87,7 +87,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 			if ext == ".png" {
 				png.Encode(out, m)
 			} else {
-				jpeg.Encode(out, m, nil)
+				jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
 			}
 
 			f.Thumb = filepath.Join(folder, rn)

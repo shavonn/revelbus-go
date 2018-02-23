@@ -21,14 +21,7 @@
                 {{if .Gallery}}
                 <hr />
                 <h2>Gallery</h2>
-                    {{with $.Gallery}}
-                    <div class="gallery">
-                        {{range .Images}}
-                        <a href="/assets/{{.Name}}"><img src="/assets/{{.Name}}" alt="" title="" /></a>
-                        {{end}}
-                        <div class="clear"></div>
-                    </div>
-                    {{end}}
+                    {{template "gallery-partial" .}}
                 {{end}}
         </div>
         <div class="sidebar">

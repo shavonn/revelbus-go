@@ -1,12 +1,13 @@
 .gallery {
-    overflow: auto;
-
+    height: 320px;
+    
     a {
         float: left;
         position: relative;
         display: block;
         width: 25%;
         height: 320px;
+        overflow: hidden;
     }
 
     img {
