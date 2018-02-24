@@ -28,10 +28,11 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := v.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}

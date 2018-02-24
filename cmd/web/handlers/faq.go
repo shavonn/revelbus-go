@@ -28,10 +28,11 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := faq.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -46,7 +47,7 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	view.Render(w, r, "faq-admin", &view.View{
-		Title: faq.Question,
+		Title: "FAQ",
 		Form:  f,
 	})
 }
@@ -69,7 +70,8 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 
 	if !f.Valid() {
 		v := &view.View{
-			Form: f,
+			Form:  f,
+			Title: "FAQ",
 		}
 
 		if f.ID == "" {
