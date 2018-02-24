@@ -11,7 +11,7 @@ import (
 type Gallery struct {
 	ID     int
 	Name   string
-	Images []*File
+	Images Files
 }
 
 type Galleries []*Gallery

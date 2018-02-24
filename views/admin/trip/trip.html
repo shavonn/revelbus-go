@@ -65,9 +65,9 @@
         </div>
         <div class="form-group">
             <label for="gallery">Gallery</label>
-            <select class="form-control" name="gallery">
+            <select class="form-control" name="gallery_id">
                 {{range $.Galleries}}
-                <option value="{{.ID}}"{{if eq $.Form.Gallery .ID}} selected{{end}}>{{.Name}}</option>
+                <option value="{{.ID}}"{{if eq $.Form.GalleryID .ID}} selected{{end}}>{{.Name}}</option>
                 {{end}}
             </select>
         </div>
@@ -93,8 +93,8 @@
         </div>
         <div class="form-group">
             <label for="image">Image</label>
-            <input type="hidden" name="image" value="{{.Image}}" />
-            {{if not .Image}}
+            <input type="hidden" name="image_id" value="{{.ImageID}}" />
+            {{if not .ImageID}}
             <input type="file" class="form-control-file" name="trip_image">
             {{else}}
             <img src="/assets/{{.Image}}" />
