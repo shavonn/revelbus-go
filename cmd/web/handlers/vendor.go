@@ -182,7 +182,23 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := v.Delete()
+	err := v.GetBase()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	image := &models.File{
+		ID: v.BrandID,
+	}
+
+	err = utils.DeleteFile(image)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = v.Delete()
 	if err == db.ErrCannotDelete {
 		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
 		if err != nil {

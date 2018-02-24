@@ -129,6 +129,14 @@ func (t *Trip) Get() error {
 	return err
 }
 
+func (t *Trip) GetBase() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT image_id FROM trips WHERE id = ?`
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
+	return err
+}
+
 func GetBySlug(s string) (*Trip, error) {
 	conn, _ := db.GetConnection()
 	t := &Trip{}

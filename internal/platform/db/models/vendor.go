@@ -115,6 +115,14 @@ func (v *Vendor) Get() error {
 	return err
 }
 
+func (v *Vendor) GetBase() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT brand_id FROM vendors WHERE id = ?`
+	err := conn.QueryRow(stmt, v.ID).Scan(&v.BrandID)
+	return err
+}
+
 func (v *Vendor) GetFile() error {
 	conn, _ := db.GetConnection()
 

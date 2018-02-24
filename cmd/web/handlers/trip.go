@@ -201,7 +201,23 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Delete()
+	err := t.GetBase()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	image := &models.File{
+		ID: t.ImageID,
+	}
+
+	err = utils.DeleteFile(image)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = t.Delete()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
