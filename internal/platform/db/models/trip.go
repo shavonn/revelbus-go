@@ -99,10 +99,10 @@ func (t *Trip) Get() error {
 		return err
 	}
 
-	err = t.GetImage()
-	if err != nil {
-		return err
-	}
+	// err = t.GetImage()
+	// if err != nil {
+	// 	return err
+	// }
 
 	err = t.GetVendors()
 
@@ -338,9 +338,9 @@ func (t *Trip) GetImage() error {
 
 	f := &File{}
 
-	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
+	stmt := `SELECT f.id, f.name, f.thumb, FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
 
-	err := conn.QueryRow(stmt, t.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
+	err := conn.QueryRow(stmt, t.ID).Scan(&f.ID, &f.Name, &f.Thumb)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = nil

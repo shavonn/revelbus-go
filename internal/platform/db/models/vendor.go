@@ -136,9 +136,9 @@ func (v *Vendor) GetImage() error {
 
 	f := &File{}
 
-	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM vendors v JOIN files f ON v.brand_id = f.id WHERE v.id = ?`
+	stmt := `SELECT f.id, f.name, f.thumb FROM vendors v JOIN files f ON v.brand_id = f.id WHERE v.id = ?`
 
-	err := conn.QueryRow(stmt, v.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
+	err := conn.QueryRow(stmt, v.ID).Scan(&f.ID, &f.Name, &f.Thumb)
 	if err != sql.ErrNoRows && err != nil {
 		return err
 	}
