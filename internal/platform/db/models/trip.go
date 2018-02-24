@@ -190,7 +190,7 @@ func GetTrips() (*Trips, error) {
 func GetUpcomingTrips(limit int) (*Trips, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
+	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
 	if limit > 0 {
 		stmt = stmt + ` LIMIT ` + strconv.Itoa(limit)
@@ -230,7 +230,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 
 	trips := make(GroupedTrips)
 
-	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
+	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
 	rows, err := conn.Query(stmt)
 	if err != nil {
@@ -264,7 +264,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 func (t *Trip) GetPartners() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT v.id, v.name, v.brand, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
+	stmt := `SELECT v.id, v.name, v.brand_id, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
 	rows, err := conn.Query(stmt, t.ID)
 	if err != nil {
 		return err
@@ -274,7 +274,7 @@ func (t *Trip) GetPartners() error {
 	partners := Vendors{}
 	for rows.Next() {
 		p := &Vendor{}
-		err := rows.Scan(&p.ID, &p.Name, &p.Brand, &p.URL)
+		err := rows.Scan(&p.ID, &p.Name, &p.BrandID, &p.URL)
 		if err != nil {
 			return err
 		}
@@ -332,8 +332,12 @@ func (t *Trip) GetFile() error {
 	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
 
 	err := conn.QueryRow(stmt, t.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
-	if err != sql.ErrNoRows && err != nil {
-		return err
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = nil
+		} else {
+			return err
+		}
 	}
 
 	t.Image = f
