@@ -108,16 +108,16 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "admin-trip", v)
 	}
 
-	fn, err := utils.UploadFile(w, r, "trip_image", "uploads/trip")
+	fn, err := utils.UploadFile(w, r, "trip_image", "uploads/trip", false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	if len(fn) > 0 && fn[0] != "" {
-		f.Image = fn[0]
+	if len(fn) > 0 {
+		f.Image = fn[0].Name
 	} else if (len(f.Image) > 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile(f.Image)
+		err = utils.DeleteFile(fn[0])
 		if err != nil {
 			view.ServerError(w, r, err)
 			return

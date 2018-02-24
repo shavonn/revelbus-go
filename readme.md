@@ -8,10 +8,6 @@ Revel Bus backend, tour management.
 `config/config.[env-name].env.json`
 **env** environment variable
 
-###  Required upload folders
-* public/uploads/trip
-* public/uploads/vendor
-
 ## Usage
 
 ### Flash

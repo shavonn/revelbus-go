@@ -91,16 +91,16 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "vendor", v)
 	}
 
-	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor")
+	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor", false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	if len(fn) > 0 && fn[0] != "" {
-		f.Brand = fn[0]
+	if len(fn) > 0 {
+		f.Brand = fn[0].Name
 	} else if (len(f.Brand) > 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile(f.Brand)
+		err = utils.DeleteFile(fn[0])
 		if err != nil {
 			view.ServerError(w, r, err)
 			return

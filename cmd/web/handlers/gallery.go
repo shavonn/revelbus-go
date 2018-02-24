@@ -37,12 +37,6 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files, err := models.GetFiles()
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
 	f := &models.GalleryForm{
 		ID:   strconv.Itoa(g.ID),
 		Name: g.Name,
@@ -52,7 +46,6 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		Title:   g.Name,
 		Form:    f,
 		Gallery: g,
-		Files:   files,
 	})
 }
 
@@ -96,23 +89,13 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 
 		fldr := slug.Make(g.Name)
 
-		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr)
+		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr, true)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
 		}
 
-		for _, upload := range uploads {
-			f := models.File{
-				Name: upload,
-			}
-
-			err := f.Create()
-			if err != nil {
-				view.ServerError(w, r, err)
-				return
-			}
-
+		for _, f := range uploads {
 			g.AttachImage(strconv.Itoa(f.ID))
 			if err != nil {
 				view.ServerError(w, r, err)
@@ -176,37 +159,6 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/galleries", http.StatusSeeOther)
 }
 
-func AttachImage(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	err := r.ParseForm()
-	if err != nil {
-		view.ClientError(w, r, http.StatusBadRequest)
-		return
-	}
-
-	fid := r.PostForm.Get("file")
-
-	g := models.Gallery{
-		ID: utils.ToInt(id),
-	}
-
-	err = g.AttachImage(fid)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	err = flash.Add(w, r, utils.MsgSuccessfullyAddedImage, "success")
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	http.Redirect(w, r, "/admin/gallery?id="+id, http.StatusSeeOther)
-}
-
 func DetachImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -218,6 +170,25 @@ func DetachImage(w http.ResponseWriter, r *http.Request) {
 
 	err := g.DetachImage(fid)
 	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	f := &models.File{
+		ID: utils.ToInt(fid),
+	}
+
+	err = utils.DeleteFile(f)
+	if err == db.ErrNotFound {
+		view.NotFound(w, r)
+		return
+	} else if err == db.ErrCannotDelete {
+		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}

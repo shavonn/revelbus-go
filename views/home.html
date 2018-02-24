@@ -21,13 +21,8 @@
         </div>
         {{end}}
     </div>
-    {{with .Gallery}}
-    <div class="gallery">
-        {{range .Images}}
-        <a href="/assets/{{.Name}}"><img src="/assets/{{.Name}}" alt="" title="" /></a>
-        {{end}}
-        <div class="clear"></div>
-    </div>
+    {{if and .Gallery .Gallery.Images}}
+    {{template "gallery-partial" .}}
     {{end}}
     <div class="mailing-list duo">
         <div class="container">

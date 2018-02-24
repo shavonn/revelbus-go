@@ -11,6 +11,7 @@ import (
 type File struct {
 	ID      int
 	Name    string
+	Thumb   string
 	Created time.Time
 }
 
@@ -19,8 +20,8 @@ type Files []*File
 func (f *File) Create() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `INSERT INTO files (name, created_at, updated_at) VALUES(?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, f.Name)
+	stmt := `INSERT INTO files (name, thumb, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, f.Name, f.Thumb)
 	if err != nil {
 		return err
 	}
@@ -52,8 +53,8 @@ func (f *File) Delete() error {
 func (f *File) Get() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT name, created_at FROM files WHERE id = ?`
-	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name, &f.Created)
+	stmt := `SELECT name, thumb, created_at FROM files WHERE id = ?`
+	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name, &f.Thumb, &f.Created)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}
@@ -64,7 +65,7 @@ func (f *File) Get() error {
 func GetFiles() (*Files, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, name, created_at FROM files ORDER BY name`
+	stmt := `SELECT id, name, thumb, created_at FROM files ORDER BY name`
 	rows, err := conn.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func GetFiles() (*Files, error) {
 	files := Files{}
 	for rows.Next() {
 		f := &File{}
-		err := rows.Scan(&f.ID, &f.Name, &f.Created)
+		err := rows.Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
 		if err != nil {
 			return nil, err
 		}

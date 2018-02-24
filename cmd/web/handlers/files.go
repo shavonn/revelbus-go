@@ -26,22 +26,10 @@ func PostUpload(w http.ResponseWriter, r *http.Request) {
 
 	fldr := r.PostForm.Get("fldr")
 
-	uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr)
+	_, err = utils.UploadFile(w, r, "files", "uploads/files/"+fldr, false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
-	}
-
-	for _, upload := range uploads {
-		f := models.File{
-			Name: upload,
-		}
-
-		err := f.Create()
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
 	}
 
 	http.Redirect(w, r, "/admin/files", http.StatusSeeOther)
@@ -63,24 +51,15 @@ func RemoveFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	f := models.File{
+	f := &models.File{
 		ID: utils.ToInt(id),
 	}
 
-	err := f.Get()
-	if err != nil {
-		view.ServerError(w, r, err)
+	err := utils.DeleteFile(f)
+	if err == db.ErrNotFound {
+		view.NotFound(w, r)
 		return
-	}
-
-	err = utils.DeleteFile(f.Name)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	err = f.Delete()
-	if err == db.ErrCannotDelete {
+	} else if err == db.ErrCannotDelete {
 		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
 		if err != nil {
 			view.ServerError(w, r, err)
