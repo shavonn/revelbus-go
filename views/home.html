@@ -21,7 +21,9 @@
         </div>
         {{end}}
     </div>
+    {{if and .Gallery .Gallery.Images}}
     {{template "gallery-partial" .}}
+    {{end}}
     <div class="mailing-list duo">
         <div class="container">
             <img src="/assets/images/chars/wine_gal2.svg" class="one" />
