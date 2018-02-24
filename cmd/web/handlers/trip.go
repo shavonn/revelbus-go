@@ -28,10 +28,11 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := t.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -155,6 +156,10 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	if t.ID != 0 {
 		err := t.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}
@@ -203,18 +208,24 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 
 	err := t.GetBase()
 	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
 
-	image := &models.File{
-		ID: t.ImageID,
-	}
+	if t.ImageID != 0 {
+		image := &models.File{
+			ID: t.ImageID,
+		}
 
-	err = utils.DeleteFile(image)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
+		err = utils.DeleteFile(image)
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
 	}
 
 	err = t.Delete()

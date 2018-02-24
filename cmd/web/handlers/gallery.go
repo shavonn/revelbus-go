@@ -29,10 +29,11 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := g.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -83,6 +84,10 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 	if g.ID != 0 {
 		err := g.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}
@@ -179,10 +184,7 @@ func DetachImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = utils.DeleteFile(f)
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err == db.ErrCannotDelete {
+	if err == db.ErrCannotDelete {
 		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
 		if err != nil {
 			view.ServerError(w, r, err)

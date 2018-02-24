@@ -75,11 +75,31 @@ func (v *Vendor) Create() error {
 	return nil
 }
 
+func (v *Vendor) Get() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand_id, active FROM vendors WHERE id = ?`
+	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.BrandID, &v.Active)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+
+	err = v.GetImage()
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func (v *Vendor) Update() error {
 	conn, _ := db.GetConnection()
 
 	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand_id = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active, v.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
 	return err
 }
 
@@ -93,25 +113,10 @@ func (v *Vendor) Delete() error {
 
 		if ok && merr.Number == 1451 {
 			return db.ErrCannotDelete
+		} else if err == sql.ErrNoRows {
+			return db.ErrNotFound
 		}
 	}
-	return err
-}
-
-func (v *Vendor) Get() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand_id, active FROM vendors WHERE id = ?`
-	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.BrandID, &v.Active)
-	if err == sql.ErrNoRows {
-		return db.ErrNotFound
-	}
-
-	err = v.GetFile()
-	if err != nil {
-		return err
-	}
-
 	return err
 }
 
@@ -120,17 +125,20 @@ func (v *Vendor) GetBase() error {
 
 	stmt := `SELECT brand_id FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.BrandID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
 	return err
 }
 
-func (v *Vendor) GetFile() error {
+func (v *Vendor) GetImage() error {
 	conn, _ := db.GetConnection()
 
 	f := &File{}
 
-	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM vendors v JOIN files f ON v.brand_id = f.id WHERE v.id = ?`
+	stmt := `SELECT f.id, f.name, f.thumb FROM vendors v JOIN files f ON v.brand_id = f.id WHERE v.id = ?`
 
-	err := conn.QueryRow(stmt, v.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
+	err := conn.QueryRow(stmt, v.ID).Scan(&f.ID, &f.Name, &f.Thumb)
 	if err != sql.ErrNoRows && err != nil {
 		return err
 	}

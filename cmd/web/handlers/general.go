@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"revelforce/cmd/web/view"
+	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/db/models"
 	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
@@ -150,6 +151,10 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 
 	t, err := models.GetBySlug(slug)
 	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}

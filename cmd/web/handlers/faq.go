@@ -28,10 +28,11 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := faq.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -41,12 +42,12 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 		Question: faq.Question,
 		Answer:   faq.Answer,
 		Category: faq.Category,
-		Order:    strconv.Itoa(faq.Order),
+		Order:    faq.Order,
 		Active:   faq.Active,
 	}
 
 	view.Render(w, r, "faq-admin", &view.View{
-		Title: faq.Question,
+		Title: "FAQ",
 		Form:  f,
 	})
 }
@@ -63,13 +64,14 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Question: r.PostForm.Get("question"),
 		Category: r.PostForm.Get("category"),
 		Answer:   r.PostForm.Get("answer"),
-		Order:    r.PostForm.Get("order"),
+		Order:    utils.ToInt(r.PostForm.Get("order")),
 		Active:   (len(r.Form["active"]) == 1),
 	}
 
 	if !f.Valid() {
 		v := &view.View{
-			Form: f,
+			Form:  f,
+			Title: "FAQ",
 		}
 
 		if f.ID == "" {
@@ -86,13 +88,17 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Question: f.Question,
 		Answer:   f.Answer,
 		Category: f.Category,
-		Order:    utils.ToInt(f.Order),
+		Order:    f.Order,
 		Active:   f.Active,
 	}
 
 	if faq.ID != 0 {
 		err := faq.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}

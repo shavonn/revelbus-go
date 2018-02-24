@@ -23,7 +23,7 @@ type SlideForm struct {
 	Blurb  string
 	Style  string
 	Active bool
-	Order  string
+	Order  int
 	Errors map[string]string
 }
 
@@ -57,22 +57,6 @@ func (s *Slide) Create() error {
 	return nil
 }
 
-func (s *Slide) Update() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `UPDATE slides SET title = ?, blurb= ?, style = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, s.Title, s.Blurb, s.Style, s.Order, s.Active, s.ID)
-	return err
-}
-
-func (s *Slide) Delete() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `DELETE FROM slides WHERE id = ?`
-	_, err := conn.Exec(stmt, s.ID)
-	return err
-}
-
 func (s *Slide) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -82,6 +66,28 @@ func (s *Slide) Get() error {
 		return db.ErrNotFound
 	}
 
+	return err
+}
+
+func (s *Slide) Update() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `UPDATE slides SET title = ?, blurb= ?, style = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, s.Title, s.Blurb, s.Style, s.Order, s.Active, s.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+	return err
+}
+
+func (s *Slide) Delete() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `DELETE FROM slides WHERE id = ?`
+	_, err := conn.Exec(stmt, s.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
 	return err
 }
 

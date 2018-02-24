@@ -20,13 +20,14 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := s.Get()
-	if err == db.ErrNotFound {
-		view.Render(w, r, "settings", &view.View{
-			Form:  new(models.SettingsForm),
-			Title: "Settings",
-		})
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.Render(w, r, "settings", &view.View{
+				Form:  new(models.SettingsForm),
+				Title: "Settings",
+			})
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}

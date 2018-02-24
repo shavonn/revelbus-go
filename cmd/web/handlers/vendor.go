@@ -28,10 +28,11 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := v.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -137,6 +138,10 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	if v.ID != 0 {
 		err := v.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}
@@ -184,18 +189,24 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 
 	err := v.GetBase()
 	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
 
-	image := &models.File{
-		ID: v.BrandID,
-	}
+	if v.BrandID != 0 {
+		image := &models.File{
+			ID: v.BrandID,
+		}
 
-	err = utils.DeleteFile(image)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
+		err = utils.DeleteFile(image)
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
 	}
 
 	err = v.Delete()

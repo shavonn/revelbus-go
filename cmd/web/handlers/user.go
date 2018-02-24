@@ -29,10 +29,11 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := u.Get()
-	if err == db.ErrNotFound {
-		view.NotFound(w, r)
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == db.ErrNotFound {
+			view.NotFound(w, r)
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -88,6 +89,10 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	if u.ID != 0 {
 		err := u.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}

@@ -50,22 +50,6 @@ func (g *Gallery) Create() error {
 	return nil
 }
 
-func (g *Gallery) Update() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, g.Name, g.ID)
-	return err
-}
-
-func (g *Gallery) Delete() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `DELETE FROM galleries WHERE id = ?`
-	_, err := conn.Exec(stmt, g.ID)
-	return err
-}
-
 func (g *Gallery) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -75,37 +59,30 @@ func (g *Gallery) Get() error {
 		return db.ErrNotFound
 	}
 
-	err = g.GetFiles()
+	err = g.GetImages()
 	return err
 }
 
-func (g *Gallery) GetFiles() error {
+func (g *Gallery) Update() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
-	rows, err := conn.Query(stmt, g.ID)
-	if err != nil {
-		return err
+	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, g.Name, g.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
 	}
-	defer rows.Close()
+	return err
+}
 
-	files := Files{}
-	for rows.Next() {
-		f := &File{}
-		err := rows.Scan(&f.ID, &f.Name, &f.Thumb)
-		if err != nil {
-			return err
-		}
-		files = append(files, f)
+func (g *Gallery) Delete() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `DELETE FROM galleries WHERE id = ?`
+	_, err := conn.Exec(stmt, g.ID)
+	if err == sql.ErrNoRows {
+		return nil
 	}
-
-	if err = rows.Err(); err != nil {
-		return err
-	}
-
-	g.Images = files
-
-	return nil
+	return err
 }
 
 func GetGalleries() (*Galleries, error) {
@@ -135,6 +112,35 @@ func GetGalleries() (*Galleries, error) {
 	return &galleries, nil
 }
 
+func (g *Gallery) GetImages() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
+	rows, err := conn.Query(stmt, g.ID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	files := Files{}
+	for rows.Next() {
+		f := &File{}
+		err := rows.Scan(&f.ID, &f.Name, &f.Thumb)
+		if err != nil {
+			return err
+		}
+		files = append(files, f)
+	}
+
+	if err = rows.Err(); err != nil {
+		return err
+	}
+
+	g.Images = files
+
+	return nil
+}
+
 func (g *Gallery) AttachImage(fid string) error {
 	conn, _ := db.GetConnection()
 
@@ -155,12 +161,8 @@ func (g *Gallery) DetachImage(fid string) error {
 
 	stmt := `DELETE FROM galleries_images WHERE gallery_id = ? AND file_id = ?`
 	_, err := conn.Exec(stmt, g.ID, fid)
-	if err != nil {
-		merr, ok := err.(*mysql.MySQLError)
-
-		if ok && merr.Number == 1062 {
-			return db.ErrDuplicate
-		}
+	if err != nil && err == sql.ErrNoRows {
+		return nil
 	}
 	return err
 }

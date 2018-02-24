@@ -25,7 +25,7 @@ type FAQForm struct {
 	Answer   string
 	Category string
 	Active   bool
-	Order    string
+	Order    int
 	Errors   map[string]string
 }
 
@@ -57,22 +57,6 @@ func (f *FAQ) Create() error {
 	return nil
 }
 
-func (f *FAQ) Update() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active, f.ID)
-	return err
-}
-
-func (f *FAQ) Delete() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `DELETE FROM faqs WHERE id = ?`
-	_, err := conn.Exec(stmt, f.ID)
-	return err
-}
-
 func (f *FAQ) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -82,6 +66,28 @@ func (f *FAQ) Get() error {
 		return db.ErrNotFound
 	}
 
+	return err
+}
+
+func (f *FAQ) Update() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active, f.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+	return err
+}
+
+func (f *FAQ) Delete() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `DELETE FROM faqs WHERE id = ?`
+	_, err := conn.Exec(stmt, f.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
 	return err
 }
 

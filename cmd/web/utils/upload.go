@@ -111,7 +111,6 @@ func DeleteFile(f *models.File) error {
 		if err == db.ErrNotFound {
 			return nil
 		}
-
 		return err
 	}
 
