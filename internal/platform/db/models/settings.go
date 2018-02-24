@@ -51,14 +51,6 @@ func (s *Settings) Create() error {
 	return nil
 }
 
-func (s *Settings) Update() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `UPDATE settings SET contact_blurb = ?, about_blurb = ?, about_content = ?, home_gallery = ?, home_gallery_active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, s.ContactBlurb, s.AboutBlurb, s.AboutContent, s.HomeGallery, s.HomeGalleryActive, s.ID)
-	return err
-}
-
 func (s *Settings) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -68,5 +60,17 @@ func (s *Settings) Get() error {
 		return db.ErrNotFound
 	}
 
+	return err
+}
+
+func (s *Settings) Update() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `UPDATE settings SET contact_blurb = ?, about_blurb = ?, about_content = ?, home_gallery = ?, home_gallery_active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, s.ContactBlurb, s.AboutBlurb, s.AboutContent, s.HomeGallery, s.HomeGalleryActive, s.ID)
+
+	if err == sql.ErrNoRows {
+		return s.Create()
+	}
 	return err
 }

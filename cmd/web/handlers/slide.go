@@ -41,7 +41,7 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 		Title:  s.Title,
 		Blurb:  s.Blurb,
 		Style:  s.Style,
-		Order:  strconv.Itoa(s.Order),
+		Order:  s.Order,
 		Active: s.Active,
 	}
 
@@ -63,7 +63,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Title:  r.PostForm.Get("title"),
 		Blurb:  r.PostForm.Get("blurb"),
 		Style:  r.PostForm.Get("style"),
-		Order:  r.PostForm.Get("order"),
+		Order:  utils.ToInt(r.PostForm.Get("order")),
 		Active: (len(r.Form["active"]) == 1),
 	}
 
@@ -86,13 +86,17 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Title:  f.Title,
 		Blurb:  f.Blurb,
 		Style:  f.Style,
-		Order:  utils.ToInt(f.Order),
+		Order:  f.Order,
 		Active: f.Active,
 	}
 
 	if s.ID != 0 {
 		err := s.Update()
 		if err != nil {
+			if err == db.ErrNotFound {
+				view.NotFound(w, r)
+				return
+			}
 			view.ServerError(w, r, err)
 			return
 		}

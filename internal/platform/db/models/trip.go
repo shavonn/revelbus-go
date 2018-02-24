@@ -87,26 +87,6 @@ func (t *Trip) Create() error {
 	return nil
 }
 
-func (t *Trip) Update() error {
-	conn, _ := db.GetConnection()
-
-	if t.Slug == "" {
-		t.Slug = db.GetSlug(t.Title, "trips")
-	}
-
-	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image_id = ?, gallery_id = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.ImageID, t.GalleryID, t.ID)
-	return err
-}
-
-func (t *Trip) Delete() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `DELETE FROM trips WHERE id = ?`
-	_, err := conn.Exec(stmt, t.ID)
-	return err
-}
-
 func (t *Trip) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -119,21 +99,13 @@ func (t *Trip) Get() error {
 		return err
 	}
 
-	err = t.GetFile()
+	err = t.GetImage()
 	if err != nil {
 		return err
 	}
 
 	err = t.GetVendors()
 
-	return err
-}
-
-func (t *Trip) GetBase() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `SELECT image_id FROM trips WHERE id = ?`
-	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
 	return err
 }
 
@@ -147,7 +119,7 @@ func GetBySlug(s string) (*Trip, error) {
 		return nil, db.ErrNotFound
 	}
 
-	err = t.GetFile()
+	err = t.GetImage()
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +130,43 @@ func GetBySlug(s string) (*Trip, error) {
 	}
 
 	return t, err
+}
+
+func (t *Trip) Update() error {
+	conn, _ := db.GetConnection()
+
+	if t.Slug == "" {
+		t.Slug = db.GetSlug(t.Title, "trips")
+	}
+
+	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image_id = ?, gallery_id = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.ImageID, t.GalleryID, t.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+	return err
+}
+
+func (t *Trip) Delete() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `DELETE FROM trips WHERE id = ?`
+	_, err := conn.Exec(stmt, t.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	return err
+}
+
+func (t *Trip) GetBase() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT image_id FROM trips WHERE id = ?`
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+	return err
 }
 
 func GetTrips() (*Trips, error) {
@@ -210,7 +219,7 @@ func GetUpcomingTrips(limit int) (*Trips, error) {
 			return nil, err
 		}
 
-		err = t.GetFile()
+		err = t.GetImage()
 		if err != nil {
 			return nil, err
 		}
@@ -246,7 +255,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 		}
 		month := t.Start.Format("01")
 
-		err = t.GetFile()
+		err = t.GetImage()
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +288,7 @@ func (t *Trip) GetPartners() error {
 			return err
 		}
 
-		err = p.GetFile()
+		err = p.GetImage()
 		if err != nil {
 			return err
 		}
@@ -324,7 +333,7 @@ func (t *Trip) GetVenues() error {
 	return nil
 }
 
-func (t *Trip) GetFile() error {
+func (t *Trip) GetImage() error {
 	conn, _ := db.GetConnection()
 
 	f := &File{}
@@ -376,10 +385,8 @@ func (t *Trip) DetachVendor(r string, vid string) error {
 	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
 	_, err := conn.Exec(stmt, t.ID, vid)
 	if err != nil {
-		merr, ok := err.(*mysql.MySQLError)
-
-		if ok && merr.Number == 1062 {
-			return db.ErrDuplicate
+		if err == sql.ErrNoRows {
+			return nil
 		}
 	}
 	return err

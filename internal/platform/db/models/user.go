@@ -134,31 +134,6 @@ func (u *User) Create() error {
 	return err
 }
 
-func (u *User) Update() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `UPDATE users SET name = ?, email = ?, role = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, u.Name, u.Email, u.Role, u.ID)
-	return err
-}
-
-func (u *User) UpdatePassword(pw string) error {
-	conn, _ := db.GetConnection()
-	pass, err := bcrypt.GenerateFromPassword([]byte(pw), viper.GetInt("cost"))
-
-	stmt := `UPDATE users SET password = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err = conn.Exec(stmt, string(pass), u.ID)
-	return err
-}
-
-func (u *User) Delete() error {
-	conn, _ := db.GetConnection()
-
-	stmt := `DELETE FROM users WHERE id = ?`
-	_, err := conn.Exec(stmt, u.ID)
-	return err
-}
-
 func (u *User) Get() error {
 	conn, _ := db.GetConnection()
 
@@ -178,6 +153,37 @@ func (u *User) Get() error {
 		return db.ErrNotFound
 	}
 
+	return err
+}
+
+func (u *User) Update() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `UPDATE users SET name = ?, email = ?, role = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, u.Name, u.Email, u.Role, u.ID)
+	if err == sql.ErrNoRows {
+		return db.ErrNotFound
+	}
+	return err
+}
+
+func (u *User) UpdatePassword(pw string) error {
+	conn, _ := db.GetConnection()
+	pass, err := bcrypt.GenerateFromPassword([]byte(pw), viper.GetInt("cost"))
+
+	stmt := `UPDATE users SET password = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err = conn.Exec(stmt, string(pass), u.ID)
+	return err
+}
+
+func (u *User) Delete() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `DELETE FROM users WHERE id = ?`
+	_, err := conn.Exec(stmt, u.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
 	return err
 }
 
