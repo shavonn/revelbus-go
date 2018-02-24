@@ -22,9 +22,10 @@ type Trip struct {
 	Price        string
 	TicketingURL string
 	Notes        string
-	Image        string
-	Gallery      int
+	ImageID      int
+	GalleryID    int
 
+	Image    *File
 	Partners Vendors
 	Venues   Vendors
 }
@@ -45,8 +46,9 @@ type TripForm struct {
 	Price        string
 	TicketingURL string
 	Notes        string
+	ImageID      int
+	GalleryID    int
 	Image        string
-	Gallery      int
 	Errors       map[string]string
 }
 
@@ -69,8 +71,8 @@ func (t *Trip) Create() error {
 
 	slug := db.GetSlug(t.Title, "trips")
 
-	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, gallery, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.Gallery)
+	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, gallery_id, image_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.GalleryID, t.ImageID)
 	if err != nil {
 		return err
 	}
@@ -92,8 +94,8 @@ func (t *Trip) Update() error {
 		t.Slug = db.GetSlug(t.Title, "trips")
 	}
 
-	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image = ?, gallery = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.Image, t.Gallery, t.ID)
+	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image_id = ?, gallery_id = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.ImageID, t.GalleryID, t.ID)
 	return err
 }
 
@@ -108,10 +110,18 @@ func (t *Trip) Delete() error {
 func (t *Trip) Get() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image, gallery FROM trips WHERE id = ?`
-	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.Image, &t.Gallery)
-	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image_id, gallery_id FROM trips WHERE id = ?`
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.ImageID, &t.GalleryID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return db.ErrNotFound
+		}
+		return err
+	}
+
+	err = t.GetFile()
+	if err != nil {
+		return err
 	}
 
 	err = t.GetVendors()
@@ -119,14 +129,27 @@ func (t *Trip) Get() error {
 	return err
 }
 
+func (t *Trip) GetBase() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT image_id FROM trips WHERE id = ?`
+	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
+	return err
+}
+
 func GetBySlug(s string) (*Trip, error) {
 	conn, _ := db.GetConnection()
 	t := &Trip{}
 
-	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image, gallery FROM trips WHERE slug = ?`
-	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Image, &t.Gallery)
+	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image_id, gallery_id FROM trips WHERE slug = ?`
+	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.ImageID, &t.GalleryID)
 	if err == sql.ErrNoRows {
 		return nil, db.ErrNotFound
+	}
+
+	err = t.GetFile()
+	if err != nil {
+		return nil, err
 	}
 
 	err = t.GetVendors()
@@ -167,7 +190,7 @@ func GetTrips() (*Trips, error) {
 func GetUpcomingTrips(limit int) (*Trips, error) {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
+	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
 	if limit > 0 {
 		stmt = stmt + ` LIMIT ` + strconv.Itoa(limit)
@@ -182,10 +205,16 @@ func GetUpcomingTrips(limit int) (*Trips, error) {
 	trips := Trips{}
 	for rows.Next() {
 		t := &Trip{}
-		err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Start, &t.End, &t.Image, &t.Blurb)
+		err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Start, &t.End, &t.ImageID, &t.Blurb)
 		if err != nil {
 			return nil, err
 		}
+
+		err = t.GetFile()
+		if err != nil {
+			return nil, err
+		}
+
 		trips = append(trips, t)
 	}
 
@@ -201,7 +230,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 
 	trips := make(GroupedTrips)
 
-	stmt := `SELECT id, title, slug, start, end, image, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
+	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
 	rows, err := conn.Query(stmt)
 	if err != nil {
@@ -211,11 +240,17 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 
 	for rows.Next() {
 		t := &Trip{}
-		err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Start, &t.End, &t.Image, &t.Blurb)
+		err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Start, &t.End, &t.ImageID, &t.Blurb)
 		if err != nil {
 			return nil, err
 		}
 		month := t.Start.Format("01")
+
+		err = t.GetFile()
+		if err != nil {
+			return nil, err
+		}
+
 		trips[month] = append(trips[month], t)
 	}
 
@@ -229,7 +264,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 func (t *Trip) GetPartners() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT v.id, v.name, v.brand, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
+	stmt := `SELECT v.id, v.name, v.brand_id, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
 	rows, err := conn.Query(stmt, t.ID)
 	if err != nil {
 		return err
@@ -239,7 +274,12 @@ func (t *Trip) GetPartners() error {
 	partners := Vendors{}
 	for rows.Next() {
 		p := &Vendor{}
-		err := rows.Scan(&p.ID, &p.Name, &p.Brand, &p.URL)
+		err := rows.Scan(&p.ID, &p.Name, &p.BrandID, &p.URL)
+		if err != nil {
+			return err
+		}
+
+		err = p.GetFile()
 		if err != nil {
 			return err
 		}
@@ -280,6 +320,27 @@ func (t *Trip) GetVenues() error {
 	}
 
 	t.Venues = venues
+
+	return nil
+}
+
+func (t *Trip) GetFile() error {
+	conn, _ := db.GetConnection()
+
+	f := &File{}
+
+	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
+
+	err := conn.QueryRow(stmt, t.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = nil
+		} else {
+			return err
+		}
+	}
+
+	t.Image = f
 
 	return nil
 }

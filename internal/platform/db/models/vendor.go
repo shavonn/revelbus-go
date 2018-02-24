@@ -21,7 +21,9 @@ type Vendor struct {
 	Notes   string
 	Active  bool
 	Primary bool
-	Brand   string
+	BrandID int
+
+	Brand *File
 }
 
 type Vendors []*Vendor
@@ -37,8 +39,9 @@ type VendorForm struct {
 	Email   string
 	URL     string
 	Notes   string
-	Brand   string
+	BrandID int
 	Active  bool
+	Brand   string
 	Errors  map[string]string
 }
 
@@ -56,8 +59,8 @@ func (f *VendorForm) Valid() bool {
 func (v *Vendor) Create() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active)
+	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand_id, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active)
 	if err != nil {
 		return err
 	}
@@ -75,8 +78,8 @@ func (v *Vendor) Create() error {
 func (v *Vendor) Update() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.Brand, v.Active, v.ID)
+	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand_id = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active, v.ID)
 	return err
 }
 
@@ -98,13 +101,43 @@ func (v *Vendor) Delete() error {
 func (v *Vendor) Get() error {
 	conn, _ := db.GetConnection()
 
-	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand, active FROM vendors WHERE id = ?`
-	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.Brand, &v.Active)
+	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand_id, active FROM vendors WHERE id = ?`
+	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.BrandID, &v.Active)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}
 
+	err = v.GetFile()
+	if err != nil {
+		return err
+	}
+
 	return err
+}
+
+func (v *Vendor) GetBase() error {
+	conn, _ := db.GetConnection()
+
+	stmt := `SELECT brand_id FROM vendors WHERE id = ?`
+	err := conn.QueryRow(stmt, v.ID).Scan(&v.BrandID)
+	return err
+}
+
+func (v *Vendor) GetFile() error {
+	conn, _ := db.GetConnection()
+
+	f := &File{}
+
+	stmt := `SELECT f.id, f.name, f.thumb, f.created_at FROM vendors v JOIN files f ON v.brand_id = f.id WHERE v.id = ?`
+
+	err := conn.QueryRow(stmt, v.ID).Scan(&f.ID, &f.Name, &f.Thumb, &f.Created)
+	if err != sql.ErrNoRows && err != nil {
+		return err
+	}
+
+	v.Brand = f
+
+	return nil
 }
 
 func GetVendors(oa bool) (*Vendors, error) {

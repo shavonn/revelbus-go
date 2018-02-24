@@ -60,8 +60,12 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		Price:        t.Price,
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
-		Image:        t.Image,
-		Gallery:      t.Gallery,
+		ImageID:      t.ImageID,
+		GalleryID:    t.GalleryID,
+	}
+
+	if t.Image != nil {
+		f.Image = t.Image.Thumb
 	}
 
 	view.Render(w, r, "admin-trip", &view.View{
@@ -92,8 +96,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		TicketingURL: r.PostForm.Get("ticketing_url"),
 		Price:        r.PostForm.Get("price"),
 		Notes:        r.PostForm.Get("notes"),
-		Image:        r.PostForm.Get("image"),
-		Gallery:      utils.ToInt(r.PostForm.Get("gallery")),
+		ImageID:      utils.ToInt(r.PostForm.Get("image_id")),
+		GalleryID:    utils.ToInt(r.PostForm.Get("gallery_id")),
 	}
 
 	if !f.Valid() {
@@ -106,23 +110,6 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		}
 
 		view.Render(w, r, "admin-trip", v)
-	}
-
-	fn, err := utils.UploadFile(w, r, "trip_image", "uploads/trip", false)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	if len(fn) > 0 {
-		f.Image = fn[0].Name
-	} else if (len(f.Image) > 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile(fn[0])
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
-		f.Image = ""
 	}
 
 	var msg string
@@ -139,8 +126,30 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		TicketingURL: f.TicketingURL,
 		Price:        f.Price,
 		Notes:        f.Notes,
-		Image:        f.Image,
-		Gallery:      f.Gallery,
+		ImageID:      f.ImageID,
+		GalleryID:    f.GalleryID,
+	}
+
+	image, err := utils.UploadFile(w, r, "trip_image", "uploads/trip", true)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	if len(image) > 0 {
+		t.ImageID = image[0].ID
+	} else if (f.ImageID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		image := &models.File{
+			ID: f.ImageID,
+		}
+
+		err = utils.DeleteFile(image)
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		t.ImageID = 0
 	}
 
 	if t.ID != 0 {
@@ -192,7 +201,23 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Delete()
+	err := t.GetBase()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	image := &models.File{
+		ID: t.ImageID,
+	}
+
+	err = utils.DeleteFile(image)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = t.Delete()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/db/models"
 
 	"github.com/kennygrant/sanitize"
@@ -107,6 +108,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 func DeleteFile(f *models.File) error {
 	err := f.Get()
 	if err != nil {
+		if err == db.ErrNotFound {
+			return nil
+		}
+
 		return err
 	}
 

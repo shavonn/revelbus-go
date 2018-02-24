@@ -59,9 +59,6 @@ func PostProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.Name = f.Name
-	u.Email = f.Email
-
 	err = u.Update()
 	if err == db.ErrDuplicateEmail {
 		f.Errors["Email"] = "E-mail address is already in use"
@@ -74,6 +71,9 @@ func PostProfile(w http.ResponseWriter, r *http.Request) {
 		view.ServerError(w, r, err)
 		return
 	}
+
+	u.Name = f.Name
+	u.Email = f.Email
 
 	err = utils.SetUserSession(w, r, u)
 	if err != nil {

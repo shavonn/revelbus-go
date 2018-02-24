@@ -47,6 +47,7 @@ func (f *File) Delete() error {
 			return db.ErrCannotDelete
 		}
 	}
+
 	return err
 }
 

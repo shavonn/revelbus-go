@@ -168,9 +168,9 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		Content:   template.HTML(t.Description),
 	}
 
-	if t.Gallery != 0 {
+	if t.GalleryID != 0 {
 		g := &models.Gallery{
-			ID: t.Gallery,
+			ID: t.GalleryID,
 		}
 
 		err = g.Get()
