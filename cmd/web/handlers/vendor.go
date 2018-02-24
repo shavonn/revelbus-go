@@ -47,8 +47,12 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 		Email:   v.Email,
 		URL:     v.URL,
 		Notes:   v.Notes,
-		Brand:   v.Brand,
+		BrandID: v.BrandID,
 		Active:  v.Active,
+	}
+
+	if v.Brand != nil {
+		f.Brand = v.Brand.Thumb
 	}
 
 	view.Render(w, r, "vendor", &view.View{
@@ -75,7 +79,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		Email:   r.PostForm.Get("email"),
 		URL:     r.PostForm.Get("url"),
 		Notes:   r.PostForm.Get("notes"),
-		Brand:   r.PostForm.Get("brand"),
+		BrandID: utils.ToInt(r.PostForm.Get("brand_id")),
 		Active:  (len(r.Form["active"]) == 1),
 	}
 
@@ -91,23 +95,6 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "vendor", v)
 	}
 
-	fn, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor", false)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
-	if len(fn) > 0 {
-		f.Brand = fn[0].Name
-	} else if (len(f.Brand) > 0) && (len(r.Form["deleteimg"]) == 1) {
-		err = utils.DeleteFile(fn[0])
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
-		f.Brand = ""
-	}
-
 	var msg string
 
 	v := models.Vendor{
@@ -121,8 +108,30 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		Email:   f.Email,
 		URL:     f.URL,
 		Notes:   f.Notes,
-		Brand:   f.Brand,
+		BrandID: f.BrandID,
 		Active:  f.Active,
+	}
+
+	image, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor", true)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	if len(image) > 0 {
+		v.BrandID = image[0].ID
+	} else if (f.BrandID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		image := &models.File{
+			ID: f.BrandID,
+		}
+
+		err = utils.DeleteFile(image)
+		if err != nil {
+			view.ServerError(w, r, err)
+			return
+		}
+
+		v.BrandID = 0
 	}
 
 	if v.ID != 0 {

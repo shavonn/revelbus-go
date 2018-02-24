@@ -79,8 +79,8 @@
         
         <div class="form-group">
             <label for="brand">Brand</label>
-            <input type="hidden" name="brand" value="{{.Brand}}" />
-            {{if not .Brand}}
+            <input type="hidden" name="brand_id" value="{{.BrandID}}" />
+            {{if not .BrandID}}
             <input type="file" class="form-control-file" name="brand_image">
             {{else}}
             <img src="/assets/{{.Brand}}" />

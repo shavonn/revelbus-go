@@ -270,6 +270,11 @@ func (t *Trip) GetPartners() error {
 		if err != nil {
 			return err
 		}
+
+		err = p.GetFile()
+		if err != nil {
+			return err
+		}
 		partners = append(partners, p)
 	}
 
