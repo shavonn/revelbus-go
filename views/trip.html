@@ -18,7 +18,7 @@
                 </div>
                 {{end}}
                 
-                {{if and $.Gallery $.Gallery.Images}}
+                {{if .GalleryID}}
                 <hr />
                 <h2>Gallery</h2>
                 {{template "gallery-partial" .}}

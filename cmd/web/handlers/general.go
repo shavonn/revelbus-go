@@ -42,7 +42,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Slides:    slides,
 	}
 
-	if s.HomeGalleryActive {
+	if s.HomeGalleryActive && s.HomeGallery != 0 {
 		g := &models.Gallery{
 			ID: s.HomeGallery,
 		}

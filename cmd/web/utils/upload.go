@@ -59,7 +59,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 		f.Name = filepath.Join(folder, fn)
 
 		if makeThumb {
-			rn := "thumb_" + fn
+			rn := fn + "_thumb"
 			ext := filepath.Ext(fn)
 
 			file, err := os.Open(filepath.Join(uploadDir, fn))

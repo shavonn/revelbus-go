@@ -40,7 +40,7 @@
         <div class="row">
             <div class="col-6 form-group">
                 <label for="start">Start</label>
-                <input type="text" class="datetime_field form-control{{with .Errors.Start}} is-invalid{{end}}" aria-describedby="startHelp" name="start" value="{{.Start}}">
+                <input type="text" id="start" class="datetime_field form-control{{with .Errors.Start}} is-invalid{{end}}" aria-describedby="startHelp" name="start" value="{{.Start}}">
                 <small id="startHelp" class="form-text text-muted">YYYY-MM-DD h:mm</small>
                 {{with .Errors.Start}}
                 <div class="invalid-feedback">{{.}}</div>
@@ -48,7 +48,7 @@
             </div>
             <div class="col-6 form-group">
                 <label for="end">End</label>
-                <input type="text" class="datetime_field form-control{{with .Errors.End}} is-invalid{{end}}" aria-describedby="endHelp" name="end" value="{{.End}}">
+                <input type="text" id="end" class="datetime_field form-control{{with .Errors.End}} is-invalid{{end}}" aria-describedby="endHelp" name="end" value="{{.End}}">
                 <small id="endHelp" class="form-text text-muted">YYYY-MM-DD h:mm</small>                
                 {{with .Errors.End}}
                 <div class="invalid-feedback">{{.}}</div>
