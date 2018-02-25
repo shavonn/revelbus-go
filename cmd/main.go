@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"revelforce/cmd/web"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/session"
+	"revelforce/pkg/database"
+	"revelforce/pkg/sessions"
 	"syscall"
 	"time"
 
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	log.Println("main : Started : Initialize MySql")
-	masterDB, err := db.GetConnection()
+	masterDB, err := database.GetConnection()
 	if err != nil {
 		log.Fatalf("startup : Connect to DB : %v", err)
 	}
@@ -36,7 +36,7 @@ func main() {
 		log.Fatalf("DB Ping : %v", err)
 	}
 
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 
 	srv := http.Server{
 		Addr:           viper.GetString("addr"),

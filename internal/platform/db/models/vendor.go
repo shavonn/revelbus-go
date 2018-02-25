@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/forms"
+	"revelforce/pkg/database"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -57,7 +58,7 @@ func (f *VendorForm) Valid() bool {
 }
 
 func (v *Vendor) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO vendors (name, address, city, state, zip, phone, email, url, notes, brand_id, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active)
@@ -75,8 +76,8 @@ func (v *Vendor) Create() error {
 	return nil
 }
 
-func (v *Vendor) Get() error {
-	conn, _ := db.GetConnection()
+func (v *Vendor) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand_id, active FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.BrandID, &v.Active)
@@ -84,7 +85,7 @@ func (v *Vendor) Get() error {
 		return db.ErrNotFound
 	}
 
-	err = v.GetImage()
+	err = v.FetchImage()
 	if err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func (v *Vendor) Get() error {
 }
 
 func (v *Vendor) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand_id = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active, v.ID)
@@ -104,7 +105,7 @@ func (v *Vendor) Update() error {
 }
 
 func (v *Vendor) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM vendors WHERE id = ?`
 	_, err := conn.Exec(stmt, v.ID)
@@ -121,7 +122,7 @@ func (v *Vendor) Delete() error {
 }
 
 func (v *Vendor) GetBase() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT brand_id FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.BrandID)
@@ -131,8 +132,8 @@ func (v *Vendor) GetBase() error {
 	return err
 }
 
-func (v *Vendor) GetImage() error {
-	conn, _ := db.GetConnection()
+func (v *Vendor) FetchImage() error {
+	conn, _ := database.GetConnection()
 
 	f := &File{}
 
@@ -148,8 +149,8 @@ func (v *Vendor) GetImage() error {
 	return nil
 }
 
-func GetVendors(oa bool) (*Vendors, error) {
-	conn, _ := db.GetConnection()
+func FetchVendors(oa bool) (*Vendors, error) {
+	conn, _ := database.GetConnection()
 
 	var stmt string
 

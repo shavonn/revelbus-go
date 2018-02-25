@@ -5,6 +5,8 @@ import (
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/forms"
 
+	"revelforce/pkg/database"
+
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -32,7 +34,7 @@ func (f *GalleryForm) Valid() bool {
 }
 
 func (g *Gallery) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO galleries (name, created_at, updated_at) VALUES(?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, g.Name)
@@ -50,8 +52,8 @@ func (g *Gallery) Create() error {
 	return nil
 }
 
-func (g *Gallery) Get() error {
-	conn, _ := db.GetConnection()
+func (g *Gallery) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT name FROM galleries WHERE id = ?`
 	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name)
@@ -59,12 +61,12 @@ func (g *Gallery) Get() error {
 		return db.ErrNotFound
 	}
 
-	err = g.GetImages()
+	err = g.FetchImages()
 	return err
 }
 
 func (g *Gallery) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, g.Name, g.ID)
@@ -75,7 +77,7 @@ func (g *Gallery) Update() error {
 }
 
 func (g *Gallery) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM galleries WHERE id = ?`
 	_, err := conn.Exec(stmt, g.ID)
@@ -85,8 +87,8 @@ func (g *Gallery) Delete() error {
 	return err
 }
 
-func GetGalleries() (*Galleries, error) {
-	conn, _ := db.GetConnection()
+func FetchGalleries() (*Galleries, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, name FROM galleries`
 	rows, err := conn.Query(stmt)
@@ -112,8 +114,8 @@ func GetGalleries() (*Galleries, error) {
 	return &galleries, nil
 }
 
-func (g *Gallery) GetImages() error {
-	conn, _ := db.GetConnection()
+func (g *Gallery) FetchImages() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
 	rows, err := conn.Query(stmt, g.ID)
@@ -142,7 +144,7 @@ func (g *Gallery) GetImages() error {
 }
 
 func (g *Gallery) AttachImage(fid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO galleries_images (gallery_id, file_id, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	_, err := conn.Exec(stmt, g.ID, fid)
@@ -157,7 +159,7 @@ func (g *Gallery) AttachImage(fid string) error {
 }
 
 func (g *Gallery) DetachImage(fid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM galleries_images WHERE gallery_id = ? AND file_id = ?`
 	_, err := conn.Exec(stmt, g.ID, fid)

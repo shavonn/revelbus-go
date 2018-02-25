@@ -27,7 +27,7 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := faq.Get()
+	err := faq.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -124,7 +124,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListFAQs(w http.ResponseWriter, r *http.Request) {
-	faqs, err := models.GetFAQs()
+	faqs, err := models.FetchFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

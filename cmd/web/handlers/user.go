@@ -28,7 +28,7 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := u.Get()
+	err := u.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -136,7 +136,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := models.GetUsers()
+	users, err := models.FetchUsers()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

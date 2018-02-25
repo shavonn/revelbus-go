@@ -3,11 +3,11 @@ package utils
 import (
 	"net/http"
 	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/session"
+	"revelforce/pkg/sessions"
 )
 
-func LoggedIn(r *http.Request) (*models.User, error) {
-	sesh := session.GetSession()
+func IsAuthenticated(r *http.Request) (*models.User, error) {
+	sesh := sessions.GetSession()
 
 	s := sesh.Load(r)
 	loggedIn, err := s.Exists("AuthUser")
@@ -28,7 +28,7 @@ func LoggedIn(r *http.Request) (*models.User, error) {
 }
 
 func SetUserSession(w http.ResponseWriter, r *http.Request, u *models.User) error {
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 
 	s := sesh.Load(r)
 	err := s.PutObject(w, "AuthUser", u)
@@ -39,7 +39,7 @@ func SetUserSession(w http.ResponseWriter, r *http.Request, u *models.User) erro
 }
 
 func RemoveUserSession(w http.ResponseWriter, r *http.Request) error {
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 
 	s := sesh.Load(r)
 	err := s.Remove(w, "AuthUser")

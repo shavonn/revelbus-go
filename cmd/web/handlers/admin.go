@@ -19,7 +19,7 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.Render(w, r, "settings", &view.View{
@@ -32,7 +32,7 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	galleries, err := models.GetGalleries()
+	galleries, err := models.FetchGalleries()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

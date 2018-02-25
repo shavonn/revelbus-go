@@ -57,7 +57,7 @@ func Render(w http.ResponseWriter, r *http.Request, tpl string, v *View) {
 	}
 	v.Flash = flash
 
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		ServerError(w, r, err)
 		return

@@ -2,7 +2,7 @@ package flash
 
 import (
 	"net/http"
-	"revelforce/internal/platform/session"
+	"revelforce/pkg/sessions"
 )
 
 type Msg struct {
@@ -11,7 +11,7 @@ type Msg struct {
 }
 
 func Add(w http.ResponseWriter, r *http.Request, m string, t string) error {
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 	s := sesh.Load(r)
 	err := s.PutObject(w, "flash", &Msg{
 		AlertType: t,
@@ -24,7 +24,7 @@ func Add(w http.ResponseWriter, r *http.Request, m string, t string) error {
 }
 
 func Fetch(w http.ResponseWriter, r *http.Request) (Msg, error) {
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 	s := sesh.Load(r)
 	f := Msg{}
 	err := s.PopObject(w, "flash", &f)

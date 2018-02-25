@@ -6,15 +6,17 @@ import (
 	"strconv"
 	"time"
 
+	"revelforce/pkg/database"
+
 	"github.com/gosimple/slug"
 )
 
 var (
+	ErrCannotDelete       = errors.New("Cannot delete entity")
 	ErrDuplicate          = errors.New("Duplicate entry")
 	ErrDuplicateEmail     = errors.New("Email address already in use")
 	ErrInvalidCredentials = errors.New("Invalid user credentials")
 	ErrNotFound           = errors.New("Not found")
-	ErrCannotDelete       = errors.New("Cannot delete entity")
 )
 
 const (
@@ -33,7 +35,7 @@ func GetSlug(str string, t string) string {
 	var id int
 	var err error
 
-	conn, _ := GetConnection()
+	conn, _ := database.GetConnection()
 	stmt := `SELECT id FROM ` + t + ` WHERE slug = ?`
 
 	s := slug.Make(str)

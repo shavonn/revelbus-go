@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"revelforce/pkg/database"
+
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -67,7 +69,7 @@ func (f *TripForm) Valid() bool {
 }
 
 func (t *Trip) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	slug := db.GetSlug(t.Title, "trips")
 
@@ -87,8 +89,8 @@ func (t *Trip) Create() error {
 	return nil
 }
 
-func (t *Trip) Get() error {
-	conn, _ := db.GetConnection()
+func (t *Trip) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT title, slug, status, blurb, description, start, end, price, ticketing_url, notes, image_id, gallery_id FROM trips WHERE id = ?`
 	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.ImageID, &t.GalleryID)
@@ -99,18 +101,18 @@ func (t *Trip) Get() error {
 		return err
 	}
 
-	// err = t.GetImage()
-	// if err != nil {
-	// 	return err
-	// }
+	err = t.FetchImage()
+	if err != nil {
+		return err
+	}
 
-	err = t.GetVendors()
+	err = t.FetchVendors()
 
 	return err
 }
 
-func GetBySlug(s string) (*Trip, error) {
-	conn, _ := db.GetConnection()
+func FetchBySlug(s string) (*Trip, error) {
+	conn, _ := database.GetConnection()
 	t := &Trip{}
 
 	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image_id, gallery_id FROM trips WHERE slug = ?`
@@ -119,12 +121,12 @@ func GetBySlug(s string) (*Trip, error) {
 		return nil, db.ErrNotFound
 	}
 
-	err = t.GetImage()
+	err = t.FetchImage()
 	if err != nil {
 		return nil, err
 	}
 
-	err = t.GetVendors()
+	err = t.FetchVendors()
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +135,7 @@ func GetBySlug(s string) (*Trip, error) {
 }
 
 func (t *Trip) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	if t.Slug == "" {
 		t.Slug = db.GetSlug(t.Title, "trips")
@@ -148,7 +150,7 @@ func (t *Trip) Update() error {
 }
 
 func (t *Trip) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM trips WHERE id = ?`
 	_, err := conn.Exec(stmt, t.ID)
@@ -159,7 +161,7 @@ func (t *Trip) Delete() error {
 }
 
 func (t *Trip) GetBase() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT image_id FROM trips WHERE id = ?`
 	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
@@ -169,8 +171,8 @@ func (t *Trip) GetBase() error {
 	return err
 }
 
-func GetTrips() (*Trips, error) {
-	conn, _ := db.GetConnection()
+func FetchTrips() (*Trips, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, status, start, end FROM trips ORDER BY start, end`
 	rows, err := conn.Query(stmt)
@@ -196,8 +198,8 @@ func GetTrips() (*Trips, error) {
 	return &trips, nil
 }
 
-func GetUpcomingTrips(limit int) (*Trips, error) {
-	conn, _ := db.GetConnection()
+func FetchUpcomingTrips(limit int) (*Trips, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
 
@@ -219,7 +221,7 @@ func GetUpcomingTrips(limit int) (*Trips, error) {
 			return nil, err
 		}
 
-		err = t.GetImage()
+		err = t.FetchImage()
 		if err != nil {
 			return nil, err
 		}
@@ -234,8 +236,8 @@ func GetUpcomingTrips(limit int) (*Trips, error) {
 	return &trips, nil
 }
 
-func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
-	conn, _ := db.GetConnection()
+func FetchUpcomingTripsByMonth() (*GroupedTrips, error) {
+	conn, _ := database.GetConnection()
 
 	trips := make(GroupedTrips)
 
@@ -255,7 +257,7 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 		}
 		month := t.Start.Format("01")
 
-		err = t.GetImage()
+		err = t.FetchImage()
 		if err != nil {
 			return nil, err
 		}
@@ -270,8 +272,8 @@ func GetUpcomingTripsByMonth() (*GroupedTrips, error) {
 	return &trips, nil
 }
 
-func (t *Trip) GetPartners() error {
-	conn, _ := db.GetConnection()
+func (t *Trip) FetchPartners() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT v.id, v.name, v.brand_id, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
 	rows, err := conn.Query(stmt, t.ID)
@@ -288,7 +290,7 @@ func (t *Trip) GetPartners() error {
 			return err
 		}
 
-		err = p.GetImage()
+		err = p.FetchImage()
 		if err != nil {
 			return err
 		}
@@ -304,8 +306,8 @@ func (t *Trip) GetPartners() error {
 	return nil
 }
 
-func (t *Trip) GetVenues() error {
-	conn, _ := db.GetConnection()
+func (t *Trip) FetchVenues() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT v.id, v.name, v.address, v.city, v.state, v.zip, v.phone, tv.is_primary FROM trips_venues tv JOIN vendors v ON tv.venue_id = v.id WHERE tv.trip_id = ? AND v.active = 1 ORDER BY name`
 	rows, err := conn.Query(stmt, t.ID)
@@ -333,12 +335,12 @@ func (t *Trip) GetVenues() error {
 	return nil
 }
 
-func (t *Trip) GetImage() error {
-	conn, _ := db.GetConnection()
+func (t *Trip) FetchImage() error {
+	conn, _ := database.GetConnection()
 
 	f := &File{}
 
-	stmt := `SELECT f.id, f.name, f.thumb, FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
+	stmt := `SELECT f.id, f.name, f.thumb FROM trips t JOIN files f ON t.image_id = f.id WHERE t.id = ?`
 
 	err := conn.QueryRow(stmt, t.ID).Scan(&f.ID, &f.Name, &f.Thumb)
 	if err != nil {
@@ -354,18 +356,18 @@ func (t *Trip) GetImage() error {
 	return nil
 }
 
-func (t *Trip) GetVendors() error {
-	err := t.GetPartners()
+func (t *Trip) FetchVendors() error {
+	err := t.FetchPartners()
 	if err != nil {
 		return err
 	}
 
-	err = t.GetVenues()
+	err = t.FetchVenues()
 	return err
 }
 
 func (t *Trip) AttachVendor(r string, vid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO trips_` + r + `s (trip_id, ` + r + `_id, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	_, err := conn.Exec(stmt, t.ID, vid)
@@ -380,7 +382,7 @@ func (t *Trip) AttachVendor(r string, vid string) error {
 }
 
 func (t *Trip) DetachVendor(r string, vid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
 	_, err := conn.Exec(stmt, t.ID, vid)
@@ -393,7 +395,7 @@ func (t *Trip) DetachVendor(r string, vid string) error {
 }
 
 func (t *Trip) SetVenueStatus(vid string, isPrimary bool) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	if isPrimary {
 		stmt := `UPDATE trips_venues SET is_primary = false, updated_at = UTC_TIMESTAMP() WHERE trip_id = ? AND is_primary = true`

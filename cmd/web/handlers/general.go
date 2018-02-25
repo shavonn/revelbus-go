@@ -14,13 +14,13 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetUpcomingTrips(3)
+	trips, err := models.FetchUpcomingTrips(3)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	slides, err := models.GetActiveSlides()
+	slides, err := models.FetchActiveSlides()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -30,7 +30,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err = s.Get()
+	err = s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -47,7 +47,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			ID: s.HomeGallery,
 		}
 
-		err = g.Get()
+		err = g.Fetch()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -64,7 +64,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -82,7 +82,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -132,7 +132,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func Trips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetUpcomingTripsByMonth()
+	trips, err := models.FetchUpcomingTripsByMonth()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -149,7 +149,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
-	t, err := models.GetBySlug(slug)
+	t, err := models.FetchBySlug(slug)
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -159,7 +159,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := models.GetUpcomingTrips(2)
+	trips, err := models.FetchUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -178,7 +178,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 			ID: t.GalleryID,
 		}
 
-		err = g.Get()
+		err = g.Fetch()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -191,13 +191,13 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 }
 
 func Faq(w http.ResponseWriter, r *http.Request) {
-	faqs, err := models.GetActiveFAQs()
+	faqs, err := models.FetchActiveFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	trips, err := models.GetUpcomingTrips(2)
+	trips, err := models.FetchUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

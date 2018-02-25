@@ -27,7 +27,7 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := v.Get()
+	err := v.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -167,7 +167,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListVendors(w http.ResponseWriter, r *http.Request) {
-	vendors, err := models.GetVendors(false)
+	vendors, err := models.FetchVendors(false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -210,21 +210,22 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = v.Delete()
-	if err == db.ErrCannotDelete {
-		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
+	if err != nil {
+		if err == db.ErrCannotDelete {
+			err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
 		}
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
-	} else {
-		err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
+	}
+
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
 	}
 
 	http.Redirect(w, r, "/admin/vendors", http.StatusSeeOther)

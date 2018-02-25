@@ -28,7 +28,7 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := g.Get()
+	err := g.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -129,7 +129,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListGalleries(w http.ResponseWriter, r *http.Request) {
-	galleries, err := models.GetGalleries()
+	galleries, err := models.FetchGalleries()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -184,13 +184,14 @@ func DetachImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = utils.DeleteFile(f)
-	if err == db.ErrCannotDelete {
-		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
+	if err != nil {
+		if err == db.ErrCannotDelete {
+			err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
 		}
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}

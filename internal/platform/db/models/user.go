@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/forms"
+	"revelforce/pkg/database"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
@@ -105,7 +106,7 @@ func (f *UserForm) ValidPassword() bool {
 }
 
 func (u *User) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), viper.GetInt("cost"))
 	if err != nil {
@@ -134,8 +135,8 @@ func (u *User) Create() error {
 	return err
 }
 
-func (u *User) Get() error {
-	conn, _ := db.GetConnection()
+func (u *User) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	snippet := `SELECT id, name, email, role FROM users WHERE`
 
@@ -157,7 +158,7 @@ func (u *User) Get() error {
 }
 
 func (u *User) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE users SET name = ?, email = ?, role = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, u.Name, u.Email, u.Role, u.ID)
@@ -168,16 +169,16 @@ func (u *User) Update() error {
 }
 
 func (u *User) UpdatePassword(pw string) error {
-	conn, _ := db.GetConnection()
-	pass, err := bcrypt.GenerateFromPassword([]byte(pw), viper.GetInt("cost"))
+	conn, _ := database.GetConnection()
+	hp, err := bcrypt.GenerateFromPassword([]byte(pw), viper.GetInt("cost"))
 
 	stmt := `UPDATE users SET password = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
-	_, err = conn.Exec(stmt, string(pass), u.ID)
+	_, err = conn.Exec(stmt, string(hp), u.ID)
 	return err
 }
 
 func (u *User) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM users WHERE id = ?`
 	_, err := conn.Exec(stmt, u.ID)
@@ -187,8 +188,8 @@ func (u *User) Delete() error {
 	return err
 }
 
-func GetUsers() (Users, error) {
-	conn, _ := db.GetConnection()
+func FetchUsers() (Users, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, name, role FROM users ORDER BY name`
 	rows, err := conn.Query(stmt)
@@ -215,7 +216,7 @@ func GetUsers() (Users, error) {
 }
 
 func (u *User) VerifyUser(pw string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	var hp []byte
 
@@ -227,7 +228,7 @@ func (u *User) VerifyUser(pw string) error {
 	}
 
 	err = bcrypt.CompareHashAndPassword(hp, []byte(pw))
-	if err == bcrypt.ErrMismatchedHashAndPassword {
+	if err == bcrypt.ErrMismatchedHashAndPassword || err == bcrypt.ErrHashTooShort {
 		return db.ErrInvalidCredentials
 	} else if err != nil {
 		return err
@@ -250,7 +251,7 @@ func (u *User) VerifyAndUpdatePassword(old string, new string) error {
 }
 
 func (u *User) SetRecover(h string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE users SET recovery_hash = ?, updated_at = UTC_TIMESTAMP() WHERE email = ?`
 	_, err := conn.Exec(stmt, h, u.Email)
@@ -258,7 +259,7 @@ func (u *User) SetRecover(h string) error {
 }
 
 func (u *User) CheckRecover(h string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT email FROM users WHERE email = ? AND recovery_hash = ?`
 	err := conn.QueryRow(stmt, u.Email, h).Scan(&u.Email)
@@ -270,7 +271,7 @@ func (u *User) CheckRecover(h string) error {
 }
 
 func (u *User) Recover(h string, pw string) error {
-	err := u.Get()
+	err := u.Fetch()
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return db.ErrNotFound

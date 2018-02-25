@@ -106,7 +106,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 }
 
 func DeleteFile(f *models.File) error {
-	err := f.Get()
+	err := f.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			return nil

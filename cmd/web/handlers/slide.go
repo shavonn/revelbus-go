@@ -27,7 +27,7 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -123,7 +123,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListSlides(w http.ResponseWriter, r *http.Request) {
-	slides, err := models.GetSlides()
+	slides, err := models.FetchSlides()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

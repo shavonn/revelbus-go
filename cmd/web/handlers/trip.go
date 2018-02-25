@@ -27,7 +27,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -37,13 +37,13 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	galleries, err := models.GetGalleries()
+	galleries, err := models.FetchGalleries()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -186,7 +186,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListTrips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetTrips()
+	trips, err := models.FetchTrips()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -251,13 +251,13 @@ func TripPartners(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -278,13 +278,13 @@ func TripVenues(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
