@@ -28,16 +28,18 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 
 	m := r.MultipartForm
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
-		os.Mkdir(uploadDir, 0755)
+		os.Mkdir(uploadDir, 0777)
+	} else if err != nil {
+		return uploaded, err
 	}
 
 	files := m.File[fieldName]
 	for i := range files {
 		file, err := files[i].Open()
-		defer file.Close()
 		if err != nil {
 			return uploaded, err
 		}
+		defer file.Close()
 
 		// new file
 		f := &models.File{}
@@ -106,15 +108,17 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 }
 
 func DeleteFile(f *models.File) error {
-	err := f.Fetch()
-	if err != nil {
-		if err == db.ErrNotFound {
-			return nil
+	if f.Name == "" {
+		err := f.Fetch()
+		if err != nil {
+			if err == db.ErrNotFound {
+				return nil
+			}
+			return err
 		}
-		return err
 	}
 
-	err = f.Delete()
+	err := f.Delete()
 	if err != nil {
 		return err
 	}
@@ -131,4 +135,9 @@ func DeleteFile(f *models.File) error {
 		}
 	}
 	return nil
+}
+
+func DeleteFolder(path string) error {
+	err := os.RemoveAll(filepath.Join(viper.GetString("files.static") + path))
+	return err
 }

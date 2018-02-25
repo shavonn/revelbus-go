@@ -88,8 +88,7 @@ func parseTemplates() (*template.Template, error) {
 	templ := template.New("").Funcs(fm)
 	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {
 		if strings.Contains(path, ".html") {
-			_, err = templ.ParseFiles(path)
-			if err != nil {
+			if _, err = templ.ParseFiles(path); err != nil {
 				return err
 			}
 		}

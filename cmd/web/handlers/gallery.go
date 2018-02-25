@@ -39,8 +39,9 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.GalleryForm{
-		ID:   strconv.Itoa(g.ID),
-		Name: g.Name,
+		ID:     strconv.Itoa(g.ID),
+		Name:   g.Name,
+		Folder: g.Folder,
 	}
 
 	view.Render(w, r, "gallery", &view.View{
@@ -58,8 +59,9 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.GalleryForm{
-		ID:   r.PostForm.Get("id"),
-		Name: r.PostForm.Get("name"),
+		ID:     r.PostForm.Get("id"),
+		Name:   r.PostForm.Get("name"),
+		Folder: r.PostForm.Get("folder"),
 	}
 
 	if !f.Valid() {
@@ -81,6 +83,10 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 		Name: f.Name,
 	}
 
+	if g.Folder == "" {
+		g.Folder = slug.Make(f.Name)
+	}
+
 	if g.ID != 0 {
 		err := g.Update()
 		if err != nil {
@@ -92,9 +98,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fldr := slug.Make(g.Name)
-
-		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr, true)
+		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+g.Folder, true)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -149,7 +153,19 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := g.Delete()
+	err := g.Fetch()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = utils.DeleteFolder("uploads/files/" + g.Folder)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = g.Delete()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

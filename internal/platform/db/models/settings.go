@@ -70,7 +70,6 @@ func (s *Settings) Update() error {
 
 	stmt := `UPDATE settings SET contact_blurb = ?, about_blurb = ?, about_content = ?, home_gallery = ?, home_gallery_active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, s.ContactBlurb, s.AboutBlurb, s.AboutContent, s.HomeGallery, s.HomeGalleryActive, s.ID)
-
 	if err == sql.ErrNoRows {
 		return s.Create()
 	}

@@ -35,8 +35,7 @@ func (v *validator) ValidEmail(k string, i string) {
 
 func (v *validator) ValidDateTime(k string, i string) {
 	if i != "" {
-		_, err := time.Parse("2006-01-02 15:04", i)
-		if err != nil {
+		if _, err := time.Parse("2006-01-02 15:04", i); err != nil {
 			v.Errors[k] = "Please enter a valid date/time."
 		}
 	}
@@ -63,8 +62,7 @@ func (v *validator) ValidSlug(k string, i string) {
 
 func (v *validator) ValidURL(k string, i string) {
 	if i != "" {
-		_, err := url.ParseRequestURI(i)
-		if err != nil {
+		if _, err := url.ParseRequestURI(i); err != nil {
 			v.Errors[k] = "Please enter a valid URL."
 		}
 	}

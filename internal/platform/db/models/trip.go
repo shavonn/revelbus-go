@@ -386,10 +386,8 @@ func (t *Trip) DetachVendor(r string, vid string) error {
 
 	stmt := `DELETE FROM trips_` + r + `s WHERE trip_id = ? AND ` + r + `_id = ?`
 	_, err := conn.Exec(stmt, t.ID, vid)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
+	if err != nil && err == sql.ErrNoRows {
+		return nil
 	}
 	return err
 }

@@ -13,6 +13,7 @@ import (
 type Gallery struct {
 	ID     int
 	Name   string
+	Folder string
 	Images Files
 }
 
@@ -21,6 +22,7 @@ type Galleries []*Gallery
 type GalleryForm struct {
 	ID     string
 	Name   string
+	Folder string
 	Errors map[string]string
 }
 
@@ -36,8 +38,8 @@ func (f *GalleryForm) Valid() bool {
 func (g *Gallery) Create() error {
 	conn, _ := database.GetConnection()
 
-	stmt := `INSERT INTO galleries (name, created_at, updated_at) VALUES(?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, g.Name)
+	stmt := `INSERT INTO galleries (name, folder, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, g.Name, g.Folder)
 	if err != nil {
 		return err
 	}
@@ -55,8 +57,8 @@ func (g *Gallery) Create() error {
 func (g *Gallery) Fetch() error {
 	conn, _ := database.GetConnection()
 
-	stmt := `SELECT name FROM galleries WHERE id = ?`
-	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name)
+	stmt := `SELECT name, folder FROM galleries WHERE id = ?`
+	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name, &g.Folder)
 	if err == sql.ErrNoRows {
 		return db.ErrNotFound
 	}
@@ -79,8 +81,13 @@ func (g *Gallery) Update() error {
 func (g *Gallery) Delete() error {
 	conn, _ := database.GetConnection()
 
+	err := g.DeleteImages()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
 	stmt := `DELETE FROM galleries WHERE id = ?`
-	_, err := conn.Exec(stmt, g.ID)
+	_, err = conn.Exec(stmt, g.ID)
 	if err == sql.ErrNoRows {
 		return nil
 	}
@@ -141,6 +148,17 @@ func (g *Gallery) GetImages() error {
 	g.Images = files
 
 	return nil
+}
+
+func (g *Gallery) DeleteImages() error {
+	conn, _ := database.GetConnection()
+
+	stmt := `DELETE f, gi FROM files f JOIN galleries_images gi ON gi.file_id = f.id WHERE gi.gallery_id = ?`
+	_, err := conn.Exec(stmt, g.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	return err
 }
 
 func (g *Gallery) AttachImage(fid string) error {

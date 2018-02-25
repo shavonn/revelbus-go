@@ -26,8 +26,7 @@ func PostUpload(w http.ResponseWriter, r *http.Request) {
 
 	fldr := r.PostForm.Get("fldr")
 
-	_, err = utils.UploadFile(w, r, "files", "uploads/files/"+fldr, false)
-	if err != nil {
+	if _, err = utils.UploadFile(w, r, "files", "uploads/files/"+fldr, false); err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
