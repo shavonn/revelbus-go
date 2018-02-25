@@ -53,6 +53,10 @@
     border: none;
     background-color: #FFC80A;
     @include border-radius(100px);
+
+    &:focus {
+        outline: none;
+    }
 }
 
 footer {

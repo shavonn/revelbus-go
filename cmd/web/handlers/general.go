@@ -6,21 +6,21 @@ import (
 	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
+	"revelforce/pkg/email"
 
 	"github.com/gorilla/mux"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.FetchUpcomingTrips(3)
+	trips, err := models.FindUpcomingTrips(3)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	slides, err := models.FetchActiveSlides()
+	slides, err := models.FindActiveSlides()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -72,6 +72,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 
 	view.Render(w, r, "about", &view.View{
 		ActiveKey: "about",
+		Title:     "About",
 		Blurb:     s.AboutBlurb,
 		Content:   template.HTML(s.AboutContent),
 	})
@@ -90,6 +91,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 
 	view.Render(w, r, "contact", &view.View{
 		ActiveKey: "contact",
+		Title:     "Contact",
 		Blurb:     s.ContactBlurb,
 	})
 }
@@ -132,7 +134,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func Trips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.FetchUpcomingTripsByMonth()
+	trips, err := models.FindUpcomingTripsByMonth()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -149,7 +151,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
-	t, err := models.FetchBySlug(slug)
+	t, err := models.FindBySlug(slug)
 	if err != nil {
 		if err == db.ErrNotFound {
 			view.NotFound(w, r)
@@ -159,7 +161,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := models.FetchUpcomingTrips(2)
+	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -191,13 +193,13 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 }
 
 func Faq(w http.ResponseWriter, r *http.Request) {
-	faqs, err := models.FetchActiveFAQs()
+	faqs, err := models.FindActiveFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	trips, err := models.FetchUpcomingTrips(2)
+	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

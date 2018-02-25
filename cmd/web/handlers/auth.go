@@ -6,8 +6,8 @@ import (
 	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/db"
 	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/email"
 	"revelforce/internal/platform/flash"
+	"revelforce/pkg/email"
 
 	"github.com/gorilla/mux"
 )

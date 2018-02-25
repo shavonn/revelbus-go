@@ -61,7 +61,7 @@ func (g *Gallery) Fetch() error {
 		return db.ErrNotFound
 	}
 
-	err = g.FetchImages()
+	err = g.GetImages()
 	return err
 }
 
@@ -114,7 +114,7 @@ func FetchGalleries() (*Galleries, error) {
 	return &galleries, nil
 }
 
-func (g *Gallery) FetchImages() error {
+func (g *Gallery) GetImages() error {
 	conn, _ := database.GetConnection()
 
 	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`

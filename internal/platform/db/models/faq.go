@@ -119,7 +119,7 @@ func FetchFAQs() (*FAQs, error) {
 	return &faqs, nil
 }
 
-func FetchActiveFAQs() (*GroupedFAQs, error) {
+func FindActiveFAQs() (*GroupedFAQs, error) {
 	conn, _ := database.GetConnection()
 
 	faqs := make(GroupedFAQs)

@@ -119,6 +119,9 @@
 
     h2 {
         max-width: 380px;
+        position: relative;
+        left: 20px;
+        z-index: 99;
     }
 
     &.game_guys {
@@ -138,10 +141,14 @@
     }
 
     &.swimmers {
-        background-color: #91D9F8;
+        background-color: #ECCC88;
+        background-image: url('../images/headers/swimmers_bg.svg');
+        background-size: contain;
+        background-repeat: repeat-x;
 
         .banner-character {
             width: 92%;
+            max-height: 155%;
         }
     }
 

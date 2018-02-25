@@ -85,7 +85,7 @@ func (v *Vendor) Fetch() error {
 		return db.ErrNotFound
 	}
 
-	err = v.FetchImage()
+	err = v.GetImage()
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (v *Vendor) GetBase() error {
 	return err
 }
 
-func (v *Vendor) FetchImage() error {
+func (v *Vendor) GetImage() error {
 	conn, _ := database.GetConnection()
 
 	f := &File{}

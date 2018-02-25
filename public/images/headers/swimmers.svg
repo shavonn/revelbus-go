@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1280px" height="351px" viewBox="0 0 1280 351" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="500px" height="351px" viewBox="0 0 500 351" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
     <title>Landing</title>
     <desc>Created with Sketch.</desc>
     <defs>
         <rect id="path-1" x="0" y="0" width="1307" height="280"></rect>
     </defs>
-    <g id="RevelBus-Contact" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(0.000000, -33.000000)">
+    <g id="RevelBus-Contact" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-780.000000, -33.000000)">
         <g id="Landing" transform="translate(0.000000, -10.000000)">
             <g id="BG" transform="translate(0.000000, 114.000000)">
                 <g id="1mastres">
                     <mask id="mask-2" fill="white">
                         <use xlink:href="#path-1"></use>
                     </mask>
-                    <g id="Beach" mask="url(#mask-2)">
-                        <g transform="translate(0.000000, -17.000000)">
+                    <use id="Mask" fill="#518CDE" opacity="0" xlink:href="#path-1"></use>
+                    <g id="Beach" opacity="0" mask="url(#mask-2)">
+                        <g transform="translate(-487.000000, 157.000000)">
                             <g>
+                                <rect id="Rectangle-path" fill="#91D9F8" fill-rule="nonzero" opacity="0" x="0" y="0" width="1280" height="300"></rect>
                                 <rect id="Rectangle-path" fill="#41BEE8" fill-rule="nonzero" x="0" y="222.9" width="1280" height="55.2"></rect>
                                 <rect id="Rectangle-path" fill="#ECCC88" fill-rule="nonzero" x="0" y="272.2" width="1280" height="26.9"></rect>
                                 <path d="M712,253 L900.8,253" id="Shape" stroke="#6BCDE6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -66,7 +68,7 @@
                     </g>
                 </g>
             </g>
-            <g id="Swimsuit_Character" transform="translate(801.000000, 43.000000)">
+            <g id="Swimsuit_Character" transform="translate(780.000000, 43.000000)">
                 <g id="Group">
                     <g fill-rule="nonzero">
                         <path d="M207.29567,110.520885 C207.29567,110.520885 240.436165,20.6410164 323.156927,46.2463279 C385.784633,65.5809508 478.682397,0.522557377 478.682397,0.522557377 L614.897658,51.4719016 C614.897658,51.4719016 465.895907,153.631869 381.348503,129.332951 C296.8011,105.034033 297.322998,61.6617705 217.99457,120.449475" id="Shape" fill="#F5C41B"></path>

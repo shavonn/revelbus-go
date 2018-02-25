@@ -101,17 +101,17 @@ func (t *Trip) Fetch() error {
 		return err
 	}
 
-	err = t.FetchImage()
+	err = t.GetImage()
 	if err != nil {
 		return err
 	}
 
-	err = t.FetchVendors()
+	err = t.GetTripVendors()
 
 	return err
 }
 
-func FetchBySlug(s string) (*Trip, error) {
+func FindBySlug(s string) (*Trip, error) {
 	conn, _ := database.GetConnection()
 	t := &Trip{}
 
@@ -121,12 +121,12 @@ func FetchBySlug(s string) (*Trip, error) {
 		return nil, db.ErrNotFound
 	}
 
-	err = t.FetchImage()
+	err = t.GetImage()
 	if err != nil {
 		return nil, err
 	}
 
-	err = t.FetchVendors()
+	err = t.GetTripVendors()
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func FetchTrips() (*Trips, error) {
 	return &trips, nil
 }
 
-func FetchUpcomingTrips(limit int) (*Trips, error) {
+func FindUpcomingTrips(limit int) (*Trips, error) {
 	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, slug, start, end, image_id, blurb FROM trips WHERE (start > NOW() - INTERVAL 1 DAY) AND status = 'published' ORDER BY start, end`
@@ -221,7 +221,7 @@ func FetchUpcomingTrips(limit int) (*Trips, error) {
 			return nil, err
 		}
 
-		err = t.FetchImage()
+		err = t.GetImage()
 		if err != nil {
 			return nil, err
 		}
@@ -236,7 +236,7 @@ func FetchUpcomingTrips(limit int) (*Trips, error) {
 	return &trips, nil
 }
 
-func FetchUpcomingTripsByMonth() (*GroupedTrips, error) {
+func FindUpcomingTripsByMonth() (*GroupedTrips, error) {
 	conn, _ := database.GetConnection()
 
 	trips := make(GroupedTrips)
@@ -257,7 +257,7 @@ func FetchUpcomingTripsByMonth() (*GroupedTrips, error) {
 		}
 		month := t.Start.Format("01")
 
-		err = t.FetchImage()
+		err = t.GetImage()
 		if err != nil {
 			return nil, err
 		}
@@ -272,7 +272,7 @@ func FetchUpcomingTripsByMonth() (*GroupedTrips, error) {
 	return &trips, nil
 }
 
-func (t *Trip) FetchPartners() error {
+func (t *Trip) GetTripPartners() error {
 	conn, _ := database.GetConnection()
 
 	stmt := `SELECT v.id, v.name, v.brand_id, v.url FROM trips_partners tp JOIN vendors v ON tp.partner_id = v.id WHERE tp.trip_id = ? AND v.active = 1 ORDER BY name`
@@ -290,7 +290,7 @@ func (t *Trip) FetchPartners() error {
 			return err
 		}
 
-		err = p.FetchImage()
+		err = p.GetImage()
 		if err != nil {
 			return err
 		}
@@ -306,7 +306,7 @@ func (t *Trip) FetchPartners() error {
 	return nil
 }
 
-func (t *Trip) FetchVenues() error {
+func (t *Trip) GetTripVenues() error {
 	conn, _ := database.GetConnection()
 
 	stmt := `SELECT v.id, v.name, v.address, v.city, v.state, v.zip, v.phone, tv.is_primary FROM trips_venues tv JOIN vendors v ON tv.venue_id = v.id WHERE tv.trip_id = ? AND v.active = 1 ORDER BY name`
@@ -335,7 +335,7 @@ func (t *Trip) FetchVenues() error {
 	return nil
 }
 
-func (t *Trip) FetchImage() error {
+func (t *Trip) GetImage() error {
 	conn, _ := database.GetConnection()
 
 	f := &File{}
@@ -356,13 +356,13 @@ func (t *Trip) FetchImage() error {
 	return nil
 }
 
-func (t *Trip) FetchVendors() error {
-	err := t.FetchPartners()
+func (t *Trip) GetTripVendors() error {
+	err := t.GetTripPartners()
 	if err != nil {
 		return err
 	}
 
-	err = t.FetchVenues()
+	err = t.GetTripVenues()
 	return err
 }
 

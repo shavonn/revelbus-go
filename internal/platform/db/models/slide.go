@@ -120,7 +120,7 @@ func FetchSlides() (*Slides, error) {
 	return &slides, nil
 }
 
-func FetchActiveSlides() (*Slides, error) {
+func FindActiveSlides() (*Slides, error) {
 	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, blurb, style, sort_order FROM slides WHERE active = 1 ORDER BY sort_order`
