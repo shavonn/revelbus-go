@@ -153,6 +153,12 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		t.ImageID = 0
 	}
 
+	err = utils.CreateICS(&t)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
 	if t.ID != 0 {
 		err := t.Update()
 		if err != nil {

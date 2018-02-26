@@ -66,6 +66,7 @@
         <div class="form-group">
             <label for="gallery">Gallery</label>
             <select class="form-control" name="gallery_id">
+                <option value=""></option>
                 {{range $.Galleries}}
                 <option value="{{.ID}}"{{if eq $.Form.GalleryID .ID}} selected{{end}}>{{.Name}}</option>
                 {{end}}
