@@ -2,7 +2,7 @@ package utils
 
 import (
 	"net/http"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/pkg/sessions"
 )
 

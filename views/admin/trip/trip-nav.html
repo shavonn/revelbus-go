@@ -1,7 +1,7 @@
 {{define "trip-nav"}}
     {{with .Trip}}
     <p>
-        <strong>Trip ID:</strong> {{.ID}}
+        <strong>Trip ID:</strong> {{.ID}} (<a href="/trip/{{.Slug}}" target="_blank">view</a>)
         <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#vendorModal">
             + Vendor
         </button>

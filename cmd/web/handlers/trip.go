@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -29,7 +29,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 
 	err := t.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -56,8 +56,8 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		Status:       t.Status,
 		Blurb:        t.Blurb,
 		Description:  t.Description,
-		Start:        t.Start.Format(db.TimeFormat),
-		End:          t.End.Format(db.TimeFormat),
+		Start:        t.Start.Format(domain.TimeFormat),
+		End:          t.End.Format(domain.TimeFormat),
 		Price:        t.Price,
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
@@ -122,8 +122,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		Status:       f.Status,
 		Blurb:        f.Blurb,
 		Description:  f.Description,
-		Start:        db.ToTime(f.Start),
-		End:          db.ToTime(f.End),
+		Start:        domain.ToTime(f.Start),
+		End:          domain.ToTime(f.End),
 		TicketingURL: f.TicketingURL,
 		Price:        f.Price,
 		Notes:        f.Notes,
@@ -153,16 +153,10 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		t.ImageID = 0
 	}
 
-	err = utils.CreateICS(&t)
-	if err != nil {
-		view.ServerError(w, r, err)
-		return
-	}
-
 	if t.ID != 0 {
 		err := t.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -179,6 +173,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		}
 		msg = utils.MsgSuccessfullyCreated
 	}
+
+	writeICS(&t)
 
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
@@ -214,7 +210,7 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 
 	err := t.GetBase()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -376,6 +372,8 @@ func UpdateVenueStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	writeICS(&t)
+
 	err = flash.Add(w, r, utils.MsgSuccessfullyUpdated, "success")
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -383,4 +381,13 @@ func UpdateVenueStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/trip/"+id+"?venues", http.StatusSeeOther)
+}
+
+func writeICS(t *models.Trip) error {
+	err := t.Fetch()
+	if err != nil {
+		return err
+	}
+
+	return utils.CreateICS(t)
 }

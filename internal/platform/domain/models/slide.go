@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 
 	"revelforce/pkg/database"
@@ -65,7 +65,7 @@ func (s *Slide) Fetch() error {
 	stmt := `SELECT id, title, blurb, style, sort_order, active FROM slides WHERE id = ?`
 	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.Title, &s.Blurb, &s.Style, &s.Order, &s.Active)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
@@ -77,7 +77,7 @@ func (s *Slide) Update() error {
 	stmt := `UPDATE slides SET title = ?, blurb= ?, style = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, s.Title, s.Blurb, s.Style, s.Order, s.Active, s.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }

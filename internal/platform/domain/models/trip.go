@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 	"strconv"
 	"time"
@@ -30,6 +30,8 @@ type Trip struct {
 	Image    *File
 	Partners Vendors
 	Venues   Vendors
+
+	CalLinks map[string]string
 }
 
 type Trips []*Trip
@@ -71,7 +73,7 @@ func (f *TripForm) Valid() bool {
 func (t *Trip) Create() error {
 	conn, _ := database.GetConnection()
 
-	slug := db.GetSlug(t.Title, "trips")
+	slug := domain.GetSlug(t.Title, "trips")
 
 	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, gallery_id, image_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.GalleryID, t.ImageID)
@@ -96,7 +98,7 @@ func (t *Trip) Fetch() error {
 	err := conn.QueryRow(stmt, t.ID).Scan(&t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.Notes, &t.ImageID, &t.GalleryID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return db.ErrNotFound
+			return domain.ErrNotFound
 		}
 		return err
 	}
@@ -118,7 +120,7 @@ func FindBySlug(s string) (*Trip, error) {
 	stmt := `SELECT id, title, slug, status, blurb, description, start, end, price, ticketing_url, image_id, gallery_id FROM trips WHERE slug = ?`
 	err := conn.QueryRow(stmt, s).Scan(&t.ID, &t.Title, &t.Slug, &t.Status, &t.Blurb, &t.Description, &t.Start, &t.End, &t.Price, &t.TicketingURL, &t.ImageID, &t.GalleryID)
 	if err == sql.ErrNoRows {
-		return nil, db.ErrNotFound
+		return nil, domain.ErrNotFound
 	}
 
 	err = t.GetImage()
@@ -138,13 +140,13 @@ func (t *Trip) Update() error {
 	conn, _ := database.GetConnection()
 
 	if t.Slug == "" {
-		t.Slug = db.GetSlug(t.Title, "trips")
+		t.Slug = domain.GetSlug(t.Title, "trips")
 	}
 
 	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image_id = ?, gallery_id = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.ImageID, t.GalleryID, t.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
@@ -166,7 +168,7 @@ func (t *Trip) GetBase() error {
 	stmt := `SELECT image_id FROM trips WHERE id = ?`
 	err := conn.QueryRow(stmt, t.ID).Scan(&t.ImageID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
@@ -375,7 +377,7 @@ func (t *Trip) AttachVendor(r string, vid string) error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1062 {
-			return db.ErrDuplicate
+			return domain.ErrDuplicate
 		}
 	}
 	return err

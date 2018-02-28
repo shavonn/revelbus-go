@@ -9,13 +9,12 @@ X-WR-TIMEZONE:America/New_York
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-DTSTAMP:20180226T022710Z
-UID:10
+DTSTAMP:20180228T034130Z
+UID:REVBUS10
 TZID:America/New_York
-SUMMARY:pooooo
-DESCRIPTION:But that didn't worked for me...any solutions?
-
-For example the string could look like:But 
+SUMMARY:Hot DOam
+DESCRIPTION:For details, visit: http://www.revelbus.com/trip/pooooo
+LOCATION:Shavonn Brown, 105 Lazy Laurel Chase, Roswell, GA, 30076
 DTSTART;TZID=America/New_York;VALUE=DATE-TIME:20180302T150400
 DTEND;TZID=America/New_York;VALUE=DATE-TIME:20180312T150400
 END:VEVENT

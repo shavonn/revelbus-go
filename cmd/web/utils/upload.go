@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/nfnt/resize"
@@ -19,7 +19,7 @@ import (
 
 func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder string, makeThumb bool) ([]*models.File, error) {
 	uploaded := []*models.File{}
-	uploadDir := filepath.Join(viper.GetString("files.static") + folder)
+	uploadDir := filepath.Join(viper.GetString("files.static"), folder)
 
 	err := r.ParseMultipartForm(100000)
 	if err != nil {
@@ -111,7 +111,7 @@ func DeleteFile(f *models.File) error {
 	if f.Name == "" {
 		err := f.Fetch()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				return nil
 			}
 			return err

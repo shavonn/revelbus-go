@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/pkg/database"
 	"time"
 
@@ -42,7 +42,7 @@ func (f *File) Fetch() error {
 	stmt := `SELECT name, thumb, created_at FROM files WHERE id = ?`
 	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name, &f.Thumb, &f.Created)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
@@ -57,7 +57,7 @@ func (f *File) Delete() error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1451 {
-			return db.ErrCannotDelete
+			return domain.ErrCannotDelete
 		} else if err == sql.ErrNoRows {
 			return nil
 		}

@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 	"revelforce/pkg/database"
 
@@ -119,7 +119,7 @@ func (u *User) Create() error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1062 {
-			return db.ErrDuplicateEmail
+			return domain.ErrDuplicateEmail
 		}
 
 		return err
@@ -151,7 +151,7 @@ func (u *User) Fetch() error {
 	}
 
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
@@ -163,7 +163,7 @@ func (u *User) Update() error {
 	stmt := `UPDATE users SET name = ?, email = ?, role = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, u.Name, u.Email, u.Role, u.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
@@ -229,7 +229,7 @@ func (u *User) VerifyUser(pw string) error {
 
 	err = bcrypt.CompareHashAndPassword(hp, []byte(pw))
 	if err == bcrypt.ErrMismatchedHashAndPassword || err == bcrypt.ErrHashTooShort {
-		return db.ErrInvalidCredentials
+		return domain.ErrInvalidCredentials
 	} else if err != nil {
 		return err
 	}
@@ -264,7 +264,7 @@ func (u *User) CheckRecover(h string) error {
 	stmt := `SELECT email FROM users WHERE email = ? AND recovery_hash = ?`
 	err := conn.QueryRow(stmt, u.Email, h).Scan(&u.Email)
 	if err != nil && err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
@@ -274,7 +274,7 @@ func (u *User) Recover(h string, pw string) error {
 	err := u.Fetch()
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return db.ErrNotFound
+			return domain.ErrNotFound
 		}
 		return err
 	}
@@ -282,7 +282,7 @@ func (u *User) Recover(h string, pw string) error {
 	err = u.CheckRecover(h)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return db.ErrNotFound
+			return domain.ErrNotFound
 		}
 		return err
 	}

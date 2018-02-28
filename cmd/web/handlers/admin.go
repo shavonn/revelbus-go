@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 )
@@ -21,7 +21,7 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 
 	err := s.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.Render(w, r, "settings", &view.View{
 				Form:  new(models.SettingsForm),
 				Title: "Settings",

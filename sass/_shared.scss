@@ -41,6 +41,28 @@
     }
 }
 
+.cal-links {
+    position: relative;
+
+    .links {
+        position: absolute;
+        top: 25px;
+        left: 0;
+
+        width: 75%;
+        display: none;
+        padding: 5px;
+        border: 1px solid #44B4A8;
+        text-align: center;
+    }
+
+    &:hover {
+        .links {
+            display: inline-block;
+        }
+    }
+}
+
 .btn {
     @include font-rem(12);
     letter-spacing: 2.4px;

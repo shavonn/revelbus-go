@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -29,7 +29,7 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 
 	err := v.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -138,7 +138,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	if v.ID != 0 {
 		err := v.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -189,7 +189,7 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 
 	err := v.GetBase()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -211,7 +211,7 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 
 	err = v.Delete()
 	if err != nil {
-		if err == db.ErrCannotDelete {
+		if err == domain.ErrCannotDelete {
 			err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
 			if err != nil {
 				view.ServerError(w, r, err)

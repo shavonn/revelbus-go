@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 
 	"revelforce/pkg/database"
@@ -59,7 +59,7 @@ func (s *Settings) Fetch() error {
 	stmt := `SELECT id, contact_blurb, about_blurb, about_content, home_gallery, home_gallery_active FROM settings WHERE id = ?`
 	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.ContactBlurb, &s.AboutBlurb, &s.AboutContent, &s.HomeGallery, &s.HomeGalleryActive)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err

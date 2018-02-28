@@ -2,4 +2,5 @@ config/*.env.json
 public/uploads/*
 node_modules
 public/css/*
+public/ical/*
 .sass-cache/*

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"revelforce/pkg/email"
 
@@ -50,7 +50,7 @@ func PostSignup(w http.ResponseWriter, r *http.Request) {
 
 	err = u.Create()
 	if err != nil {
-		if err == db.ErrDuplicateEmail {
+		if err == domain.ErrDuplicateEmail {
 			f.Errors["Email"] = "E-mail address is already in use"
 			view.Render(w, r, "signup", &view.View{
 				Form:  f,
@@ -103,7 +103,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 
 	err = u.VerifyUser(f.Password)
 	if err != nil {
-		if err == db.ErrInvalidCredentials {
+		if err == domain.ErrInvalidCredentials {
 			err = flash.Add(w, r, utils.MsgUnsuccessfulLogin, "danger")
 			if err != nil {
 				view.ServerError(w, r, err)
@@ -257,7 +257,7 @@ func PostPasswordReset(w http.ResponseWriter, r *http.Request) {
 
 	err = u.Recover(f.RecoveryHash, f.Password)
 	if err != nil {
-		if err == db.ErrInvalidCredentials {
+		if err == domain.ErrInvalidCredentials {
 			err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
 			if err != nil {
 				view.ServerError(w, r, err)

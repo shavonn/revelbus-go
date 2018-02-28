@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 	"revelforce/pkg/database"
 
@@ -82,7 +82,7 @@ func (v *Vendor) Fetch() error {
 	stmt := `SELECT id, name, address, city, state, zip, phone, email, url, notes, brand_id, active FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.ID, &v.Name, &v.Address, &v.City, &v.State, &v.Zip, &v.Phone, &v.Email, &v.URL, &v.Notes, &v.BrandID, &v.Active)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	err = v.GetImage()
@@ -99,7 +99,7 @@ func (v *Vendor) Update() error {
 	stmt := `UPDATE vendors SET name = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, email = ?, url = ?, notes = ?, brand_id = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, v.Name, v.Address, v.City, v.State, v.Zip, v.Phone, v.Email, v.URL, v.Notes, v.BrandID, v.Active, v.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
@@ -113,9 +113,9 @@ func (v *Vendor) Delete() error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1451 {
-			return db.ErrCannotDelete
+			return domain.ErrCannotDelete
 		} else if err == sql.ErrNoRows {
-			return db.ErrNotFound
+			return domain.ErrNotFound
 		}
 	}
 	return err
@@ -127,7 +127,7 @@ func (v *Vendor) GetBase() error {
 	stmt := `SELECT brand_id FROM vendors WHERE id = ?`
 	err := conn.QueryRow(stmt, v.ID).Scan(&v.BrandID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }

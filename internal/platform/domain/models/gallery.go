@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 
 	"revelforce/pkg/database"
@@ -60,7 +60,7 @@ func (g *Gallery) Fetch() error {
 	stmt := `SELECT name, folder FROM galleries WHERE id = ?`
 	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name, &g.Folder)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	err = g.GetImages()
@@ -73,7 +73,7 @@ func (g *Gallery) Update() error {
 	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, g.Name, g.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
@@ -170,7 +170,7 @@ func (g *Gallery) AttachImage(fid string) error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1062 {
-			return db.ErrDuplicate
+			return domain.ErrDuplicate
 		}
 	}
 	return err

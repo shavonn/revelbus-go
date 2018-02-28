@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"revelforce/cmd/web/utils"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"strings"

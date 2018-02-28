@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 )
 
@@ -59,7 +59,7 @@ func PostProfile(w http.ResponseWriter, r *http.Request) {
 
 	err = u.Update()
 	if err != nil {
-		if err == db.ErrDuplicateEmail {
+		if err == domain.ErrDuplicateEmail {
 			f.Errors["Email"] = "E-mail address is already in use"
 			view.Render(w, r, "profile", &view.View{
 				Form:  f,
@@ -125,7 +125,7 @@ func PostPassword(w http.ResponseWriter, r *http.Request) {
 
 	err = u.VerifyAndUpdatePassword(f.OldPassword, f.Password)
 	if err != nil {
-		if err == db.ErrInvalidCredentials {
+		if err == domain.ErrInvalidCredentials {
 			err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
 			if err != nil {
 				view.ServerError(w, r, err)

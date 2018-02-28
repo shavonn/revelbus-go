@@ -3,9 +3,10 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"revelforce/pkg/email"
@@ -153,13 +154,15 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 
 	t, err := models.FindBySlug(slug)
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
 		view.ServerError(w, r, err)
 		return
 	}
+
+	t.CalLinks = utils.GetCalendarLinks(t)
 
 	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {

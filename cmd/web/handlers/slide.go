@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -29,7 +29,7 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 
 	err := s.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -94,7 +94,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 	if s.ID != 0 {
 		err := s.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}

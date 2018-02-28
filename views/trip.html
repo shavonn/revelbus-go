@@ -29,9 +29,17 @@
                 <h3 class="date-and-time">DATE AND TIME</h3>
                 {{humanDate .Start}}<br />
                 {{humanDate .End}}<br />
-                <a href="/assets/ical/{{.ID}}.ics" class="ical">Add to Calendar</a>
+               <div class="cal-links">
+                    <a href="/assets/ical/{{.ID}}.ics" class="ical">Add to Calendar</a>
+                    <div class="links">
+                        <a href="{{.CalLinks.google}}">Google</a> - 
+                        <a href="{{.CalLinks.ics}}">Outlook</a> - 
+                        <a href="{{.CalLinks.yahoo}}">Yahoo</a> 
+                    </div>
+                </div>
             </div>
-                
+            
+            {{if .Venues}}
             <div class="widget with-icon">
                 <h3 class="with-icon locale">LOCATION</h3>
                 {{range .Venues}}
@@ -43,6 +51,7 @@
                     {{end}}
                 {{end}}
             </div>
+            {{end}}
         </div>
     </main>
     <div class="trip-listing horizontal container">

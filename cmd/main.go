@@ -57,13 +57,13 @@ func main() {
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM)
 
-	log.Println("main : Start shutdown...")
-
 	select {
 	case err := <-serverErrors:
 		log.Fatalf("Error starting server: %v", err)
 
 	case <-osSignals:
+		log.Println("main : Start shutdown...")
+
 		ctx, cancel := context.WithTimeout(context.Background(), (5 * time.Second))
 		defer cancel()
 
