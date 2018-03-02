@@ -32,7 +32,7 @@
                     <input type="hidden" name="csrf_token" value="{{$.Token}}">
                     <div class="form-group">
                         <label for="vendors">Vendors</label>
-                        <select class="form-control" name="vendor">
+                        <select class="form-control vendor-dropdown" name="vendor">
                             {{range $.Vendors}}
                             <option value="{{.ID}}">{{.Name}}</option>
                             {{end}}
