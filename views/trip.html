@@ -18,7 +18,7 @@
                 </div>
                 {{end}}
                 
-                {{if and $.Gallery $.Gallery.Images}}
+                {{if .GalleryID}}
                 <hr />
                 <h2>Gallery</h2>
                 {{template "gallery-partial" .}}
@@ -29,9 +29,17 @@
                 <h3 class="date-and-time">DATE AND TIME</h3>
                 {{humanDate .Start}}<br />
                 {{humanDate .End}}<br />
-                Add to Calendar
+               <div class="cal-links">
+                    <a href="/ical/{{.Slug}}.ics" class="ical">Add to Calendar</a>
+                    <div class="links">
+                        <a href="{{.CalendarLinks.google}}">Google</a> - 
+                        <a href="{{.CalendarLinks.ics}}">Outlook</a> - 
+                        <a href="{{.CalendarLinks.yahoo}}">Yahoo</a> 
+                    </div>
+                </div>
             </div>
-                
+            
+            {{if .Venues}}
             <div class="widget with-icon">
                 <h3 class="with-icon locale">LOCATION</h3>
                 {{range .Venues}}
@@ -43,6 +51,7 @@
                     {{end}}
                 {{end}}
             </div>
+            {{end}}
         </div>
     </main>
     <div class="trip-listing horizontal container">

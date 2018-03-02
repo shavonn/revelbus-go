@@ -5,6 +5,7 @@
         <input type="hidden" name="csrf_token" value="{{$.Token}}">
         {{if .ID}}
         <input type="hidden" name="id" value="{{.ID}}">
+        <input type="hidden" name="folder" value="{{.Folder}}" />
         {{end}}
         <div class="form-group">
             <label for="name">Name</label>

@@ -2,7 +2,8 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
+	"revelforce/pkg/database"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -18,7 +19,7 @@ type File struct {
 type Files []*File
 
 func (f *File) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO files (name, thumb, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, f.Name, f.Thumb)
@@ -35,20 +36,20 @@ func (f *File) Create() error {
 	return nil
 }
 
-func (f *File) Get() error {
-	conn, _ := db.GetConnection()
+func (f *File) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT name, thumb, created_at FROM files WHERE id = ?`
 	err := conn.QueryRow(stmt, f.ID).Scan(&f.Name, &f.Thumb, &f.Created)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
 }
 
 func (f *File) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM files WHERE id = ?`
 	_, err := conn.Exec(stmt, f.ID)
@@ -56,7 +57,7 @@ func (f *File) Delete() error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1451 {
-			return db.ErrCannotDelete
+			return domain.ErrCannotDelete
 		} else if err == sql.ErrNoRows {
 			return nil
 		}
@@ -65,8 +66,8 @@ func (f *File) Delete() error {
 	return err
 }
 
-func GetFiles() (*Files, error) {
-	conn, _ := db.GetConnection()
+func FetchFiles() (*Files, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, name, thumb, created_at FROM files ORDER BY name`
 	rows, err := conn.Query(stmt)

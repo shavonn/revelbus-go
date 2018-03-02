@@ -1,9 +1,12 @@
-package email
+package emails
 
-import "revelforce/internal/platform/forms"
+import (
+	"revelforce/internal/platform/forms"
+	"revelforce/pkg/email"
+)
 
 func NewPassword(e string, pw string) error {
-	m := email{
+	m := email.Email{
 		To: []string{
 			e,
 		},
@@ -12,12 +15,12 @@ func NewPassword(e string, pw string) error {
 		HTML:    "<p>Your new password is: " + pw + "</p>",
 	}
 
-	err := send(m)
+	err := email.Send(m)
 	return err
 }
 
 func RecoverAccount(e string, h string) error {
-	m := email{
+	m := email.Email{
 		To: []string{
 			e,
 		},
@@ -26,17 +29,17 @@ func RecoverAccount(e string, h string) error {
 		HTML:    "<p>Click to reset password: /auth/recover/?email=" + e + "&hash=" + h + "</p>",
 	}
 
-	err := send(m)
+	err := email.Send(m)
 	return err
 }
 
 func ContactEmail(f *forms.ContactForm) error {
-	m := email{
+	m := email.Email{
 		Subject: "Revel Bus Contact Form",
 		Text:    "Name: " + f.Name + " \nEmail: " + f.Email + " \nPhone: " + f.Phone + " \nMessage: " + f.Message,
 		HTML:    "Name: " + f.Name + " \nEmail: " + f.Email + " \nPhone: " + f.Phone + " \nMessage: " + f.Message,
 	}
 
-	err := send(m)
+	err := email.Send(m)
 	return err
 }

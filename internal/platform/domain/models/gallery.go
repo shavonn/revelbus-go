@@ -2,15 +2,19 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
 
+	"revelforce/pkg/database"
+
 	"github.com/go-sql-driver/mysql"
+	"github.com/gosimple/slug"
 )
 
 type Gallery struct {
 	ID     int
 	Name   string
+	Folder string
 	Images Files
 }
 
@@ -19,6 +23,7 @@ type Galleries []*Gallery
 type GalleryForm struct {
 	ID     string
 	Name   string
+	Folder string
 	Errors map[string]string
 }
 
@@ -32,10 +37,14 @@ func (f *GalleryForm) Valid() bool {
 }
 
 func (g *Gallery) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
-	stmt := `INSERT INTO galleries (name, created_at, updated_at) VALUES(?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, g.Name)
+	if g.Folder == "" {
+		g.Folder = slug.Make(g.Name)
+	}
+
+	stmt := `INSERT INTO galleries (name, folder, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	result, err := conn.Exec(stmt, g.Name, g.Folder)
 	if err != nil {
 		return err
 	}
@@ -50,13 +59,13 @@ func (g *Gallery) Create() error {
 	return nil
 }
 
-func (g *Gallery) Get() error {
-	conn, _ := db.GetConnection()
+func (g *Gallery) Fetch() error {
+	conn, _ := database.GetConnection()
 
-	stmt := `SELECT name FROM galleries WHERE id = ?`
-	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name)
+	stmt := `SELECT name, folder FROM galleries WHERE id = ?`
+	err := conn.QueryRow(stmt, g.ID).Scan(&g.Name, &g.Folder)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	err = g.GetImages()
@@ -64,29 +73,38 @@ func (g *Gallery) Get() error {
 }
 
 func (g *Gallery) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
+
+	if g.Folder == "" {
+		g.Folder = slug.Make(g.Name)
+	}
 
 	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, g.Name, g.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
 
 func (g *Gallery) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
+
+	err := g.DeleteImages()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
 
 	stmt := `DELETE FROM galleries WHERE id = ?`
-	_, err := conn.Exec(stmt, g.ID)
+	_, err = conn.Exec(stmt, g.ID)
 	if err == sql.ErrNoRows {
 		return nil
 	}
 	return err
 }
 
-func GetGalleries() (*Galleries, error) {
-	conn, _ := db.GetConnection()
+func FetchGalleries() (*Galleries, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, name FROM galleries`
 	rows, err := conn.Query(stmt)
@@ -113,7 +131,7 @@ func GetGalleries() (*Galleries, error) {
 }
 
 func (g *Gallery) GetImages() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT f.id, f.name, f.thumb FROM galleries_images gi JOIN files f ON gi.file_id = f.id WHERE gi.gallery_id = ?`
 	rows, err := conn.Query(stmt, g.ID)
@@ -141,8 +159,19 @@ func (g *Gallery) GetImages() error {
 	return nil
 }
 
+func (g *Gallery) DeleteImages() error {
+	conn, _ := database.GetConnection()
+
+	stmt := `DELETE f, gi FROM files f JOIN galleries_images gi ON gi.file_id = f.id WHERE gi.gallery_id = ?`
+	_, err := conn.Exec(stmt, g.ID)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	return err
+}
+
 func (g *Gallery) AttachImage(fid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO galleries_images (gallery_id, file_id, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	_, err := conn.Exec(stmt, g.ID, fid)
@@ -150,14 +179,14 @@ func (g *Gallery) AttachImage(fid string) error {
 		merr, ok := err.(*mysql.MySQLError)
 
 		if ok && merr.Number == 1062 {
-			return db.ErrDuplicate
+			return domain.ErrDuplicate
 		}
 	}
 	return err
 }
 
 func (g *Gallery) DetachImage(fid string) error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM galleries_images WHERE gallery_id = ? AND file_id = ?`
 	_, err := conn.Exec(stmt, g.ID, fid)

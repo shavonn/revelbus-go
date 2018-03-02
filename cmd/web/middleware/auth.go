@@ -8,7 +8,7 @@ import (
 )
 
 func RequireLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -28,7 +28,7 @@ func RequireLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 }
 
 func RequireAdmin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -57,7 +57,7 @@ func RequireAdmin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 }
 
 func RequireGuest(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

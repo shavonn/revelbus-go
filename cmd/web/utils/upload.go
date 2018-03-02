@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/nfnt/resize"
@@ -19,7 +19,7 @@ import (
 
 func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder string, makeThumb bool) ([]*models.File, error) {
 	uploaded := []*models.File{}
-	uploadDir := filepath.Join(viper.GetString("files.static") + folder)
+	uploadDir := filepath.Join(viper.GetString("files.static"), folder)
 
 	err := r.ParseMultipartForm(100000)
 	if err != nil {
@@ -28,16 +28,18 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 
 	m := r.MultipartForm
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
-		os.Mkdir(uploadDir, 0755)
+		os.Mkdir(uploadDir, 0777)
+	} else if err != nil {
+		return uploaded, err
 	}
 
 	files := m.File[fieldName]
 	for i := range files {
 		file, err := files[i].Open()
-		defer file.Close()
 		if err != nil {
 			return uploaded, err
 		}
+		defer file.Close()
 
 		// new file
 		f := &models.File{}
@@ -57,7 +59,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 		f.Name = filepath.Join(folder, fn)
 
 		if makeThumb {
-			rn := "thumb_" + fn
+			rn := fn + "_thumb"
 			ext := filepath.Ext(fn)
 
 			file, err := os.Open(filepath.Join(uploadDir, fn))
@@ -106,15 +108,17 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 }
 
 func DeleteFile(f *models.File) error {
-	err := f.Get()
-	if err != nil {
-		if err == db.ErrNotFound {
-			return nil
+	if f.Name == "" {
+		err := f.Fetch()
+		if err != nil {
+			if err == domain.ErrNotFound {
+				return nil
+			}
+			return err
 		}
-		return err
 	}
 
-	err = f.Delete()
+	err := f.Delete()
 	if err != nil {
 		return err
 	}
@@ -131,4 +135,9 @@ func DeleteFile(f *models.File) error {
 		}
 	}
 	return nil
+}
+
+func DeleteFolder(path string) error {
+	err := os.RemoveAll(filepath.Join(viper.GetString("files.static") + path))
+	return err
 }

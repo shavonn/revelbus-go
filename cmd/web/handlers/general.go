@@ -4,9 +4,10 @@ import (
 	"html/template"
 	"net/http"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/email"
+	"revelforce/internal/platform/cal"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 
@@ -14,13 +15,13 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetUpcomingTrips(3)
+	trips, err := models.FindUpcomingTrips(3)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	slides, err := models.GetActiveSlides()
+	slides, err := models.FindActiveSlides()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -30,7 +31,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err = s.Get()
+	err = s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -42,12 +43,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Slides:    slides,
 	}
 
-	if s.HomeGalleryActive {
+	if s.HomeGalleryActive && s.HomeGallery != 0 {
 		g := &models.Gallery{
 			ID: s.HomeGallery,
 		}
 
-		err = g.Get()
+		err = g.Fetch()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -64,7 +65,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -72,6 +73,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 
 	view.Render(w, r, "about", &view.View{
 		ActiveKey: "about",
+		Title:     "About",
 		Blurb:     s.AboutBlurb,
 		Content:   template.HTML(s.AboutContent),
 	})
@@ -82,7 +84,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 		ID: 1,
 	}
 
-	err := s.Get()
+	err := s.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -90,6 +92,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 
 	view.Render(w, r, "contact", &view.View{
 		ActiveKey: "contact",
+		Title:     "Contact",
 		Blurb:     s.ContactBlurb,
 	})
 }
@@ -116,7 +119,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "contact", v)
 	}
 
-	err = email.ContactEmail(f)
+	err = emails.ContactEmail(f)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -132,7 +135,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func Trips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetUpcomingTripsByMonth()
+	trips, err := models.FindUpcomingTripsByMonth()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -149,9 +152,9 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
-	t, err := models.GetBySlug(slug)
+	t, err := models.FindBySlug(slug)
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -159,7 +162,9 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := models.GetUpcomingTrips(2)
+	t.CalendarLinks = cal.GetCalendarLinks(t)
+
+	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -178,7 +183,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 			ID: t.GalleryID,
 		}
 
-		err = g.Get()
+		err = g.Fetch()
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -191,13 +196,13 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 }
 
 func Faq(w http.ResponseWriter, r *http.Request) {
-	faqs, err := models.GetActiveFAQs()
+	faqs, err := models.FindActiveFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	trips, err := models.GetUpcomingTrips(2)
+	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -209,4 +214,21 @@ func Faq(w http.ResponseWriter, r *http.Request) {
 		FAQGrouped: faqs,
 		Trips:      trips,
 	})
+}
+
+func Ical(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	slug := vars["slug"]
+
+	t, err := models.FindBySlug(slug)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = cal.GenerateICS(w, t)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
 }

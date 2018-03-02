@@ -4,13 +4,12 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/gosimple/slug"
 )
 
 func GalleryForm(w http.ResponseWriter, r *http.Request) {
@@ -28,9 +27,9 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := g.Get()
+	err := g.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -39,8 +38,9 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.GalleryForm{
-		ID:   strconv.Itoa(g.ID),
-		Name: g.Name,
+		ID:     strconv.Itoa(g.ID),
+		Name:   g.Name,
+		Folder: g.Folder,
 	}
 
 	view.Render(w, r, "gallery", &view.View{
@@ -58,8 +58,9 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.GalleryForm{
-		ID:   r.PostForm.Get("id"),
-		Name: r.PostForm.Get("name"),
+		ID:     r.PostForm.Get("id"),
+		Name:   r.PostForm.Get("name"),
+		Folder: r.PostForm.Get("folder"),
 	}
 
 	if !f.Valid() {
@@ -84,7 +85,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 	if g.ID != 0 {
 		err := g.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -92,9 +93,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fldr := slug.Make(g.Name)
-
-		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+fldr, true)
+		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+g.Folder, true)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -129,7 +128,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListGalleries(w http.ResponseWriter, r *http.Request) {
-	galleries, err := models.GetGalleries()
+	galleries, err := models.FetchGalleries()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -149,7 +148,19 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := g.Delete()
+	err := g.Fetch()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = utils.DeleteFolder("uploads/files/" + g.Folder)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = g.Delete()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -184,13 +195,14 @@ func DetachImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = utils.DeleteFile(f)
-	if err == db.ErrCannotDelete {
-		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
+	if err != nil {
+		if err == domain.ErrCannotDelete {
+			err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
 		}
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}

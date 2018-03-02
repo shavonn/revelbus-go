@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -27,9 +27,9 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -37,13 +37,13 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	galleries, err := models.GetGalleries()
+	galleries, err := models.FetchGalleries()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -56,8 +56,8 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		Status:       t.Status,
 		Blurb:        t.Blurb,
 		Description:  t.Description,
-		Start:        t.Start.Format(db.TimeFormat),
-		End:          t.End.Format(db.TimeFormat),
+		Start:        t.Start.Format(domain.TimeFormat),
+		End:          t.End.Format(domain.TimeFormat),
 		Price:        t.Price,
 		TicketingURL: t.TicketingURL,
 		Notes:        t.Notes,
@@ -122,8 +122,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		Status:       f.Status,
 		Blurb:        f.Blurb,
 		Description:  f.Description,
-		Start:        db.ToTime(f.Start),
-		End:          db.ToTime(f.End),
+		Start:        domain.ToTime(f.Start),
+		End:          domain.ToTime(f.End),
 		TicketingURL: f.TicketingURL,
 		Price:        f.Price,
 		Notes:        f.Notes,
@@ -156,7 +156,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	if t.ID != 0 {
 		err := t.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -186,7 +186,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListTrips(w http.ResponseWriter, r *http.Request) {
-	trips, err := models.GetTrips()
+	trips, err := models.FetchTrips()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -208,7 +208,7 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 
 	err := t.GetBase()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -251,13 +251,13 @@ func TripPartners(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -278,13 +278,13 @@ func TripVenues(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := t.Get()
+	err := t.Fetch()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
-	vendors, err := models.GetVendors(true)
+	vendors, err := models.FetchVendors(true)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

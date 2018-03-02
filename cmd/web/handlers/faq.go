@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -27,9 +27,9 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := faq.Get()
+	err := faq.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -95,7 +95,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 	if faq.ID != 0 {
 		err := faq.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -124,7 +124,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListFAQs(w http.ResponseWriter, r *http.Request) {
-	faqs, err := models.GetFAQs()
+	faqs, err := models.FetchFAQs()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

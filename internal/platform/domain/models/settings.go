@@ -2,8 +2,10 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
+
+	"revelforce/pkg/database"
 )
 
 type Settings struct {
@@ -33,7 +35,7 @@ func (f *SettingsForm) Valid() bool {
 }
 
 func (s *Settings) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO settings (contact_blurb, about_blurb, about_content, home_gallery, home_gallery_active, created_at, updated_at) VALUES(?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, s.ContactBlurb, s.AboutBlurb, s.AboutContent, s.HomeGallery, s.HomeGalleryActive)
@@ -51,24 +53,23 @@ func (s *Settings) Create() error {
 	return nil
 }
 
-func (s *Settings) Get() error {
-	conn, _ := db.GetConnection()
+func (s *Settings) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, contact_blurb, about_blurb, about_content, home_gallery, home_gallery_active FROM settings WHERE id = ?`
 	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.ContactBlurb, &s.AboutBlurb, &s.AboutContent, &s.HomeGallery, &s.HomeGalleryActive)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
 }
 
 func (s *Settings) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE settings SET contact_blurb = ?, about_blurb = ?, about_content = ?, home_gallery = ?, home_gallery_active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, s.ContactBlurb, s.AboutBlurb, s.AboutContent, s.HomeGallery, s.HomeGalleryActive, s.ID)
-
 	if err == sql.ErrNoRows {
 		return s.Create()
 	}

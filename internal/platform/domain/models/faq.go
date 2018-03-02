@@ -2,8 +2,9 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
+	"revelforce/pkg/database"
 )
 
 type FAQ struct {
@@ -40,7 +41,7 @@ func (f *FAQForm) Valid() bool {
 }
 
 func (f *FAQ) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO faqs (question, answer, category, sort_order, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active)
@@ -57,31 +58,31 @@ func (f *FAQ) Create() error {
 	return nil
 }
 
-func (f *FAQ) Get() error {
-	conn, _ := db.GetConnection()
+func (f *FAQ) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT question, answer, category, sort_order, active FROM faqs WHERE id = ?`
 	err := conn.QueryRow(stmt, f.ID).Scan(&f.Question, &f.Answer, &f.Category, &f.Order, &f.Active)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
 }
 
 func (f *FAQ) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE faqs SET question = ?, answer= ?, category = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, f.Question, f.Answer, f.Category, f.Order, f.Active, f.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
 
 func (f *FAQ) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM faqs WHERE id = ?`
 	_, err := conn.Exec(stmt, f.ID)
@@ -91,8 +92,8 @@ func (f *FAQ) Delete() error {
 	return err
 }
 
-func GetFAQs() (*FAQs, error) {
-	conn, _ := db.GetConnection()
+func FetchFAQs() (*FAQs, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, question, answer, category, sort_order, active FROM faqs ORDER BY sort_order`
 	rows, err := conn.Query(stmt)
@@ -118,8 +119,8 @@ func GetFAQs() (*FAQs, error) {
 	return &faqs, nil
 }
 
-func GetActiveFAQs() (*GroupedFAQs, error) {
-	conn, _ := db.GetConnection()
+func FindActiveFAQs() (*GroupedFAQs, error) {
+	conn, _ := database.GetConnection()
 
 	faqs := make(GroupedFAQs)
 

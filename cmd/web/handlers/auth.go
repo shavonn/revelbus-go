@@ -4,13 +4,12 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/email"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
 
 	"github.com/gorilla/mux"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func SignupForm(w http.ResponseWriter, r *http.Request) {
@@ -50,14 +49,15 @@ func PostSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = u.Create()
-	if err == db.ErrDuplicateEmail {
-		f.Errors["Email"] = "E-mail address is already in use"
-		view.Render(w, r, "signup", &view.View{
-			Form:  f,
-			Title: "Signup",
-		})
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == domain.ErrDuplicateEmail {
+			f.Errors["Email"] = "E-mail address is already in use"
+			view.Render(w, r, "signup", &view.View{
+				Form:  f,
+				Title: "Signup",
+			})
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -102,19 +102,20 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = u.VerifyUser(f.Password)
-	if err == db.ErrInvalidCredentials {
-		err = flash.Add(w, r, utils.MsgUnsuccessfulLogin, "danger")
-		if err != nil {
-			view.ServerError(w, r, err)
+	if err != nil {
+		if err == domain.ErrInvalidCredentials {
+			err = flash.Add(w, r, utils.MsgUnsuccessfulLogin, "danger")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
+
+			view.Render(w, r, "login", &view.View{
+				Form:  f,
+				Title: "Login",
+			})
 			return
 		}
-
-		view.Render(w, r, "login", &view.View{
-			Form:  f,
-			Title: "Login",
-		})
-		return
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
@@ -168,7 +169,7 @@ func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 		Email: f.Email,
 	}
 
-	err = u.Get()
+	err = u.Fetch()
 	if err == nil {
 		rh := utils.RandomString(20)
 
@@ -178,7 +179,7 @@ func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		email.RecoverAccount(u.Email, rh)
+		emails.RecoverAccount(u.Email, rh)
 	}
 
 	err = flash.Add(w, r, utils.MsgRecoverySent, "success")
@@ -255,19 +256,20 @@ func PostPasswordReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = u.Recover(f.RecoveryHash, f.Password)
-	if err == db.ErrInvalidCredentials || err == bcrypt.ErrHashTooShort {
-		err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
-		if err != nil {
-			view.ServerError(w, r, err)
+	if err != nil {
+		if err == domain.ErrInvalidCredentials {
+			err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
+
+			view.Render(w, r, "reset", &view.View{
+				Form:  f,
+				Title: "Reset Password",
+			})
 			return
 		}
-
-		view.Render(w, r, "reset", &view.View{
-			Form:  f,
-			Title: "Reset Password",
-		})
-		return
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"revelforce/cmd/web/utils"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
 	"strings"
@@ -57,7 +57,7 @@ func Render(w http.ResponseWriter, r *http.Request, tpl string, v *View) {
 	}
 	v.Flash = flash
 
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		ServerError(w, r, err)
 		return
@@ -88,8 +88,7 @@ func parseTemplates() (*template.Template, error) {
 	templ := template.New("").Funcs(fm)
 	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {
 		if strings.Contains(path, ".html") {
-			_, err = templ.ParseFiles(path)
-			if err != nil {
+			if _, err = templ.ParseFiles(path); err != nil {
 				return err
 			}
 		}

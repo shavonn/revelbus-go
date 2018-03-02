@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -27,9 +27,9 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := v.Get()
+	err := v.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -138,7 +138,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	if v.ID != 0 {
 		err := v.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -167,7 +167,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListVendors(w http.ResponseWriter, r *http.Request) {
-	vendors, err := models.GetVendors(false)
+	vendors, err := models.FetchVendors(false)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -189,7 +189,7 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 
 	err := v.GetBase()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -210,21 +210,22 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = v.Delete()
-	if err == db.ErrCannotDelete {
-		err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
+	if err != nil {
+		if err == domain.ErrCannotDelete {
+			err = flash.Add(w, r, utils.MsgCannotRemove, "warning")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
 		}
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
-	} else {
-		err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
+	}
+
+	err = flash.Add(w, r, utils.MsgSuccessfullyRemoved, "success")
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
 	}
 
 	http.Redirect(w, r, "/admin/vendors", http.StatusSeeOther)

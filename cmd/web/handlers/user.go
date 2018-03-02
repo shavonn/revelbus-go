@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
-	"revelforce/internal/platform/email"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
 	"strconv"
 
@@ -28,9 +28,9 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 		ID: utils.ToInt(id),
 	}
 
-	err := u.Get()
+	err := u.Fetch()
 	if err != nil {
-		if err == db.ErrNotFound {
+		if err == domain.ErrNotFound {
 			view.NotFound(w, r)
 			return
 		}
@@ -89,7 +89,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	if u.ID != 0 {
 		err := u.Update()
 		if err != nil {
-			if err == db.ErrNotFound {
+			if err == domain.ErrNotFound {
 				view.NotFound(w, r)
 				return
 			}
@@ -106,7 +106,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			email.NewPassword(u.Email, pw)
+			emails.NewPassword(u.Email, pw)
 		}
 
 		msg = utils.MsgSuccessfullyUpdated
@@ -120,7 +120,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		email.NewPassword(u.Email, pw)
+		emails.NewPassword(u.Email, pw)
 		msg = utils.MsgSuccessfullyCreated
 	}
 
@@ -136,7 +136,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := models.GetUsers()
+	users, err := models.FetchUsers()
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

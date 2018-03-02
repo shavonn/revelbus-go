@@ -4,11 +4,9 @@ import (
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/db/models"
+	"revelforce/internal/platform/domain"
+	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/flash"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func UserDashboard(w http.ResponseWriter, r *http.Request) {
@@ -16,7 +14,7 @@ func UserDashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProfileForm(w http.ResponseWriter, r *http.Request) {
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -53,21 +51,22 @@ func PostProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
 	err = u.Update()
-	if err == db.ErrDuplicateEmail {
-		f.Errors["Email"] = "E-mail address is already in use"
-		view.Render(w, r, "profile", &view.View{
-			Form:  f,
-			Title: "Update Profile",
-		})
-		return
-	} else if err != nil {
+	if err != nil {
+		if err == domain.ErrDuplicateEmail {
+			f.Errors["Email"] = "E-mail address is already in use"
+			view.Render(w, r, "profile", &view.View{
+				Form:  f,
+				Title: "Update Profile",
+			})
+			return
+		}
 		view.ServerError(w, r, err)
 		return
 	}
@@ -118,26 +117,27 @@ func PostPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := utils.LoggedIn(r)
+	u, err := utils.IsAuthenticated(r)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}
 
 	err = u.VerifyAndUpdatePassword(f.OldPassword, f.Password)
-	if err == db.ErrInvalidCredentials || err == bcrypt.ErrHashTooShort {
-		err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
-		if err != nil {
-			view.ServerError(w, r, err)
+	if err != nil {
+		if err == domain.ErrInvalidCredentials {
+			err = flash.Add(w, r, utils.MsgInvalidCredentials, "danger")
+			if err != nil {
+				view.ServerError(w, r, err)
+				return
+			}
+
+			view.Render(w, r, "password", &view.View{
+				Form:  f,
+				Title: "Update Password",
+			})
 			return
 		}
-
-		view.Render(w, r, "password", &view.View{
-			Form:  f,
-			Title: "Update Password",
-		})
-		return
-	} else if err != nil {
 		view.ServerError(w, r, err)
 		return
 	}

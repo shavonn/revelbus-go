@@ -2,8 +2,10 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/db"
+	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/forms"
+
+	"revelforce/pkg/database"
 )
 
 type Slide struct {
@@ -39,7 +41,7 @@ func (f *SlideForm) Valid() bool {
 }
 
 func (s *Slide) Create() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `INSERT INTO slides (title, blurb, style, sort_order, active, created_at, updated_at) VALUES(?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, s.Title, s.Blurb, s.Style, s.Order, s.Active)
@@ -57,31 +59,31 @@ func (s *Slide) Create() error {
 	return nil
 }
 
-func (s *Slide) Get() error {
-	conn, _ := db.GetConnection()
+func (s *Slide) Fetch() error {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, blurb, style, sort_order, active FROM slides WHERE id = ?`
 	err := conn.QueryRow(stmt, s.ID).Scan(&s.ID, &s.Title, &s.Blurb, &s.Style, &s.Order, &s.Active)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 
 	return err
 }
 
 func (s *Slide) Update() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `UPDATE slides SET title = ?, blurb= ?, style = ?, sort_order = ?, active = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, s.Title, s.Blurb, s.Style, s.Order, s.Active, s.ID)
 	if err == sql.ErrNoRows {
-		return db.ErrNotFound
+		return domain.ErrNotFound
 	}
 	return err
 }
 
 func (s *Slide) Delete() error {
-	conn, _ := db.GetConnection()
+	conn, _ := database.GetConnection()
 
 	stmt := `DELETE FROM slides WHERE id = ?`
 	_, err := conn.Exec(stmt, s.ID)
@@ -91,8 +93,8 @@ func (s *Slide) Delete() error {
 	return err
 }
 
-func GetSlides() (*Slides, error) {
-	conn, _ := db.GetConnection()
+func FetchSlides() (*Slides, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, blurb, style, sort_order, active FROM slides ORDER BY sort_order`
 	rows, err := conn.Query(stmt)
@@ -118,8 +120,8 @@ func GetSlides() (*Slides, error) {
 	return &slides, nil
 }
 
-func GetActiveSlides() (*Slides, error) {
-	conn, _ := db.GetConnection()
+func FindActiveSlides() (*Slides, error) {
+	conn, _ := database.GetConnection()
 
 	stmt := `SELECT id, title, blurb, style, sort_order FROM slides WHERE active = 1 ORDER BY sort_order`
 	rows, err := conn.Query(stmt)

@@ -7,13 +7,17 @@ import (
 	"os"
 	"os/signal"
 	"revelforce/cmd/web"
-	"revelforce/internal/platform/db"
-	"revelforce/internal/platform/session"
-	"sync"
+	"revelforce/pkg/database"
+	"revelforce/pkg/sessions"
+	"syscall"
 	"time"
 
 	"github.com/spf13/viper"
 )
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
+}
 
 func main() {
 	err := web.LoadConfig()
@@ -21,9 +25,10 @@ func main() {
 		log.Fatalf("Load Config : %v", err)
 	}
 
-	masterDB, err := db.GetConnection()
+	log.Println("main : Started : Initialize MySql")
+	masterDB, err := database.GetConnection()
 	if err != nil {
-		log.Fatalf("Connect DB : %v", err)
+		log.Fatalf("startup : Connect to DB : %v", err)
 	}
 	defer masterDB.Close()
 
@@ -31,43 +36,44 @@ func main() {
 		log.Fatalf("DB Ping : %v", err)
 	}
 
-	sesh := session.GetSession()
+	sesh := sessions.GetSession()
 
 	srv := http.Server{
 		Addr:           viper.GetString("addr"),
 		Handler:        sesh.Use(web.Routes()),
 		IdleTimeout:    time.Minute,
 		ReadTimeout:    5 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		WriteTimeout:   5 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+	serverErrors := make(chan error, 1)
 
 	go func() {
 		log.Printf("startup : Listening %s", viper.GetString("addr"))
-		log.Printf("shutdown : Listener closed : %v", srv.ListenAndServe())
-		wg.Done()
+		serverErrors <- srv.ListenAndServe()
 	}()
 
 	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, os.Interrupt)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM)
 
-	<-osSignals
+	select {
+	case err := <-serverErrors:
+		log.Fatalf("Error starting server: %v", err)
 
-	const timeout = 5 * time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	case <-osSignals:
+		log.Println("main : Start shutdown...")
 
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Printf("shutdown : Graceful shutdown did not complete in %v : %v", timeout, err)
+		ctx, cancel := context.WithTimeout(context.Background(), (5 * time.Second))
+		defer cancel()
 
-		if err := srv.Close(); err != nil {
-			log.Printf("shutdown : Error killing server : %v", err)
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Printf("Graceful shutdown did not complete in %v : %v", (5 * time.Second), err)
+			if err := srv.Close(); err != nil {
+				log.Fatalf("Could not stop http server: %v", err)
+			}
 		}
 	}
 
-	wg.Wait()
 	log.Println("main : Completed")
 }
