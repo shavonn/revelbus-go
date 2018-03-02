@@ -1,8 +1,11 @@
 package cal
 
 import (
+	"io"
 	"revelforce/internal/platform/domain/models"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -11,7 +14,38 @@ const (
 	dateTimeLayout = "20060102T150405"
 )
 
-func getAddress(t *models.Trip) string {
+type vCalendar struct {
+	version         string
+	prodID          string
+	url             string
+	name            string
+	description     string
+	timezone        string
+	refreshInterval string
+	color           string
+	calScale        string
+	method          string
+
+	vComponent []vComponent
+}
+type vComponent interface {
+	encodeIcal(w io.Writer) error
+}
+
+type vEvent struct {
+	uID         string
+	dtStamp     time.Time
+	dtStart     time.Time
+	dtEnd       time.Time
+	slug        string
+	summary     string
+	description string
+	location    string
+	tzID        string
+	allDay      bool
+}
+
+func tripToVEvent(t *models.Trip) *vEvent {
 	address := ""
 
 	if len(t.Venues) > 0 {
@@ -27,7 +61,19 @@ func getAddress(t *models.Trip) string {
 		}
 	}
 
-	return address
+	return &vEvent{
+		uID:         "REVBUS" + strconv.Itoa(t.ID),
+		dtStamp:     time.Now(),
+		dtStart:     t.Start,
+		dtEnd:       t.End,
+		summary:     t.Title,
+		location:    address,
+		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug,
+		tzID:        "EDST",
+		allDay:      false,
+
+		slug: t.Slug,
+	}
 }
 
 func stripSpaces(s string) string {

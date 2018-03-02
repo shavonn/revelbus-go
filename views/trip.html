@@ -30,11 +30,11 @@
                 {{humanDate .Start}}<br />
                 {{humanDate .End}}<br />
                <div class="cal-links">
-                    <a href="/assets/ical/{{.ID}}.ics" class="ical">Add to Calendar</a>
+                    <a href="/assets/ical/{{.Slug}}.ics" class="ical">Add to Calendar</a>
                     <div class="links">
-                        <a href="{{.CalLinks.google}}">Google</a> - 
-                        <a href="{{.CalLinks.ics}}">Outlook</a> - 
-                        <a href="{{.CalLinks.yahoo}}">Yahoo</a> 
+                        <a href="{{.CalendarLinks.google}}">Google</a> - 
+                        <a href="{{.CalendarLinks.ics}}">Outlook</a> - 
+                        <a href="{{.CalendarLinks.yahoo}}">Yahoo</a> 
                     </div>
                 </div>
             </div>

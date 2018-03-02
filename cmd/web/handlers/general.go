@@ -3,14 +3,13 @@ package handlers
 import (
 	"html/template"
 	"net/http"
-	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
+	"revelforce/internal/platform/cal"
 	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/domain/models"
 	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
-	"revelforce/pkg/cal"
 
 	"github.com/gorilla/mux"
 )
@@ -163,7 +162,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t.CalLinks = cal.GetCalendarLinks(t)
+	t.CalendarLinks = cal.GetCalendarLinks(t)
 
 	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
@@ -219,13 +218,9 @@ func Faq(w http.ResponseWriter, r *http.Request) {
 
 func Ical(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	slug := vars["slug"]
 
-	t := &models.Trip{
-		ID: utils.ToInt(id),
-	}
-
-	err := t.Fetch()
+	t, err := models.FindBySlug(slug)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

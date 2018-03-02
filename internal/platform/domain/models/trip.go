@@ -31,7 +31,7 @@ type Trip struct {
 	Partners Vendors
 	Venues   Vendors
 
-	CalLinks map[string]string
+	CalendarLinks map[string]string
 }
 
 type Trips []*Trip

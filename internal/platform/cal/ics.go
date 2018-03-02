@@ -5,104 +5,33 @@ import (
 	"io"
 	"net/http"
 	"revelforce/internal/platform/domain/models"
-	"strconv"
-	"time"
 )
 
-type vCalendar struct {
-	version         string
-	prodID          string
-	url             string
-	name            string
-	description     string
-	timezone        string
-	refreshInterval string
-	color           string
-	calScale        string
-	method          string
+func GenerateICS(w http.ResponseWriter, t *models.Trip) error {
+	cal := newCal()
+	e := tripToVEvent(t)
 
-	vComponent []vComponent
+	cal.vComponent = append(cal.vComponent, e)
+
+	w.Header().Set("Content-Type", "text/calendar")
+	err := cal.encode(w)
+	return err
 }
 
-type vEvent struct {
-	uID         string
-	dtStamp     time.Time
-	dtStart     time.Time
-	dtEnd       time.Time
-	summary     string
-	description string
-	location    string
-	tzID        string
-	allDay      bool
-}
-
-type vComponent interface {
-	encodeIcal(w io.Writer) error
-}
-
-// encode event
-func (e *vEvent) encodeIcal(w io.Writer) error {
-
-	var timeStampLayout, timeStampType, tzidTxt string
-
-	if e.allDay {
-		timeStampLayout = dateLayout
-		timeStampType = "DATE"
-	} else {
-		timeStampLayout = dateTimeLayout
-		timeStampType = "DATE-TIME"
-		if len(e.tzID) == 0 || e.tzID == "UTC" {
-			timeStampLayout = timeStampLayout + "Z"
-		}
+// create new cal with my defaults
+func newCal() *vCalendar {
+	cal := &vCalendar{
+		version:         "2.0",
+		calScale:        "GREGORIAN",
+		prodID:          "Revel Bus",
+		name:            "Revel Bus Trips",
+		url:             "http://www.revelbus.com/trips",
+		method:          "PUBLISH",
+		timezone:        "EDST",
+		refreshInterval: "PT12H",
 	}
 
-	if len(e.tzID) != 0 && e.tzID != "UTC" {
-		tzidTxt = "TZID=" + e.tzID + ";"
-	}
-
-	b := bufio.NewWriter(w)
-	if _, err := b.WriteString("BEGIN:VEVENT\r\n"); err != nil {
-		return err
-	}
-	if _, err := b.WriteString("DTSTAMP:" + e.dtStamp.UTC().Format(dateFormat) + "\r\n"); err != nil {
-		return err
-	}
-	if _, err := b.WriteString("UID:" + e.uID + "\r\n"); err != nil {
-		return err
-	}
-
-	if len(e.tzID) != 0 && e.tzID != "UTC" {
-		if _, err := b.WriteString("TZID:" + e.tzID + "\r\n"); err != nil {
-			return err
-		}
-	}
-
-	if _, err := b.WriteString("SUMMARY:" + e.summary + "\r\n"); err != nil {
-		return err
-	}
-	if e.description != "" {
-		if _, err := b.WriteString("DESCRIPTION:" + e.description + "\r\n"); err != nil {
-			return err
-		}
-	}
-	if e.location != "" {
-		if _, err := b.WriteString("LOCATION:" + e.location + "\r\n"); err != nil {
-			return err
-		}
-	}
-	if _, err := b.WriteString("DTSTART;" + tzidTxt + "VALUE=" + timeStampType + ":" + e.dtStart.Format(timeStampLayout) + "\r\n"); err != nil {
-		return err
-	}
-
-	if _, err := b.WriteString("DTEND;" + tzidTxt + "VALUE=" + timeStampType + ":" + e.dtEnd.Format(timeStampLayout) + "\r\n"); err != nil {
-		return err
-	}
-
-	if _, err := b.WriteString("END:VEVENT\r\n"); err != nil {
-		return err
-	}
-
-	return b.Flush()
+	return cal
 }
 
 // encode calendar
@@ -154,41 +83,73 @@ func (c *vCalendar) encode(w io.Writer) error {
 	return b.Flush()
 }
 
-// create new cal with my defaults
-func newCal() *vCalendar {
-	cal := &vCalendar{
-		version:         "2.0",
-		calScale:        "GREGORIAN",
-		prodID:          "Revel Bus",
-		name:            "Revel Bus Trips",
-		url:             "http://www.revelbus.com/trips",
-		method:          "PUBLISH",
-		timezone:        "EDST",
-		refreshInterval: "PT12H",
+// encode event
+func (e *vEvent) encodeIcal(w io.Writer) error {
+
+	var timeStampLayout, timeStampType, tzidTxt string
+
+	if e.allDay {
+		timeStampLayout = dateLayout
+		timeStampType = "DATE"
+	} else {
+		timeStampLayout = dateTimeLayout
+		timeStampType = "DATE-TIME"
+		if len(e.tzID) == 0 || e.tzID == "UTC" {
+			timeStampLayout = timeStampLayout + "Z"
+		}
 	}
 
-	return cal
-}
-
-func GenerateICS(w http.ResponseWriter, t *models.Trip) error {
-	cal := newCal()
-	address := getAddress(t)
-
-	e := &vEvent{
-		uID:         "REVBUS" + strconv.Itoa(t.ID),
-		dtStamp:     time.Now(),
-		dtStart:     t.Start,
-		dtEnd:       t.End,
-		summary:     t.Title,
-		location:    address,
-		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug,
-		tzID:        "EDST",
-		allDay:      false,
+	if len(e.tzID) != 0 && e.tzID != "UTC" {
+		tzidTxt = "TZID=" + e.tzID + ";"
 	}
 
-	cal.vComponent = append(cal.vComponent, e)
+	b := bufio.NewWriter(w)
 
-	w.Header().Set("Content-Type", "text/calendar")
-	err := cal.encode(w)
-	return err
+	if _, err := b.WriteString("BEGIN:VEVENT\r\n"); err != nil {
+		return err
+	}
+
+	if _, err := b.WriteString("DTSTAMP:" + e.dtStamp.UTC().Format(dateFormat) + "\r\n"); err != nil {
+		return err
+	}
+
+	if _, err := b.WriteString("UID:" + e.uID + "\r\n"); err != nil {
+		return err
+	}
+
+	if len(e.tzID) != 0 && e.tzID != "UTC" {
+		if _, err := b.WriteString("TZID:" + e.tzID + "\r\n"); err != nil {
+			return err
+		}
+	}
+
+	if _, err := b.WriteString("SUMMARY:" + e.summary + "\r\n"); err != nil {
+		return err
+	}
+
+	if e.description != "" {
+		if _, err := b.WriteString("DESCRIPTION:" + e.description + "\r\n"); err != nil {
+			return err
+		}
+	}
+
+	if e.location != "" {
+		if _, err := b.WriteString("LOCATION:" + e.location + "\r\n"); err != nil {
+			return err
+		}
+	}
+
+	if _, err := b.WriteString("DTSTART;" + tzidTxt + "VALUE=" + timeStampType + ":" + e.dtStart.Format(timeStampLayout) + "\r\n"); err != nil {
+		return err
+	}
+
+	if _, err := b.WriteString("DTEND;" + tzidTxt + "VALUE=" + timeStampType + ":" + e.dtEnd.Format(timeStampLayout) + "\r\n"); err != nil {
+		return err
+	}
+
+	if _, err := b.WriteString("END:VEVENT\r\n"); err != nil {
+		return err
+	}
+
+	return b.Flush()
 }
