@@ -8,4 +8,6 @@ $(document).ready(function(){
         altInput: true,
         altFormat: "F j, Y h:iK",
     });
+
+    $('.vendor-dropdown, .gallery-dropdown').select2();
 });
