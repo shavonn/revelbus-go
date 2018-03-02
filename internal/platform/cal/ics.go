@@ -109,7 +109,7 @@ func (e *vEvent) encodeIcal(w io.Writer) error {
 		return err
 	}
 
-	if _, err := b.WriteString("DTSTAMP:" + e.dtStamp.UTC().Format(dateFormat) + "\r\n"); err != nil {
+	if _, err := b.WriteString("DTSTAMP:" + e.dtStamp.UTC().Format(dateTimeLayout) + "\r\n"); err != nil {
 		return err
 	}
 

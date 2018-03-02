@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/gosimple/slug"
 )
 
 func GalleryForm(w http.ResponseWriter, r *http.Request) {
@@ -81,10 +80,6 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 	g := models.Gallery{
 		ID:   utils.ToInt(f.ID),
 		Name: f.Name,
-	}
-
-	if g.Folder == "" {
-		g.Folder = slug.Make(f.Name)
 	}
 
 	if g.ID != 0 {

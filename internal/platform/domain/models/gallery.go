@@ -8,6 +8,7 @@ import (
 	"revelforce/pkg/database"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gosimple/slug"
 )
 
 type Gallery struct {
@@ -37,6 +38,10 @@ func (f *GalleryForm) Valid() bool {
 
 func (g *Gallery) Create() error {
 	conn, _ := database.GetConnection()
+
+	if g.Folder == "" {
+		g.Folder = slug.Make(g.Name)
+	}
 
 	stmt := `INSERT INTO galleries (name, folder, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, g.Name, g.Folder)
@@ -69,6 +74,10 @@ func (g *Gallery) Fetch() error {
 
 func (g *Gallery) Update() error {
 	conn, _ := database.GetConnection()
+
+	if g.Folder == "" {
+		g.Folder = slug.Make(g.Name)
+	}
 
 	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := conn.Exec(stmt, g.Name, g.ID)

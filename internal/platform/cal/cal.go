@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	dateFormat     = "20060102T150405"
 	dateLayout     = "20060102"
 	dateTimeLayout = "20060102T150405"
 )

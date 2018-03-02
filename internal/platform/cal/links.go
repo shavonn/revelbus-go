@@ -19,7 +19,7 @@ func GetCalendarLinks(t *models.Trip) map[string]string {
 func (ve *vEvent) google() string {
 	uri := "https://www.google.com/calendar/render?action=TEMPLATE"
 	uri = uri + "&text=" + stripSpaces(ve.summary)
-	uri = uri + "&dates=" + ve.dtStart.Format(dateFormat) + "/" + ve.dtEnd.Format(dateFormat)
+	uri = uri + "&dates=" + ve.dtStart.Format(dateTimeLayout) + "/" + ve.dtEnd.Format(dateTimeLayout)
 	uri = uri + "&details=" + stripSpaces("For details, visit: http://www.revelbus.com/trip/"+ve.slug)
 
 	if ve.location != "" {
@@ -38,8 +38,8 @@ func (ve *vEvent) ics() string {
 func (ve *vEvent) yahoo() string {
 	uri := "https://calendar.yahoo.com/?v=60&view=d&type=20"
 	uri = uri + "&title=" + url.QueryEscape(ve.summary)
-	uri = uri + "&st=" + ve.dtStart.Format(dateFormat)
-	uri = uri + "&et=" + ve.dtEnd.Format(dateFormat)
+	uri = uri + "&st=" + ve.dtStart.Format(dateTimeLayout)
+	uri = uri + "&et=" + ve.dtEnd.Format(dateTimeLayout)
 	uri = uri + "&desc=" + url.QueryEscape("For details, visit: http://www.revelbus.com/trip/"+ve.slug)
 
 	if ve.location != "" {
