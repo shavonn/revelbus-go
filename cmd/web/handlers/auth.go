@@ -6,8 +6,8 @@ import (
 	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
-	"revelforce/pkg/email"
 
 	"github.com/gorilla/mux"
 )
@@ -179,7 +179,7 @@ func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		email.RecoverAccount(u.Email, rh)
+		emails.RecoverAccount(u.Email, rh)
 	}
 
 	err = flash.Add(w, r, utils.MsgRecoverySent, "success")

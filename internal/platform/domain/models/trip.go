@@ -109,7 +109,6 @@ func (t *Trip) Fetch() error {
 	}
 
 	err = t.GetTripVendors()
-
 	return err
 }
 
@@ -129,10 +128,6 @@ func FindBySlug(s string) (*Trip, error) {
 	}
 
 	err = t.GetTripVendors()
-	if err != nil {
-		return nil, err
-	}
-
 	return t, err
 }
 

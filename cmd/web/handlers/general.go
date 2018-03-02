@@ -7,9 +7,10 @@ import (
 	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
 	"revelforce/internal/platform/forms"
-	"revelforce/pkg/email"
+	"revelforce/pkg/cal"
 
 	"github.com/gorilla/mux"
 )
@@ -119,7 +120,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 		view.Render(w, r, "contact", v)
 	}
 
-	err = email.ContactEmail(f)
+	err = emails.ContactEmail(f)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return
@@ -162,7 +163,7 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t.CalLinks = utils.GetCalendarLinks(t)
+	t.CalLinks = cal.GetCalendarLinks(t)
 
 	trips, err := models.FindUpcomingTrips(2)
 	if err != nil {
@@ -214,4 +215,25 @@ func Faq(w http.ResponseWriter, r *http.Request) {
 		FAQGrouped: faqs,
 		Trips:      trips,
 	})
+}
+
+func Ical(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	t := &models.Trip{
+		ID: utils.ToInt(id),
+	}
+
+	err := t.Fetch()
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
+
+	err = cal.GenerateICS(w, t)
+	if err != nil {
+		view.ServerError(w, r, err)
+		return
+	}
 }

@@ -1,27 +1,15 @@
-package utils
+package cal
 
 import (
 	"net/url"
 	"path/filepath"
 	"revelforce/internal/platform/domain/models"
 	"strconv"
-	"strings"
-	"time"
 )
-
-var dateFormat = "20060102T150400Z"
 
 func GetCalendarLinks(t *models.Trip) map[string]string {
 	m := make(map[string]string)
-	address := ""
-
-	if len(t.Venues) > 0 {
-		for _, v := range t.Venues {
-			if v.Primary {
-				address = v.Name + ", " + v.Address + ", " + v.City + ", " + v.State + ", " + v.Zip
-			}
-		}
-	}
+	address := getAddress(t)
 
 	m["google"] = google(t, address)
 	m["yahoo"] = yahoo(t, address)
@@ -29,14 +17,10 @@ func GetCalendarLinks(t *models.Trip) map[string]string {
 	return m
 }
 
-func stripSpaces(s string) string {
-	return strings.Replace(s, " ", "+", -1)
-}
-
 func google(t *models.Trip, a string) string {
 	uri := "https://www.google.com/calendar/render?action=TEMPLATE"
 	uri = uri + "&text=" + stripSpaces(t.Title)
-	uri = uri + "&dates=" + t.Start.Add(time.Hour*5).Format(dateFormat) + "/" + t.End.Add(time.Hour*4).Format(dateFormat)
+	uri = uri + "&dates=" + t.Start.Format(dateFormat) + "/" + t.End.Format(dateFormat)
 	uri = uri + "&details=" + stripSpaces("For details, visit: http://www.revelbus.com/trip/"+t.Slug)
 
 	if a != "" {
@@ -49,13 +33,13 @@ func google(t *models.Trip, a string) string {
 }
 
 func ics(t *models.Trip, a string) string {
-	return filepath.Join("/assets/ical/", strconv.Itoa(t.ID)+".ics")
+	return filepath.Join("/ical/", strconv.Itoa(t.ID)+".ics")
 }
 
 func yahoo(t *models.Trip, a string) string {
 	uri := "https://calendar.yahoo.com/?v=60&view=d&type=20"
 	uri = uri + "&title=" + url.QueryEscape(t.Title)
-	uri = uri + "&st=" + t.Start.Add(time.Hour*5).Format(dateFormat)
+	uri = uri + "&st=" + t.Start.Format(dateFormat)
 	uri = uri + "&et=" + t.End.Format(dateFormat)
 	uri = uri + "&desc=" + url.QueryEscape("For details, visit: http://www.revelbus.com/trip/"+t.Slug)
 

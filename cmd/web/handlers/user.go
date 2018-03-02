@@ -6,8 +6,8 @@ import (
 	"revelforce/cmd/web/view"
 	"revelforce/internal/platform/domain"
 	"revelforce/internal/platform/domain/models"
+	"revelforce/internal/platform/emails"
 	"revelforce/internal/platform/flash"
-	"revelforce/pkg/email"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -106,7 +106,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			email.NewPassword(u.Email, pw)
+			emails.NewPassword(u.Email, pw)
 		}
 
 		msg = utils.MsgSuccessfullyUpdated
@@ -120,7 +120,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		email.NewPassword(u.Email, pw)
+		emails.NewPassword(u.Email, pw)
 		msg = utils.MsgSuccessfullyCreated
 	}
 

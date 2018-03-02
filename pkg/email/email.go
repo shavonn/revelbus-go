@@ -5,14 +5,14 @@ import (
 	gomail "gopkg.in/gomail.v2"
 )
 
-type email struct {
+type Email struct {
 	To      []string
 	Subject string
 	Text    string
 	HTML    string
 }
 
-func send(e email) error {
+func Send(e Email) error {
 	m := gomail.NewMessage()
 	d := gomail.NewPlainDialer(viper.GetString("smtp.host"), viper.GetInt("smtp.port"), viper.GetString("smtp.user"), viper.GetString("smtp.password"))
 

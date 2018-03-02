@@ -174,8 +174,6 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		msg = utils.MsgSuccessfullyCreated
 	}
 
-	writeICS(&t)
-
 	err = flash.Add(w, r, msg, "success")
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -372,8 +370,6 @@ func UpdateVenueStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeICS(&t)
-
 	err = flash.Add(w, r, utils.MsgSuccessfullyUpdated, "success")
 	if err != nil {
 		view.ServerError(w, r, err)
@@ -381,13 +377,4 @@ func UpdateVenueStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/trip/"+id+"?venues", http.StatusSeeOther)
-}
-
-func writeICS(t *models.Trip) error {
-	err := t.Fetch()
-	if err != nil {
-		return err
-	}
-
-	return utils.CreateICS(t)
 }

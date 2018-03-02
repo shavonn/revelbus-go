@@ -22,6 +22,8 @@ func Routes() http.Handler {
 	r.HandleFunc("/contact", handlers.Contact).Methods("GET")
 	r.HandleFunc("/contact", handlers.ContactPost).Methods("POST")
 
+	r.HandleFunc("/ical/{id}.ics", handlers.Ical).Methods("GET")
+
 	auth := r.PathPrefix("/auth").Subrouter()
 	auth.HandleFunc("/recover", handlers.ResetPasswordForm).Queries("email", "{email}").Queries("hash", "{hash}").Methods("GET")
 	auth.HandleFunc("/reset", handlers.PostPasswordReset).Methods("POST")
