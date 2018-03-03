@@ -1,10 +1,8 @@
 {{define "gallery-partial"}}
-{{with $.Gallery}}
     <div class="gallery">
         {{range .Images}}
-        <a href="/assets/{{.Name}}"><img src="/assets/{{.Name}}" alt="" title="" /></a>
+        <a href="/assets/{{.Name.String}}"><img src="/assets/{{.Thumb.String}}" alt="" title="" /></a>
         {{end}}
         <div class="clear"></div>
     </div>
-{{end}}
 {{end}}

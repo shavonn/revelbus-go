@@ -56,10 +56,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 			return uploaded, err
 		}
 
-		f.Name = filepath.Join(folder, fn)
+		f.Name = NewNullStr(filepath.Join(folder, fn))
 
 		if makeThumb {
-			rn := fn + "_thumb"
+			rn := "thumb_" + fn
 			ext := filepath.Ext(fn)
 
 			file, err := os.Open(filepath.Join(uploadDir, fn))
@@ -93,7 +93,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 				jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
 			}
 
-			f.Thumb = filepath.Join(folder, rn)
+			f.Thumb = NewNullStr(filepath.Join(folder, rn))
 		}
 
 		err = f.Create()
@@ -108,7 +108,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 }
 
 func DeleteFile(f *models.File) error {
-	if f.Name == "" {
+	if f.Name.String == "" {
 		err := f.Fetch()
 		if err != nil {
 			if err == domain.ErrNotFound {
@@ -123,13 +123,13 @@ func DeleteFile(f *models.File) error {
 		return err
 	}
 
-	err = os.Remove(viper.GetString("files.static") + f.Name)
+	err = os.Remove(viper.GetString("files.static") + f.Name.String)
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	if len(f.Thumb) > 0 {
-		err := os.Remove(viper.GetString("files.static") + f.Thumb)
+	if len(f.Thumb.String) > 0 {
+		err := os.Remove(viper.GetString("files.static") + f.Thumb.String)
 		if err != nil && !os.IsNotExist(err) {
 			return err
 		}

@@ -12,7 +12,7 @@
                     <h2>Partners</h2>
                     {{range .Partners}}
                         {{if .URL}}<a href="{{.URL}}" target="_new">{{end}}
-                            <img src="/assets/{{.Brand}}" alt="{{.Name}}" />
+                            <img src="/assets/{{.Brand.Thumb.String}}" alt="{{.Name}}" />
                         {{if .URL}}</a>{{end}}
                     {{end}}
                 </div>
@@ -21,7 +21,7 @@
                 {{if .GalleryID}}
                 <hr />
                 <h2>Gallery</h2>
-                {{template "gallery-partial" .}}
+                {{template "gallery-partial" $.Gallery}}
                 {{end}}
         </div>
         <div class="sidebar">

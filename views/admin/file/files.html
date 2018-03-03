@@ -12,7 +12,7 @@
         <tbody>
             {{range .Files}}
             <tr>
-                <td><a href="/assets/{{.Name}}" target="_new">{{.Name}}</td>
+                <td><a href="/assets/{{.Name.String}}" target="_new">{{.Name.String}}</td>
                 <td>{{humanDate .Created}}</td>
                 <td class="text-right"><a href="/admin/file/{{.ID}}?remove">x</i></a></td>
             </tr>

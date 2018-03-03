@@ -28,6 +28,7 @@ type Trip struct {
 	GalleryID    int
 
 	Image    *File
+	Gallery  Gallery
 	Partners Vendors
 	Venues   Vendors
 

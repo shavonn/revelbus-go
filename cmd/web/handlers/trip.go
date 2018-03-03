@@ -66,7 +66,7 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if t.Image != nil {
-		f.Image = t.Image.Thumb
+		f.Image = t.Image.Thumb.String
 	}
 
 	view.Render(w, r, "admin-trip", &view.View{

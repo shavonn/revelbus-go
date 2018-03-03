@@ -48,7 +48,7 @@
             <tbody>
                 {{range .Images}}
                 <tr>
-                    <td><a href="/assets/{{.Name}}" target="_new">{{.Name}}</td>
+                    <td><a href="/assets/{{.Name.String}}" target="_new">{{.Name.String}}</td>
                     <td class="text-right"><a href="/admin/gallery/{{$.Gallery.ID}}?file={{.ID}}">x</i></a></td>
                 </tr>
                 {{end}}

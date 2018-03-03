@@ -53,7 +53,7 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if v.Brand != nil {
-		f.Brand = v.Brand.Thumb
+		f.Brand = v.Brand.Thumb.String
 	}
 
 	view.Render(w, r, "vendor", &view.View{

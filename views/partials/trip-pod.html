@@ -1,7 +1,7 @@
 {{define "trip-pod"}}
 <article class="trip-pod">
     <a href="/trip/{{.Slug}}">
-        <header style="background-image: url('/assets/uploads/trip/{{.Image}}')">
+        <header style="background-image: url('/assets/{{.Image.Thumb.String}}')">
             <div class="date">
                 <div class="month">{{getShortMonth .Start .End}}</div>
                 <div class="day">{{getDateRange .Start .End}}</div>
