@@ -14,7 +14,7 @@
             <tbody>
                 {{range .Venues}}
                 <tr>
-                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                    <td><a href="/admin/vendor?id={{.ID}}">{{.Name.String}}</a></td>
                     <td>
                         {{if .Primary}}
                             <a href="/admin/trip/{{$.Trip.ID}}?venue={{.ID}}&is_primary=0">primary</a>

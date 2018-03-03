@@ -11,17 +11,17 @@ import (
 
 type Vendor struct {
 	ID      int
-	Name    string
-	Address string
-	City    string
-	State   string
-	Zip     string
-	Phone   string
-	Email   string
-	URL     string
-	Notes   string
-	Active  bool
+	Name    sql.NullString
+	Address sql.NullString
+	City    sql.NullString
+	State   sql.NullString
+	Zip     sql.NullString
+	Phone   sql.NullString
+	Email   sql.NullString
+	URL     sql.NullString
+	Notes   sql.NullString
 	Primary bool
+	Active  bool
 	BrandID int
 
 	Brand *File

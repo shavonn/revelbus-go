@@ -34,7 +34,7 @@
                         <label for="vendors">Vendors</label>
                         <select class="form-control vendor-dropdown" name="vendor">
                             {{range $.Vendors}}
-                            <option value="{{.ID}}">{{.Name}}</option>
+                            <option value="{{.ID}}">{{.Name.String}}</option>
                             {{end}}
                         </select>
                     </div>
