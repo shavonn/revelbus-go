@@ -12,8 +12,8 @@
         <tbody>
             {{range .Users}}
             <tr>
-                <td><a href="/admin/user?id={{.ID}}">{{.Name}}</a></td>
-                <td>{{.Role}}</td>
+                <td><a href="/admin/user?id={{.ID}}">{{.Name.String}}</a></td>
+                <td>{{.Role.String}}</td>
                 <td class="text-right"><a href="/admin/user/{{.ID}}?remove">x</a></td>
             </tr>
             {{end}}

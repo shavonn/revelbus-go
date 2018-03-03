@@ -13,10 +13,10 @@ import (
 
 type User struct {
 	ID       int
-	Name     string
-	Email    string
-	Password string
-	Role     string
+	Name     sql.NullString
+	Email    sql.NullString
+	Password sql.NullString
+	Role     sql.NullString
 }
 
 type Users []*User
@@ -108,7 +108,7 @@ func (f *UserForm) ValidPassword() bool {
 func (u *User) Create() error {
 	conn, _ := database.GetConnection()
 
-	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password), viper.GetInt("cost"))
+	hp, err := bcrypt.GenerateFromPassword([]byte(u.Password.String), viper.GetInt("cost"))
 	if err != nil {
 		return err
 	}
