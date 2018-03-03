@@ -10,12 +10,12 @@
     </div>
     <div class="owl-carousel slider">
         {{range .Slides}}
-        <div class="slide {{.Style}}">
+        <div class="slide {{.Style.String}}">
             <div class="inner container">
-                <img src="/assets/images/chars/{{.Style}}.svg" />
+                <img src="/assets/images/chars/{{.Style.String}}.svg" />
                 <div class="caption">
-                    <h3>{{.Title}}</h3>
-                    <p>{{.Blurb}}</p>
+                    <h3>{{.Title.String}}</h3>
+                    <p>{{.Blurb.String}}</p>
                 </div>
             </div>
         </div>

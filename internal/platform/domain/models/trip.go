@@ -14,16 +14,16 @@ import (
 
 type Trip struct {
 	ID           int
-	Status       string
-	Slug         string
-	Title        string
-	Blurb        string
-	Description  string
+	Status       sql.NullString
+	Slug         sql.NullString
+	Title        sql.NullString
+	Blurb        sql.NullString
+	Description  sql.NullString
 	Start        time.Time
 	End          time.Time
-	Price        string
-	TicketingURL string
-	Notes        string
+	Price        sql.NullString
+	TicketingURL sql.NullString
+	Notes        sql.NullString
 	ImageID      int
 	GalleryID    int
 
@@ -74,10 +74,15 @@ func (f *TripForm) Valid() bool {
 func (t *Trip) Create() error {
 	conn, _ := database.GetConnection()
 
-	slug := domain.GetSlug(t.Title, "trips")
+	if t.Slug.String == "" {
+		t.Slug = sql.NullString{
+			String: domain.GetSlug(t.Title.String, "trips"),
+			Valid:  true,
+		}
+	}
 
 	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, gallery_id, image_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-	result, err := conn.Exec(stmt, t.Title, slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.GalleryID, t.ImageID)
+	result, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.GalleryID, t.ImageID)
 	if err != nil {
 		return err
 	}
@@ -135,8 +140,11 @@ func FindBySlug(s string) (*Trip, error) {
 func (t *Trip) Update() error {
 	conn, _ := database.GetConnection()
 
-	if t.Slug == "" {
-		t.Slug = domain.GetSlug(t.Title, "trips")
+	if t.Slug.String == "" {
+		t.Slug = sql.NullString{
+			String: domain.GetSlug(t.Title.String, "trips"),
+			Valid:  true,
+		}
 	}
 
 	stmt := `UPDATE trips SET title = ?, slug = ?, status = ?, blurb = ?, description = ?, start = ?, end = ?, price = ?, ticketing_url = ?, notes = ?, image_id = ?, gallery_id = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`

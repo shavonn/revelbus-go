@@ -13,9 +13,9 @@
         <tbody>
             {{range .Slides}}
             <tr>
-                <td><a href="/admin/slide?id={{.ID}}">{{.Title}}</a></td>
+                <td><a href="/admin/slide?id={{.ID}}">{{.Title.String}}</a></td>
                 <td>{{.Active}}</td>
-                <td>{{.Order}}</td>
+                <td>{{.Order.Int64}}</td>
                 <td class="text-right"><a href="/admin/slide/{{.ID}}?remove">x</i></a></td>
             </tr>
             {{end}}

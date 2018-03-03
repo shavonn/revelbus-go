@@ -40,9 +40,9 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.SettingsForm{
 		ID:                strconv.Itoa(s.ID),
-		ContactBlurb:      s.ContactBlurb,
-		AboutBlurb:        s.AboutBlurb,
-		AboutContent:      s.AboutContent,
+		ContactBlurb:      s.ContactBlurb.String,
+		AboutBlurb:        s.AboutBlurb.String,
+		AboutContent:      s.AboutContent.String,
 		HomeGallery:       s.HomeGallery,
 		HomeGalleryActive: s.HomeGalleryActive,
 	}
@@ -82,9 +82,9 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 
 	s := models.Settings{
 		ID:                utils.ToInt(f.ID),
-		ContactBlurb:      f.ContactBlurb,
-		AboutBlurb:        f.AboutBlurb,
-		AboutContent:      f.AboutContent,
+		ContactBlurb:      utils.NewNullStr(f.ContactBlurb),
+		AboutBlurb:        utils.NewNullStr(f.AboutBlurb),
+		AboutContent:      utils.NewNullStr(f.AboutContent),
 		HomeGallery:       f.HomeGallery,
 		HomeGalleryActive: f.HomeGalleryActive,
 	}

@@ -16,10 +16,10 @@
             {{range .Trips}}
             <tr>
                 <td>{{.ID}}</td>
-                <td><a href="/admin/trip?id={{.ID}}">{{.Title}}</a></td>
+                <td><a href="/admin/trip?id={{.ID}}">{{.Title.String}}</a></td>
                 <td>{{humanDate .Start}}</td>
                 <td>{{humanDate .End}}</td>
-                <td>{{.Status}}</td>
+                <td>{{.Status.String}}</td>
                 <td class="text-right"><a href="/admin/trip/{{.ID}}?remove">x</a></td>
             </tr>
             {{end}}

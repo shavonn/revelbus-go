@@ -3,7 +3,7 @@
 {{with .Trip}}
     <main class="page with-sidebar trip container">
         <div class="content">
-                <h3 class="blurb">{{.Blurb}}</h3>
+                <h3 class="blurb">{{.Blurb.String}}</h3>
                 {{$.Content}}
 
                 {{if .Partners}}

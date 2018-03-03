@@ -10,11 +10,11 @@ import (
 
 type Slide struct {
 	ID     int
-	Title  string
-	Blurb  string
-	Style  string
+	Title  sql.NullString
+	Blurb  sql.NullString
+	Style  sql.NullString
+	Order  sql.NullInt64
 	Active bool
-	Order  int
 }
 
 type Slides []*Slide
@@ -24,8 +24,8 @@ type SlideForm struct {
 	Title  string
 	Blurb  string
 	Style  string
+	Order  string
 	Active bool
-	Order  int
 	Errors map[string]string
 }
 
@@ -35,6 +35,7 @@ func (f *SlideForm) Valid() bool {
 	v.Required("Title", f.Title)
 	v.Required("Blurb", f.Blurb)
 	v.Required("Style", f.Style)
+	v.ValidInt("Order", f.Order)
 
 	f.Errors = v.Errors
 	return len(f.Errors) == 0

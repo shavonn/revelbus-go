@@ -1,6 +1,6 @@
 {{define "trip-pod"}}
 <article class="trip-pod">
-    <a href="/trip/{{.Slug}}">
+    <a href="/trip/{{.Slug.String}}">
         <header style="background-image: url('/assets/{{.Image.Thumb.String}}')">
             <div class="date">
                 <div class="month">{{getShortMonth .Start .End}}</div>
@@ -9,8 +9,8 @@
         </header>
     </a>
     <div class="info">
-        <h3><a href="/trip/{{.Slug}}">{{.Title}}</a></h3>
-        <p>{{blurb .Blurb}}...</p>
+        <h3><a href="/trip/{{.Slug.String}}">{{.Title.String}}</a></h3>
+        <p>{{blurb .Blurb.String}}...</p>
     </div>
 </article>
 {{end}}

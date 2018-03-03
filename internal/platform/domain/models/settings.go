@@ -10,9 +10,9 @@ import (
 
 type Settings struct {
 	ID                int
-	ContactBlurb      string
-	AboutBlurb        string
-	AboutContent      string
+	ContactBlurb      sql.NullString
+	AboutBlurb        sql.NullString
+	AboutContent      sql.NullString
 	HomeGallery       int
 	HomeGalleryActive bool
 }

@@ -65,13 +65,13 @@ func tripToVEvent(t *models.Trip) *vEvent {
 		dtStamp:     time.Now(),
 		dtStart:     t.Start,
 		dtEnd:       t.End,
-		summary:     t.Title,
+		summary:     t.Title.String,
 		location:    address,
-		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug,
+		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug.String,
 		tzID:        "EDST",
 		allDay:      false,
 
-		slug: t.Slug,
+		slug: t.Slug.String,
 	}
 }
 
