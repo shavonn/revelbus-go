@@ -3,6 +3,7 @@ package forms
 import (
 	"net/url"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -64,6 +65,14 @@ func (v *validator) ValidURL(k string, i string) {
 	if i != "" {
 		if _, err := url.ParseRequestURI(i); err != nil {
 			v.Errors[k] = "Please enter a valid URL."
+		}
+	}
+}
+
+func (v *validator) ValidInt(k string, i string) {
+	if i != "" {
+		if _, err := strconv.Atoi(i); err != nil {
+			v.Errors[k] = "Please enter a valid number."
 		}
 	}
 }

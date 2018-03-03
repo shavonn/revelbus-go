@@ -7,8 +7,8 @@
         <ul>
             {{range $questions}}
             <li>
-                <h3>{{.Question}}</h3>
-                <p>{{.Answer}}</p>
+                <h3>{{.Question.String}}</h3>
+                <p>{{.Answer.String}}</p>
             </li>
             {{end}}
         </ul>
