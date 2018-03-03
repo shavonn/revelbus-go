@@ -13,8 +13,8 @@ import (
 
 type Gallery struct {
 	ID     int
-	Name   string
-	Folder string
+	Name   sql.NullString
+	Folder sql.NullString
 	Images Files
 }
 
@@ -39,8 +39,11 @@ func (f *GalleryForm) Valid() bool {
 func (g *Gallery) Create() error {
 	conn, _ := database.GetConnection()
 
-	if g.Folder == "" {
-		g.Folder = slug.Make(g.Name)
+	if g.Folder.String == "" {
+		g.Folder = sql.NullString{
+			String: slug.Make(g.Name.String),
+			Valid:  true,
+		}
 	}
 
 	stmt := `INSERT INTO galleries (name, folder, created_at, updated_at) VALUES(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
@@ -75,8 +78,11 @@ func (g *Gallery) Fetch() error {
 func (g *Gallery) Update() error {
 	conn, _ := database.GetConnection()
 
-	if g.Folder == "" {
-		g.Folder = slug.Make(g.Name)
+	if g.Folder.String == "" {
+		g.Folder = sql.NullString{
+			String: slug.Make(g.Name.String),
+			Valid:  true,
+		}
 	}
 
 	stmt := `UPDATE galleries SET name = ?, updated_at = UTC_TIMESTAMP() WHERE id = ?`
