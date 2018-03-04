@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
@@ -48,7 +49,7 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 		Email:   v.Email.String,
 		URL:     v.URL.String,
 		Notes:   v.Notes.String,
-		BrandID: v.BrandID,
+		BrandID: int(v.BrandID.Int64),
 		Active:  v.Active,
 	}
 
@@ -109,8 +110,13 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 		Email:   utils.NewNullStr(f.Email),
 		URL:     utils.NewNullStr(f.URL),
 		Notes:   utils.NewNullStr(f.Notes),
-		BrandID: f.BrandID,
 		Active:  f.Active,
+	}
+
+	if f.BrandID != 0 {
+		v.BrandID = utils.NewNullInt(strconv.Itoa(f.BrandID))
+	} else {
+		v.BrandID = sql.NullInt64{}
 	}
 
 	image, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor", true)
@@ -120,8 +126,8 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		v.BrandID = image[0].ID
-	} else if (f.BrandID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		v.BrandID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+	} else if (f.BrandID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.BrandID,
 		}
@@ -132,7 +138,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		v.BrandID = 0
+		v.BrandID = sql.NullInt64{}
 	}
 
 	if v.ID != 0 {
@@ -197,9 +203,9 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if v.BrandID != 0 {
+	if int(v.BrandID.Int64) != 0 {
 		image := &models.File{
-			ID: v.BrandID,
+			ID: int(v.BrandID.Int64),
 		}
 
 		err = utils.DeleteFile(image)

@@ -15,6 +15,7 @@ type Gallery struct {
 	ID     int
 	Name   sql.NullString
 	Folder sql.NullString
+
 	Images Files
 }
 
@@ -24,6 +25,7 @@ type GalleryForm struct {
 	ID     string
 	Name   string
 	Folder string
+
 	Errors map[string]string
 }
 

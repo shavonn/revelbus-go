@@ -22,7 +22,8 @@ type Vendor struct {
 	Notes   sql.NullString
 	Primary bool
 	Active  bool
-	BrandID int
+
+	BrandID sql.NullInt64
 
 	Brand *File
 }
@@ -43,7 +44,8 @@ type VendorForm struct {
 	BrandID int
 	Active  bool
 	Brand   string
-	Errors  map[string]string
+
+	Errors map[string]string
 }
 
 func (f *VendorForm) Valid() bool {

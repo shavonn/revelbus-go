@@ -25,7 +25,7 @@
                     <select class="form-control gallery-dropdown" name="home_gallery">
                         <option value=""></option>
                         {{range $.Galleries}}
-                        <option value="{{.ID}}"{{if eq $.Form.HomeGallery .ID}} selected{{end}}>{{.Name.String}}</option>
+                        <option value="{{.ID}}"{{if eq $.Form.HomeGalleryID .ID}} selected{{end}}>{{.Name.String}}</option>
                         {{end}}
                     </select>
                 </div>

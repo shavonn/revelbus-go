@@ -30,7 +30,8 @@ type UserForm struct {
 	ConfirmPassword string
 	Role            string
 	RecoveryHash    string
-	Errors          map[string]string
+
+	Errors map[string]string
 }
 
 func (f *UserForm) Valid() bool {

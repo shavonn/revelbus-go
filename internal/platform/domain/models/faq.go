@@ -27,7 +27,8 @@ type FAQForm struct {
 	Category string
 	Order    string
 	Active   bool
-	Errors   map[string]string
+
+	Errors map[string]string
 }
 
 func (f *FAQForm) Valid() bool {

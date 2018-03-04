@@ -43,9 +43,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Slides:    slides,
 	}
 
-	if s.HomeGalleryActive && s.HomeGallery != 0 {
+	if s.HomeGalleryActive && int(s.HomeGalleryID.Int64) != 0 {
 		g := &models.Gallery{
-			ID: s.HomeGallery,
+			ID: int(s.HomeGalleryID.Int64),
 		}
 
 		err = g.Fetch()
@@ -176,20 +176,6 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 		Trip:      t,
 		Trips:     trips,
 		Content:   template.HTML(t.Description.String),
-	}
-
-	if t.GalleryID != 0 {
-		g := &models.Gallery{
-			ID: t.GalleryID,
-		}
-
-		err = g.Fetch()
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
-
-		v.Gallery = g
 	}
 
 	view.Render(w, r, "trip", v)

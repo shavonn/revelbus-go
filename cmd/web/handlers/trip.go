@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
@@ -61,8 +62,8 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 		Price:        t.Price.String,
 		TicketingURL: t.TicketingURL.String,
 		Notes:        t.Notes.String,
-		ImageID:      t.ImageID,
-		GalleryID:    t.GalleryID,
+		ImageID:      int(t.ImageID.Int64),
+		GalleryID:    int(t.GalleryID.Int64),
 	}
 
 	if t.Image != nil {
@@ -127,8 +128,18 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 		TicketingURL: utils.NewNullStr(f.TicketingURL),
 		Price:        utils.NewNullStr(f.Price),
 		Notes:        utils.NewNullStr(f.Notes),
-		ImageID:      f.ImageID,
-		GalleryID:    f.GalleryID,
+	}
+
+	if f.ImageID != 0 {
+		t.ImageID = utils.NewNullInt(strconv.Itoa(f.ImageID))
+	} else {
+		t.ImageID = sql.NullInt64{}
+	}
+
+	if f.GalleryID != 0 {
+		t.GalleryID = utils.NewNullInt(strconv.Itoa(f.GalleryID))
+	} else {
+		t.GalleryID = sql.NullInt64{}
 	}
 
 	image, err := utils.UploadFile(w, r, "trip_image", "uploads/trip", true)
@@ -138,8 +149,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		t.ImageID = image[0].ID
-	} else if (f.ImageID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		t.ImageID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+	} else if (f.ImageID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.ImageID,
 		}
@@ -150,7 +161,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		t.ImageID = 0
+		t.ImageID = sql.NullInt64{}
 	}
 
 	if t.ID != 0 {
@@ -216,9 +227,9 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if t.ImageID != 0 {
+	if int(t.ImageID.Int64) != 0 {
 		image := &models.File{
-			ID: t.ImageID,
+			ID: int(t.ImageID.Int64),
 		}
 
 		err = utils.DeleteFile(image)

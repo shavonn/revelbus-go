@@ -27,13 +27,18 @@ func UploadFile(w http.ResponseWriter, r *http.Request, fieldName string, folder
 	}
 
 	m := r.MultipartForm
+
+	files := m.File[fieldName]
+	if len(files) == 1 && files[0].Size == 0 {
+		return uploaded, nil
+	}
+
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		os.Mkdir(uploadDir, 0777)
 	} else if err != nil {
 		return uploaded, err
 	}
 
-	files := m.File[fieldName]
 	for i := range files {
 		file, err := files[i].Open()
 		if err != nil {

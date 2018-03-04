@@ -24,11 +24,12 @@ type Trip struct {
 	Price        sql.NullString
 	TicketingURL sql.NullString
 	Notes        sql.NullString
-	ImageID      int
-	GalleryID    int
+
+	ImageID   sql.NullInt64
+	GalleryID sql.NullInt64
 
 	Image    *File
-	Gallery  Gallery
+	Gallery  *Gallery
 	Partners Vendors
 	Venues   Vendors
 
@@ -53,8 +54,10 @@ type TripForm struct {
 	Notes        string
 	ImageID      int
 	GalleryID    int
-	Image        string
-	Errors       map[string]string
+
+	Image string
+
+	Errors map[string]string
 }
 
 func (f *TripForm) Valid() bool {
@@ -81,7 +84,7 @@ func (t *Trip) Create() error {
 		}
 	}
 
-	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, gallery_id, image_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+	stmt := `INSERT INTO trips (title, slug, status, blurb, description, start, end, price, ticketing_url, notes, gallery_id, image_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`
 	result, err := conn.Exec(stmt, t.Title, t.Slug, t.Status, t.Blurb, t.Description, t.Start, t.End, t.Price, t.TicketingURL, t.Notes, t.GalleryID, t.ImageID)
 	if err != nil {
 		return err
@@ -129,6 +132,11 @@ func FindBySlug(s string) (*Trip, error) {
 	}
 
 	err = t.GetImage()
+	if err != nil {
+		return nil, err
+	}
+
+	err = t.GetGallery()
 	if err != nil {
 		return nil, err
 	}
@@ -359,6 +367,22 @@ func (t *Trip) GetImage() error {
 
 	t.Image = f
 
+	return nil
+}
+
+func (t *Trip) GetGallery() error {
+	if int(t.GalleryID.Int64) != 0 {
+		g := &Gallery{
+			ID: int(t.GalleryID.Int64),
+		}
+
+		err := g.Fetch()
+		if err != nil {
+			return err
+		}
+
+		t.Gallery = g
+	}
 	return nil
 }
 

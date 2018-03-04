@@ -26,6 +26,7 @@ type SlideForm struct {
 	Style  string
 	Order  string
 	Active bool
+
 	Errors map[string]string
 }
 
