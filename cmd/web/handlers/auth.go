@@ -42,10 +42,10 @@ func PostSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := models.User{
-		Name:     f.Name,
-		Email:    f.Email,
-		Password: f.Password,
-		Role:     f.Role,
+		Name:     utils.NewNullStr(f.Name),
+		Email:    utils.NewNullStr(f.Email),
+		Password: utils.NewNullStr(f.Password),
+		Role:     utils.NewNullStr(f.Role),
 	}
 
 	err = u.Create()
@@ -98,7 +98,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := &models.User{
-		Email: f.Email,
+		Email: utils.NewNullStr(f.Email),
 	}
 
 	err = u.VerifyUser(f.Password)
@@ -166,7 +166,7 @@ func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := models.User{
-		Email: f.Email,
+		Email: utils.NewNullStr(f.Email),
 	}
 
 	err = u.Fetch()
@@ -179,7 +179,7 @@ func PostForgotPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		emails.RecoverAccount(u.Email, rh)
+		emails.RecoverAccount(u.Email.String, rh)
 	}
 
 	err = flash.Add(w, r, utils.MsgRecoverySent, "success")
@@ -207,7 +207,7 @@ func ResetPasswordForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := &models.User{
-		Email: email,
+		Email: utils.NewNullStr(email),
 	}
 
 	err := u.CheckRecover(hash)
@@ -252,7 +252,7 @@ func PostPasswordReset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := &models.User{
-		Email: f.Email,
+		Email: utils.NewNullStr(f.Email),
 	}
 
 	err = u.Recover(f.RecoveryHash, f.Password)

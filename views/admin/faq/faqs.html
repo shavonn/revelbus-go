@@ -13,9 +13,9 @@
         <tbody>
             {{range .FAQs}}
             <tr>
-                <td><a href="/admin/faq?id={{.ID}}">{{.Question}}</a></td>
+                <td><a href="/admin/faq?id={{.ID}}">{{.Question.String}}</a></td>
                 <td>{{.Active}}</td>
-                <td>{{.Order}}</td>
+                <td>{{.Order.Int64}}</td>
                 <td class="text-right"><a href="/admin/faq/{{.ID}}?remove">x</i></a></td>
             </tr>
             {{end}}

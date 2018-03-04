@@ -39,15 +39,15 @@ func SlideForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.SlideForm{
 		ID:     strconv.Itoa(s.ID),
-		Title:  s.Title,
-		Blurb:  s.Blurb,
-		Style:  s.Style,
-		Order:  s.Order,
+		Title:  s.Title.String,
+		Blurb:  s.Blurb.String,
+		Style:  s.Style.String,
+		Order:  strconv.FormatInt(s.Order.Int64, 10),
 		Active: s.Active,
 	}
 
 	view.Render(w, r, "slide", &view.View{
-		Title: s.Title,
+		Title: s.Title.String,
 		Form:  f,
 	})
 }
@@ -64,7 +64,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Title:  r.PostForm.Get("title"),
 		Blurb:  r.PostForm.Get("blurb"),
 		Style:  r.PostForm.Get("style"),
-		Order:  utils.ToInt(r.PostForm.Get("order")),
+		Order:  r.PostForm.Get("order"),
 		Active: (len(r.Form["active"]) == 1),
 	}
 
@@ -84,10 +84,10 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 
 	s := models.Slide{
 		ID:     utils.ToInt(f.ID),
-		Title:  f.Title,
-		Blurb:  f.Blurb,
-		Style:  f.Style,
-		Order:  f.Order,
+		Title:  utils.NewNullStr(f.Title),
+		Blurb:  utils.NewNullStr(f.Blurb),
+		Style:  utils.NewNullStr(f.Style),
+		Order:  utils.NewNullInt(f.Order),
 		Active: f.Active,
 	}
 

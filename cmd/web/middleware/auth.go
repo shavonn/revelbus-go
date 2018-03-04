@@ -43,7 +43,7 @@ func RequireAdmin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 
 		http.Redirect(w, r, "/auth/login", 302)
 		return
-	} else if u.Role != "admin" {
+	} else if u.Role.String != "admin" {
 		err = flash.Add(w, r, utils.MsgMustBeAdmin, "warning")
 		if err != nil {
 			view.ServerError(w, r, err)

@@ -11,7 +11,7 @@
         <tbody>
             {{range .Galleries}}
             <tr>
-                <td><a href="/admin/gallery?id={{.ID}}">{{.Name}}</a></td>
+                <td><a href="/admin/gallery?id={{.ID}}">{{.Name.String}}</a></td>
                 <td class="text-right"><a href="/admin/gallery/{{.ID}}?remove">x</i></a></td>
             </tr>
             {{end}}

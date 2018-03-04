@@ -40,10 +40,10 @@ func SettingsForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.SettingsForm{
 		ID:                strconv.Itoa(s.ID),
-		ContactBlurb:      s.ContactBlurb,
-		AboutBlurb:        s.AboutBlurb,
-		AboutContent:      s.AboutContent,
-		HomeGallery:       s.HomeGallery,
+		ContactBlurb:      s.ContactBlurb.String,
+		AboutBlurb:        s.AboutBlurb.String,
+		AboutContent:      s.AboutContent.String,
+		HomeGalleryID:     int(s.HomeGalleryID.Int64),
 		HomeGalleryActive: s.HomeGalleryActive,
 	}
 
@@ -66,7 +66,7 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 		ContactBlurb:      r.PostForm.Get("contact_blurb"),
 		AboutBlurb:        r.PostForm.Get("about_blurb"),
 		AboutContent:      r.PostForm.Get("about_content"),
-		HomeGallery:       utils.ToInt(r.PostForm.Get("home_gallery")),
+		HomeGalleryID:     utils.ToInt(r.PostForm.Get("home_gallery")),
 		HomeGalleryActive: (len(r.Form["home_gallery_active"]) == 1),
 	}
 
@@ -82,10 +82,10 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 
 	s := models.Settings{
 		ID:                utils.ToInt(f.ID),
-		ContactBlurb:      f.ContactBlurb,
-		AboutBlurb:        f.AboutBlurb,
-		AboutContent:      f.AboutContent,
-		HomeGallery:       f.HomeGallery,
+		ContactBlurb:      utils.NewNullStr(f.ContactBlurb),
+		AboutBlurb:        utils.NewNullStr(f.AboutBlurb),
+		AboutContent:      utils.NewNullStr(f.AboutContent),
+		HomeGalleryID:     utils.NewNullInt(strconv.Itoa(f.HomeGalleryID)),
 		HomeGalleryActive: f.HomeGalleryActive,
 	}
 

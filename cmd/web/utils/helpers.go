@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"math/rand"
 	"strconv"
 	"time"
@@ -22,4 +23,23 @@ func RandomString(strlen int) string {
 		result[i] = chars[seededRand.Intn(len(chars))]
 	}
 	return string(result)
+}
+
+func NewNullStr(s string) sql.NullString {
+	if len(s) == 0 {
+		return sql.NullString{}
+	}
+
+	return sql.NullString{
+		String: s,
+		Valid:  true,
+	}
+}
+
+func NewNullInt(i string) sql.NullInt64 {
+	n, _ := strconv.ParseInt(i, 10, 64)
+	return sql.NullInt64{
+		Int64: n,
+		Valid: true,
+	}
 }

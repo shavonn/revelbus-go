@@ -3,7 +3,7 @@
 {{with .Trip}}
     <main class="page with-sidebar trip container">
         <div class="content">
-                <h3 class="blurb">{{.Blurb}}</h3>
+                <h3 class="blurb">{{.Blurb.String}}</h3>
                 {{$.Content}}
 
                 {{if .Partners}}
@@ -12,7 +12,7 @@
                     <h2>Partners</h2>
                     {{range .Partners}}
                         {{if .URL}}<a href="{{.URL}}" target="_new">{{end}}
-                            <img src="/assets/{{.Brand}}" alt="{{.Name}}" />
+                            <img src="/assets/{{.Brand.Thumb.String}}" alt="{{.Name.String}}" />
                         {{if .URL}}</a>{{end}}
                     {{end}}
                 </div>
@@ -21,7 +21,7 @@
                 {{if .GalleryID}}
                 <hr />
                 <h2>Gallery</h2>
-                {{template "gallery-partial" .}}
+                {{template "gallery-partial" .Gallery}}
                 {{end}}
         </div>
         <div class="sidebar">
@@ -44,10 +44,10 @@
                 <h3 class="with-icon locale">LOCATION</h3>
                 {{range .Venues}}
                     {{if .Primary}}
-                    {{.Name}}<br />
-                    {{.Address}}<br />
-                    {{.City}}, {{.State}} {{.Zip}}<br />
-                    {{.Phone}}<br />
+                    {{.Name.String}}<br />
+                    {{.Address.String}}<br />
+                    {{.City.String}}, {{.State.String}} {{.Zip.String}}<br />
+                    {{.Phone.String}}<br />
                     {{end}}
                 {{end}}
             </div>

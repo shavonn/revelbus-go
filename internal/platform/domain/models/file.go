@@ -11,8 +11,8 @@ import (
 
 type File struct {
 	ID      int
-	Name    string
-	Thumb   string
+	Name    sql.NullString
+	Thumb   sql.NullString
 	Created time.Time
 }
 

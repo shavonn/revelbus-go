@@ -40,9 +40,9 @@ func UserForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.UserForm{
 		ID:    id,
-		Name:  u.Name,
-		Email: u.Email,
-		Role:  u.Role,
+		Name:  u.Name.String,
+		Email: u.Email.String,
+		Role:  u.Role.String,
 	}
 
 	view.Render(w, r, "user", &view.View{
@@ -81,9 +81,9 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 
 	u := models.User{
 		ID:    utils.ToInt(f.ID),
-		Name:  f.Name,
-		Email: f.Email,
-		Role:  f.Role,
+		Name:  utils.NewNullStr(f.Name),
+		Email: utils.NewNullStr(f.Email),
+		Role:  utils.NewNullStr(f.Role),
 	}
 
 	if u.ID != 0 {
@@ -106,13 +106,13 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			emails.NewPassword(u.Email, pw)
+			emails.NewPassword(u.Email.String, pw)
 		}
 
 		msg = utils.MsgSuccessfullyUpdated
 	} else {
 		pw := utils.RandomString(14)
-		u.Password = pw
+		u.Password = utils.NewNullStr(pw)
 
 		err := u.Create()
 		if err != nil {
@@ -120,7 +120,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		emails.NewPassword(u.Email, pw)
+		emails.NewPassword(u.Email.String, pw)
 		msg = utils.MsgSuccessfullyCreated
 	}
 

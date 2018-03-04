@@ -11,18 +11,19 @@ import (
 
 type Vendor struct {
 	ID      int
-	Name    string
-	Address string
-	City    string
-	State   string
-	Zip     string
-	Phone   string
-	Email   string
-	URL     string
-	Notes   string
-	Active  bool
+	Name    sql.NullString
+	Address sql.NullString
+	City    sql.NullString
+	State   sql.NullString
+	Zip     sql.NullString
+	Phone   sql.NullString
+	Email   sql.NullString
+	URL     sql.NullString
+	Notes   sql.NullString
 	Primary bool
-	BrandID int
+	Active  bool
+
+	BrandID sql.NullInt64
 
 	Brand *File
 }
@@ -43,7 +44,8 @@ type VendorForm struct {
 	BrandID int
 	Active  bool
 	Brand   string
-	Errors  map[string]string
+
+	Errors map[string]string
 }
 
 func (f *VendorForm) Valid() bool {

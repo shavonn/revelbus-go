@@ -37,16 +37,16 @@
             <div class="banner trip" style="background-image: url('/assets/{{.Image}}');">
                 <div class="container">
 					<div class="details">
-						<h2>{{.Title}}</h2>
+						<h2>{{.Title.String}}</h2>
 						<div class="info">
 							<div class="date">
 								<div class="month">{{getShortMonth .Start .End}}</div>
 								<div class="day">{{getDateRange .Start .End}}</div>
 							</div>
 							<div class="price-ticket">
-								<div class="price">{{.Price}}</div>
-								{{if .TicketingURL}}
-									<a href="{{.TicketingURL}}" class="btn">Buy Tickets</a>
+								<div class="price">{{.Price.String}}</div>
+								{{if .TicketingURL.String}}
+									<a href="{{.TicketingURL.String}}" class="btn">Buy Tickets</a>
 								{{else}}
 									<span class="btn">Tickets Coming Soon!</span>
 								{{end}}

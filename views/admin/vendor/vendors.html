@@ -12,7 +12,7 @@
         <tbody>
             {{range .Vendors}}
             <tr>
-                <td><a href="/admin/vendor?id={{.ID}}">{{.Name}}</a></td>
+                <td><a href="/admin/vendor?id={{.ID}}">{{.Name.String}}</a></td>
                 <td>{{.Active}}</td>
                 <td class="text-right"><a href="/admin/vendor/{{.ID}}?remove">x</i></a></td>
             </tr>

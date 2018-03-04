@@ -43,9 +43,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Slides:    slides,
 	}
 
-	if s.HomeGalleryActive && s.HomeGallery != 0 {
+	if s.HomeGalleryActive && int(s.HomeGalleryID.Int64) != 0 {
 		g := &models.Gallery{
-			ID: s.HomeGallery,
+			ID: int(s.HomeGalleryID.Int64),
 		}
 
 		err = g.Fetch()
@@ -74,8 +74,8 @@ func About(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "about", &view.View{
 		ActiveKey: "about",
 		Title:     "About",
-		Blurb:     s.AboutBlurb,
-		Content:   template.HTML(s.AboutContent),
+		Blurb:     s.AboutBlurb.String,
+		Content:   template.HTML(s.AboutContent.String),
 	})
 }
 
@@ -93,7 +93,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 	view.Render(w, r, "contact", &view.View{
 		ActiveKey: "contact",
 		Title:     "Contact",
-		Blurb:     s.ContactBlurb,
+		Blurb:     s.ContactBlurb.String,
 	})
 }
 
@@ -172,24 +172,10 @@ func Trip(w http.ResponseWriter, r *http.Request) {
 
 	v := &view.View{
 		ActiveKey: "trip",
-		Title:     t.Title,
+		Title:     t.Title.String,
 		Trip:      t,
 		Trips:     trips,
-		Content:   template.HTML(t.Description),
-	}
-
-	if t.GalleryID != 0 {
-		g := &models.Gallery{
-			ID: t.GalleryID,
-		}
-
-		err = g.Fetch()
-		if err != nil {
-			view.ServerError(w, r, err)
-			return
-		}
-
-		v.Gallery = g
+		Content:   template.HTML(t.Description.String),
 	}
 
 	view.Render(w, r, "trip", v)

@@ -50,13 +50,14 @@ func tripToVEvent(t *models.Trip) *vEvent {
 	if len(t.Venues) > 0 {
 		for _, v := range t.Venues {
 			if v.Primary {
-				address = v.Name + ", " + v.Address + ", " + v.City + ", " + v.State + ", " + v.Zip
+				address = v.Name.String + ", " + v.Address.String + ", " + v.City.String + ", " + v.State.String + ", " + v.Zip.String
+				break
 			}
 		}
 
 		if address == "" {
 			v := t.Venues[0]
-			address = v.Name + ", " + v.Address + ", " + v.City + ", " + v.State + ", " + v.Zip
+			address = v.Name.String + ", " + v.Address.String + ", " + v.City.String + ", " + v.State.String + ", " + v.Zip.String
 		}
 	}
 
@@ -65,13 +66,13 @@ func tripToVEvent(t *models.Trip) *vEvent {
 		dtStamp:     time.Now(),
 		dtStart:     t.Start,
 		dtEnd:       t.End,
-		summary:     t.Title,
+		summary:     t.Title.String,
 		location:    address,
-		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug,
+		description: "For details, visit: http://www.revelbus.com/trip/" + t.Slug.String,
 		tzID:        "EDST",
 		allDay:      false,
 
-		slug: t.Slug,
+		slug: t.Slug.String,
 	}
 }
 

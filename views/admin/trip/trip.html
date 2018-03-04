@@ -67,8 +67,10 @@
             <label for="gallery">Gallery</label>
             <select class="form-control gallery-dropdown" name="gallery_id">
                 <option value=""></option>
+                {{if $.Galleries}}
                 {{range $.Galleries}}
-                <option value="{{.ID}}"{{if eq $.Form.GalleryID .ID}} selected{{end}}>{{.Name}}</option>
+                <option value="{{.ID}}"{{if eq $.Form.GalleryID .ID}} selected{{end}}>{{.Name.String}}</option>
+                {{end}}
                 {{end}}
             </select>
         </div>

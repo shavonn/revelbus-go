@@ -39,12 +39,12 @@ func GalleryForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.GalleryForm{
 		ID:     strconv.Itoa(g.ID),
-		Name:   g.Name,
-		Folder: g.Folder,
+		Name:   g.Name.String,
+		Folder: g.Folder.String,
 	}
 
 	view.Render(w, r, "gallery", &view.View{
-		Title:   g.Name,
+		Title:   g.Name.String,
 		Form:    f,
 		Gallery: g,
 	})
@@ -79,7 +79,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 
 	g := models.Gallery{
 		ID:   utils.ToInt(f.ID),
-		Name: f.Name,
+		Name: utils.NewNullStr(f.Name),
 	}
 
 	if g.ID != 0 {
@@ -93,7 +93,7 @@ func PostGallery(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+g.Folder, true)
+		uploads, err := utils.UploadFile(w, r, "files", "uploads/files/"+g.Folder.String, true)
 		if err != nil {
 			view.ServerError(w, r, err)
 			return
@@ -154,7 +154,7 @@ func RemoveGallery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = utils.DeleteFolder("uploads/files/" + g.Folder)
+	err = utils.DeleteFolder("uploads/files/" + g.Folder.String)
 	if err != nil {
 		view.ServerError(w, r, err)
 		return

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
@@ -39,21 +40,21 @@ func VendorForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.VendorForm{
 		ID:      strconv.Itoa(v.ID),
-		Name:    v.Name,
-		Address: v.Address,
-		City:    v.City,
-		State:   v.State,
-		Zip:     v.Zip,
-		Phone:   v.Phone,
-		Email:   v.Email,
-		URL:     v.URL,
-		Notes:   v.Notes,
-		BrandID: v.BrandID,
+		Name:    v.Name.String,
+		Address: v.Address.String,
+		City:    v.City.String,
+		State:   v.State.String,
+		Zip:     v.Zip.String,
+		Phone:   v.Phone.String,
+		Email:   v.Email.String,
+		URL:     v.URL.String,
+		Notes:   v.Notes.String,
+		BrandID: int(v.BrandID.Int64),
 		Active:  v.Active,
 	}
 
 	if v.Brand != nil {
-		f.Brand = v.Brand.Thumb
+		f.Brand = v.Brand.Thumb.String
 	}
 
 	view.Render(w, r, "vendor", &view.View{
@@ -100,17 +101,22 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 
 	v := models.Vendor{
 		ID:      utils.ToInt(f.ID),
-		Name:    f.Name,
-		Address: f.Address,
-		City:    f.City,
-		State:   f.State,
-		Zip:     f.Zip,
-		Phone:   f.Phone,
-		Email:   f.Email,
-		URL:     f.URL,
-		Notes:   f.Notes,
-		BrandID: f.BrandID,
+		Name:    utils.NewNullStr(f.Name),
+		Address: utils.NewNullStr(f.Address),
+		City:    utils.NewNullStr(f.City),
+		State:   utils.NewNullStr(f.State),
+		Zip:     utils.NewNullStr(f.Zip),
+		Phone:   utils.NewNullStr(f.Phone),
+		Email:   utils.NewNullStr(f.Email),
+		URL:     utils.NewNullStr(f.URL),
+		Notes:   utils.NewNullStr(f.Notes),
 		Active:  f.Active,
+	}
+
+	if f.BrandID != 0 {
+		v.BrandID = utils.NewNullInt(strconv.Itoa(f.BrandID))
+	} else {
+		v.BrandID = sql.NullInt64{}
 	}
 
 	image, err := utils.UploadFile(w, r, "brand_image", "uploads/vendor", true)
@@ -120,8 +126,8 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		v.BrandID = image[0].ID
-	} else if (f.BrandID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		v.BrandID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+	} else if (f.BrandID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.BrandID,
 		}
@@ -132,7 +138,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		v.BrandID = 0
+		v.BrandID = sql.NullInt64{}
 	}
 
 	if v.ID != 0 {
@@ -197,9 +203,9 @@ func RemoveVendor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if v.BrandID != 0 {
+	if int(v.BrandID.Int64) != 0 {
 		image := &models.File{
-			ID: v.BrandID,
+			ID: int(v.BrandID.Int64),
 		}
 
 		err = utils.DeleteFile(image)

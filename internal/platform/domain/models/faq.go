@@ -9,11 +9,11 @@ import (
 
 type FAQ struct {
 	ID       int
-	Question string
-	Answer   string
-	Category string
+	Question sql.NullString
+	Answer   sql.NullString
+	Category sql.NullString
+	Order    sql.NullInt64
 	Active   bool
-	Order    int
 }
 
 type FAQs []*FAQ
@@ -25,9 +25,10 @@ type FAQForm struct {
 	Question string
 	Answer   string
 	Category string
+	Order    string
 	Active   bool
-	Order    int
-	Errors   map[string]string
+
+	Errors map[string]string
 }
 
 func (f *FAQForm) Valid() bool {
@@ -35,6 +36,8 @@ func (f *FAQForm) Valid() bool {
 
 	v.Required("Question", f.Question)
 	v.Required("Answer", f.Answer)
+	v.Required("Category", f.Category)
+	v.ValidInt("Order", f.Order)
 
 	f.Errors = v.Errors
 	return len(f.Errors) == 0
@@ -137,7 +140,7 @@ func FindActiveFAQs() (*GroupedFAQs, error) {
 		if err != nil {
 			return nil, err
 		}
-		faqs[f.Category] = append(faqs[f.Category], f)
+		faqs[f.Category.String] = append(faqs[f.Category.String], f)
 	}
 
 	if err = rows.Err(); err != nil {

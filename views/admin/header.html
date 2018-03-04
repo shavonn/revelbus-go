@@ -31,7 +31,7 @@
                         {{else}}
                         <li class="nav-item"><a class="nav-link" href="/u">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="/admin">Admin Dashboard</a></li>
-                        {{if eq .Me.Role "admin"}}
+                        {{if eq .Me.Role.String "admin"}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarTrips" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Trips</a>
                             <div class="dropdown-menu" aria-labelledby="navbarTrips">
@@ -85,7 +85,7 @@
                         {{end}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{.Me.Name}}
+                            {{.Me.Name.String}}
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
                                 <a class="dropdown-item" href="/u/profile">Update Profile</a>

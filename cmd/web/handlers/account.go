@@ -21,8 +21,8 @@ func ProfileForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	f := &models.UserForm{
-		Name:  u.Name,
-		Email: u.Email,
+		Name:  u.Name.String,
+		Email: u.Email.String,
 	}
 
 	view.Render(w, r, "profile", &view.View{
@@ -71,8 +71,8 @@ func PostProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u.Name = f.Name
-	u.Email = f.Email
+	u.Name = utils.NewNullStr(f.Name)
+	u.Email = utils.NewNullStr(f.Email)
 
 	err = utils.SetUserSession(w, r, u)
 	if err != nil {

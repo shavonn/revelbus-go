@@ -39,10 +39,10 @@ func FaqForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.FAQForm{
 		ID:       strconv.Itoa(faq.ID),
-		Question: faq.Question,
-		Answer:   faq.Answer,
-		Category: faq.Category,
-		Order:    faq.Order,
+		Question: faq.Question.String,
+		Answer:   faq.Answer.String,
+		Category: faq.Category.String,
+		Order:    strconv.FormatInt(faq.Order.Int64, 10),
 		Active:   faq.Active,
 	}
 
@@ -64,7 +64,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Question: r.PostForm.Get("question"),
 		Category: r.PostForm.Get("category"),
 		Answer:   r.PostForm.Get("answer"),
-		Order:    utils.ToInt(r.PostForm.Get("order")),
+		Order:    r.PostForm.Get("order"),
 		Active:   (len(r.Form["active"]) == 1),
 	}
 
@@ -85,10 +85,10 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 
 	faq := models.FAQ{
 		ID:       utils.ToInt(f.ID),
-		Question: f.Question,
-		Answer:   f.Answer,
-		Category: f.Category,
-		Order:    f.Order,
+		Question: utils.NewNullStr(f.Question),
+		Answer:   utils.NewNullStr(f.Answer),
+		Category: utils.NewNullStr(f.Category),
+		Order:    utils.NewNullInt(f.Order),
 		Active:   f.Active,
 	}
 

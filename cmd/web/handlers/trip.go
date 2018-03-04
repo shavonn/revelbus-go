@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"revelforce/cmd/web/utils"
 	"revelforce/cmd/web/view"
@@ -51,22 +52,22 @@ func TripForm(w http.ResponseWriter, r *http.Request) {
 
 	f := &models.TripForm{
 		ID:           id,
-		Title:        t.Title,
-		Slug:         t.Slug,
-		Status:       t.Status,
-		Blurb:        t.Blurb,
-		Description:  t.Description,
+		Title:        t.Title.String,
+		Slug:         t.Slug.String,
+		Status:       t.Status.String,
+		Blurb:        t.Blurb.String,
+		Description:  t.Description.String,
 		Start:        t.Start.Format(domain.TimeFormat),
 		End:          t.End.Format(domain.TimeFormat),
-		Price:        t.Price,
-		TicketingURL: t.TicketingURL,
-		Notes:        t.Notes,
-		ImageID:      t.ImageID,
-		GalleryID:    t.GalleryID,
+		Price:        t.Price.String,
+		TicketingURL: t.TicketingURL.String,
+		Notes:        t.Notes.String,
+		ImageID:      int(t.ImageID.Int64),
+		GalleryID:    int(t.GalleryID.Int64),
 	}
 
 	if t.Image != nil {
-		f.Image = t.Image.Thumb
+		f.Image = t.Image.Thumb.String
 	}
 
 	view.Render(w, r, "admin-trip", &view.View{
@@ -117,18 +118,28 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 
 	t := models.Trip{
 		ID:           utils.ToInt(f.ID),
-		Title:        f.Title,
-		Slug:         f.Slug,
-		Status:       f.Status,
-		Blurb:        f.Blurb,
-		Description:  f.Description,
+		Title:        utils.NewNullStr(f.Title),
+		Slug:         utils.NewNullStr(f.Slug),
+		Status:       utils.NewNullStr(f.Status),
+		Blurb:        utils.NewNullStr(f.Blurb),
+		Description:  utils.NewNullStr(f.Description),
 		Start:        domain.ToTime(f.Start),
 		End:          domain.ToTime(f.End),
-		TicketingURL: f.TicketingURL,
-		Price:        f.Price,
-		Notes:        f.Notes,
-		ImageID:      f.ImageID,
-		GalleryID:    f.GalleryID,
+		TicketingURL: utils.NewNullStr(f.TicketingURL),
+		Price:        utils.NewNullStr(f.Price),
+		Notes:        utils.NewNullStr(f.Notes),
+	}
+
+	if f.ImageID != 0 {
+		t.ImageID = utils.NewNullInt(strconv.Itoa(f.ImageID))
+	} else {
+		t.ImageID = sql.NullInt64{}
+	}
+
+	if f.GalleryID != 0 {
+		t.GalleryID = utils.NewNullInt(strconv.Itoa(f.GalleryID))
+	} else {
+		t.GalleryID = sql.NullInt64{}
 	}
 
 	image, err := utils.UploadFile(w, r, "trip_image", "uploads/trip", true)
@@ -138,8 +149,8 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		t.ImageID = image[0].ID
-	} else if (f.ImageID > 0) && (len(r.Form["deleteimg"]) == 1) {
+		t.ImageID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+	} else if (f.ImageID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.ImageID,
 		}
@@ -150,7 +161,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		t.ImageID = 0
+		t.ImageID = sql.NullInt64{}
 	}
 
 	if t.ID != 0 {
@@ -216,9 +227,9 @@ func RemoveTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if t.ImageID != 0 {
+	if int(t.ImageID.Int64) != 0 {
 		image := &models.File{
-			ID: t.ImageID,
+			ID: int(t.ImageID.Int64),
 		}
 
 		err = utils.DeleteFile(image)

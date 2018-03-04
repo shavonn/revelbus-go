@@ -113,17 +113,17 @@
 
     .info {
         padding: 25px;
-    }
 
-    h3 {
-        font-family: $condensed-font;
-        @include font-rem(22);
-        font-weight: 400;
-        letter-spacing: 0;
-        line-height: 32px;
-
-        a {
-            color: #474747;
+        h3 {
+            font-family: $condensed-font;
+            @include font-rem(22);
+            font-weight: 400;
+            letter-spacing: 0;
+            line-height: 32px;
+    
+            a {
+                color: #474747;
+            }
         }
     }
 }
