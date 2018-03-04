@@ -87,7 +87,7 @@ func PostSlide(w http.ResponseWriter, r *http.Request) {
 		Title:  utils.NewNullStr(f.Title),
 		Blurb:  utils.NewNullStr(f.Blurb),
 		Style:  utils.NewNullStr(f.Style),
-		Order:  utils.NewNullInt(f.Order),
+		Order:  utils.NewNullInt(utils.ToInt(f.Order)),
 		Active: f.Active,
 	}
 

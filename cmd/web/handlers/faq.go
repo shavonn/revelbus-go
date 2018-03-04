@@ -88,7 +88,7 @@ func PostFAQ(w http.ResponseWriter, r *http.Request) {
 		Question: utils.NewNullStr(f.Question),
 		Answer:   utils.NewNullStr(f.Answer),
 		Category: utils.NewNullStr(f.Category),
-		Order:    utils.NewNullInt(f.Order),
+		Order:    utils.NewNullInt(utils.ToInt(f.Order)),
 		Active:   f.Active,
 	}
 

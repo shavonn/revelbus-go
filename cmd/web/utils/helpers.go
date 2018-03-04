@@ -36,10 +36,9 @@ func NewNullStr(s string) sql.NullString {
 	}
 }
 
-func NewNullInt(i string) sql.NullInt64 {
-	n, _ := strconv.ParseInt(i, 10, 64)
+func NewNullInt(i int) sql.NullInt64 {
 	return sql.NullInt64{
-		Int64: n,
+		Int64: int64(i),
 		Valid: true,
 	}
 }

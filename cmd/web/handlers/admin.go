@@ -85,7 +85,7 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 		ContactBlurb:      utils.NewNullStr(f.ContactBlurb),
 		AboutBlurb:        utils.NewNullStr(f.AboutBlurb),
 		AboutContent:      utils.NewNullStr(f.AboutContent),
-		HomeGalleryID:     utils.NewNullInt(strconv.Itoa(f.HomeGalleryID)),
+		HomeGalleryID:     utils.NewNullInt(f.HomeGalleryID),
 		HomeGalleryActive: f.HomeGalleryActive,
 	}
 
