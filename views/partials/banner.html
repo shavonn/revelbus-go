@@ -4,17 +4,16 @@
 <header class="banner trip" style="background-image: url('/assets/{{.Image.Name.String}}');">
     <div class="inner">
         <div class="details">
-            <h2 itemprop="name">{{.Title.String}}</h2>
+            <h2>{{.Title.String}}</h2>
             <div class="info">
-                <div class="date" itemprop="startDate" content="{{seoDate .Start}}">
+                <div class="date">
                     <div class="month">{{getShortMonth .Start .End}}</div>
                     <div class="day">{{getDateRange .Start .End}}</div>
                 </div>
-                <div class="price-ticket" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                    <meta itemprop="priceCurrency" content="USD" />
-                    <div class="price" itemprop="price">{{.Price.String}}</div>
+                <div class="price-ticket">
+                    <div class="price">{{.Price.String}}</div>
                     {{if .TicketingURL.String}}
-                        <a itemprop="url" href="{{.TicketingURL.String}}" class="btn">Buy Tickets</a>
+                        <a href="{{.TicketingURL.String}}" class="btn">Buy Tickets</a>
                     {{else}}
                         <span class="btn">Tickets Coming Soon!</span>
                     {{end}}

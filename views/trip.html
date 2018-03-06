@@ -1,11 +1,11 @@
 {{define "trip"}}
 {{template "header" .}}
-<section class="trip" itemscope itemtype="http://schema.org/Event">
+<section class="trip">
     {{template "banner" .}}
     {{with .Trip}}
     <div class="two-col inner">
         <div class="content">
-            <h3 class="blurb" itemprop="description">{{.Blurb.String}}</h3>
+            <h3 class="blurb">{{.Blurb.String}}</h3>
             {{$.Content}}
 
             {{if .Partners}}
@@ -29,7 +29,7 @@
         <aside class="sidebar">
             <div class="widget with-icon">
                 <h3 class="date-and-time">DATE AND TIME</h3>
-                <span itemprop="startDate" content="{{seoDate .Start}}">{{humanDate .Start}}</span><br />
+                {{humanDate .Start}}<br />
                 {{humanDate .End}}<br />
                <div class="cal-links">
                     <a href="/ical/{{.Slug}}.ics" class="ical">Add to Calendar</a>
@@ -46,14 +46,10 @@
                 <h3 class="with-icon locale">LOCATION</h3>
                 {{range .Venues}}
                     {{if .Primary}}
-                    <span itemprop="location" itemscope itemtype="http://schema.org/Place">
-                    <span itemprop="name">{{.Name.String}}</span><br />
-                    <span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                        <span itemprop="streetAddress">{{.Address.String}}</span><br />
-                        <span itemprop="addressLocality">{{.City.String}}</span>, <span itemprop="addressRegion">{{.State.String}}</span> <span itemprop="postalCode">{{.Zip.String}}</span><br />
-                    </span>
+                    {{.Name.String}}<br />
+                    {{.Address.String}}<br />
+                    {{.City.String}}, {{.State.String}} {{.Zip.String}}<br />
                     {{.Phone.String}}<br />
-                    </span>
                     {{end}}
                 {{end}}
             </div>

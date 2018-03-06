@@ -1,16 +1,16 @@
 {{define "trip-pod"}}
-<article class="trip-pod" itemscope itemtype="http://schema.org/Event">
-    <a itemprop="url" href="/trip/{{.Slug.String}}">
+<article class="trip-pod">
+    <a href="/trip/{{.Slug.String}}">
         <header style="background-image: url('/assets/{{.Image.Thumb.String}}')">
-            <div class="date" itemprop="startDate" content="{{seoDate .Start}}">
+            <div class="date">
                 <div class="month">{{getShortMonth .Start .End}}</div>
                 <div class="day">{{getDateRange .Start .End}}</div>
             </div>
         </header>
     </a>
     <div class="info">
-        <h3 itemprop="name"><a itemprop="url" href="/trip/{{.Slug.String}}">{{.Title.String}}</a></h3>
-        <p itemprop="description">{{blurb .Blurb.String}}...</p>
+        <h3><a href="/trip/{{.Slug.String}}">{{.Title.String}}</a></h3>
+        <p>{{blurb .Blurb.String}}...</p>
     </div>
 </article>
 {{end}}
