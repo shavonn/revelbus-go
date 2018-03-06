@@ -131,7 +131,7 @@ func ContactPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/contact", http.StatusSeeOther)
+	http.Redirect(w, r, "/contact-us", http.StatusSeeOther)
 }
 
 func Trips(w http.ResponseWriter, r *http.Request) {

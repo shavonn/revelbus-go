@@ -84,6 +84,8 @@ func parseTemplates() (*template.Template, error) {
 		"getDateRange":  getDateRange,
 		"numToMonth":    numToMonth,
 		"blurb":         blurb,
+		"seoDate":       seoDate,
+		"notTrip":       notTrip,
 	}
 	templ := template.New("").Funcs(fm)
 	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {

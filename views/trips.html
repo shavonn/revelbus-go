@@ -1,17 +1,23 @@
 {{define "trips"}}
 {{template "header" .}}
-<div class="trip-listing container">
-    {{range $month, $trips := .TripsGrouped }}
-        <h2 class="month"><span class="num">{{$month}}</span> <span class="mo">| {{numToMonth $month}}</span></h2>
-        <div class="trips">
-        {{range $trips}}
-            {{template "trip-pod" .}}
+<section class="trips">
+    {{template "banner" .}}
+    <div class="trip-listing inner">
+        {{range $month, $trips := .TripsGrouped }}
+            <h2 class="month-heading">
+                <span class="num">{{$month}}</span> 
+                <span class="mo">| {{numToMonth $month}}</span>
+            </h2>
+            <div class="trips">
+            {{range $trips}}
+                {{template "trip-pod" .}}
+            {{end}}
+            </div>
         {{end}}
-        </div>
-    {{end}}
-</div>
+    </div>
+</section>
 <div class="mailing-list">
-    <div class="container">
+    <div class="inner">
         <img src="/assets/images/chars/golf_guy.svg" class="one" />
         <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
         <div class="txt-grp">

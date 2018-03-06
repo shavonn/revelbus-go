@@ -1,32 +1,35 @@
 {{define "faq"}}
 {{template "header" .}}
-<main class="page with-sidebar container">
-    <div class="content faq">
-        {{range $cat, $questions := .FAQGrouped }}
-        <h2>{{$cat}}</h2>
-        <ul>
-            {{range $questions}}
-            <li>
-                <h3>{{.Question.String}}</h3>
-                <p>{{.Answer.String}}</p>
-            </li>
-            {{end}}
-        </ul>
-        {{end}}
-    </div>
-    <div class="sidebar">
-        <div class="trip-listing widget">
-            <h4>Upcoming Trips</h4>
-            <div class="trips">
-                {{range $.Trips}}
-                {{template "trip-pod" .}}
+<section class="faq">
+    {{template "banner" .}}
+    <div class="two-col inner">
+        <div class="content">
+            {{range $cat, $questions := .FAQGrouped }}
+            <h2>{{$cat}}</h2>
+            <ul>
+                {{range $questions}}
+                <li>
+                    <h3>{{.Question.String}}</h3>
+                    <p>{{.Answer.String}}</p>
+                </li>
                 {{end}}
-            </div>
+            </ul>
+            {{end}}
         </div>
+        <aside class="sidebar">
+            <div class="trip-listing widget">
+                <h4>Upcoming Trips</h4>
+                <div class="trips">
+                    {{range $.Trips}}
+                    {{template "trip-pod" .}}
+                    {{end}}
+                </div>
+            </div>
+        </aside>
     </div>
-</main>
+</section>
 <div class="mailing-list one">
-        <div class="container">
+        <div class="inner">
             <img src="/assets/images/chars/golf_gal.svg" class="one golf_gal" />
             <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
             <div class="txt-grp">

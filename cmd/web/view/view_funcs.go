@@ -6,6 +6,14 @@ func humanDate(t time.Time) string {
 	return t.Format("Mon, Jan 2, 2006 at 3:04 PM")
 }
 
+func seoDate(t time.Time) string {
+	return t.Format("2006-01-02")
+}
+
+func notTrip(s string) bool {
+	return (s != "trip")
+}
+
 func getShortMonth(s time.Time, e time.Time) string {
 	if s.Month() == e.Month() {
 		return s.Format("Jan")

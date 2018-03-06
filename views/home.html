@@ -1,6 +1,6 @@
 {{define "home"}}
 {{template "header" .}}
-<div class="trip-listing container">
+<div class="trip-listing inner">
         <h2>Upcoming Trips<a href="/trips" class="all-trips">All Trips</a></h2>
         <div class="trips">
             {{range .Trips}}
@@ -11,7 +11,7 @@
     <div class="owl-carousel slider">
         {{range .Slides}}
         <div class="slide {{.Style.String}}">
-            <div class="inner container">
+            <div class="inner inner">
                 <img src="/assets/images/chars/{{.Style.String}}.svg" />
                 <div class="caption">
                     <h3>{{.Title.String}}</h3>
@@ -25,7 +25,7 @@
     {{template "gallery-partial" $.Gallery}}
     {{end}}
     <div class="mailing-list duo">
-        <div class="container">
+        <div class="inner">
             <img src="/assets/images/chars/wine_gal2.svg" class="one" />
             <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
             <h3>Join the Party</h3>
