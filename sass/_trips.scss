@@ -1,4 +1,6 @@
 .trip-listing {
+    margin-bottom: 25px;
+    
     h2 {
         font-family: $condensed-font;
         @include font-rem(48);

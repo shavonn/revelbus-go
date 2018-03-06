@@ -11,6 +11,7 @@
                     <div class="day">{{getDateRange .Start .End}}</div>
                 </div>
                 <div class="price-ticket" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                    <meta itemprop="priceCurrency" content="USD" />
                     <div class="price" itemprop="price">{{.Price.String}}</div>
                     {{if .TicketingURL.String}}
                         <a itemprop="url" href="{{.TicketingURL.String}}" class="btn">Buy Tickets</a>

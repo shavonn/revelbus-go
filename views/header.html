@@ -10,18 +10,32 @@
 		<link rel="stylesheet" href="/assets/lib/owl/owl.carousel.min.css">
 		<link rel="stylesheet" href="/assets/lib/magnific/magnific-popup.css">
 		<link href="/assets/css/style.css" rel="stylesheet">
+		<!-- Google Tag Manager -->
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+			'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+			})(window,document,'script','dataLayer','GTM-T6RDL5N');</script>
+		<!-- End Google Tag Manager -->
 	</head>
 	<body class="{{.ActiveKey}}">
+		<!-- Google Tag Manager (noscript) -->
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T6RDL5N"
+			height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+		<!-- End Google Tag Manager (noscript) -->
 		<header class="main-header">
 			<nav class="main-nav inner">
-				<a href="/" class="rb_logo"><h1>Revel Bus</h1></a>
+				<a href="/" class="rb_logo" itemscope itemtype="http://schema.org/Organization">
+					<meta itemprop="name" content="Revel Bus">
+					<h1>Revel Bus</h1>
+				</a>
 				<label for="drop" class="toggle"><i class="fas fa-bars"></i></label>
 				<input type="checkbox" id="drop" />
-				<ul>
-					<li><a href="/trips">Trips</a></li>
-					<li><a href="/about-us">About</a></li>
-					<li><a href="/faq">FAQ</a></li>
-					<li><a href="/contact-us">Contact</a></li>
+				<ul itemscope itemtype="http://www.schema.org/SiteNavigationElement">
+					<li itemprop="name"><a itemprop="url" href="/trips">Trips</a></li>
+					<li itemprop="name"><a itemprop="url" href="/about-us">About</a></li>
+					<li itemprop="name"><a itemprop="url" href="/faq">FAQ</a></li>
+					<li itemprop="name"><a itemprop="url" href="/contact-us">Contact</a></li>
 					<li class="social facebook"><a href=""><i class="fab fa-facebook-f"></i></a></li>
 					<li class="social twitter"><a href=""><i class="fab fa-twitter"></i></a></li>
 					<li class="social instagram"><a href=""><i class="fab fa-instagram"></i></a></li>
