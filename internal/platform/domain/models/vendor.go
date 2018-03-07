@@ -2,9 +2,9 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/forms"
-	"revelforce/pkg/database"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/forms"
+	"revelbus/pkg/database"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -156,6 +156,7 @@ func FetchVendors(oa bool) (*Vendors, error) {
 
 	var stmt string
 
+	//only active
 	if oa {
 		stmt = `SELECT id, name, active FROM vendors WHERE active = 1 ORDER BY active DESC, name`
 	} else {

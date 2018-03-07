@@ -2,8 +2,8 @@ package utils
 
 import (
 	"net/http"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/pkg/sessions"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/pkg/sessions"
 )
 
 func IsAuthenticated(r *http.Request) (*models.User, error) {

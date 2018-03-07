@@ -1,4 +1,6 @@
 .trip-listing {
+    margin-bottom: 25px;
+    
     h2 {
         font-family: $condensed-font;
         @include font-rem(48);
@@ -9,18 +11,17 @@
         position: relative;
         margin-bottom: 30px;
 
-        &.month {
-            font-family: $primary-font;
+        &.month-heading {
             @include font-rem(24);
             line-height: 28px;
             text-transform: uppercase;
     
             .num {
-                font-family: $condensed-font;
                 font-weight: 400;
             }
     
             .mo {
+                font-family: $primary-font;
                 font-weight: 300;
             }
         }
@@ -36,6 +37,7 @@
     }
 
     a.all-trips {
+        font-family: $primary-font;
         @include font-rem(12);
         letter-spacing: 2.4px;
         line-height: 14px;
@@ -47,41 +49,41 @@
         right: 0;
     }
 
-    .trips {
-        overflow: auto;
-        position: relative;
-        margin-bottom: 20px;
-    }
-
     &.widget .trip-pod {
         width: 100%;
         margin: 0 0 20px;
     }
 
-    &.horizontal .trip-pod {
-        position: relative;
-        width: 49%;
-        height: 151px;
-        margin-bottom: 0;
-        overflow: auto;
-
-        header, .info {
+    &.horizontal {
+        .trip-pod {
+            position: relative;
+            width: 49%;
             height: 151px;
-            float: left;
-        }
+            margin-bottom: 0;
+            overflow: auto;
 
-        header {
-            width: 35%;
-            @include border-radius(5px 0 0 5px);
-        }
-    
-        .info {
-            width: 65%;
-            padding: 15px;
-            @include box-sizing();
-            @include border-radius(0 5px 5px 0);
+            header, .info {
+                height: 151px;
+                float: left;
+            }
+
+            header {
+                width: 35%;
+                @include border-radius(5px 0 0 5px);
+            }
+        
+            .info {
+                width: 65%;
+                padding: 15px;
+                @include box-sizing();
+                @include border-radius(0 5px 5px 0);
+            }
         }
     }
+}
+
+.trips {
+    overflow: auto;
 }
 
 .trip-pod {
@@ -89,6 +91,7 @@
     width: 32.31%;
     height: 364px;
     margin: 0 5px 20px;
+    overflow: hidden;
     @include  box-sizing();
     @include border-radius(5px 5px 5px 5px);
     background-color: #F7F8F9;

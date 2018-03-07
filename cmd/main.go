@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"revelforce/cmd/web"
-	"revelforce/pkg/database"
-	"revelforce/pkg/sessions"
+	"revelbus/cmd/web"
+	"revelbus/pkg/database"
+	"revelbus/pkg/sessions"
 	"syscall"
 	"time"
 

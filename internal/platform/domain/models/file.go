@@ -2,8 +2,8 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/domain"
-	"revelforce/pkg/database"
+	"revelbus/internal/platform/domain"
+	"revelbus/pkg/database"
 	"time"
 
 	"github.com/go-sql-driver/mysql"

@@ -2,12 +2,12 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/forms"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/forms"
 	"strconv"
 	"time"
 
-	"revelforce/pkg/database"
+	"revelbus/pkg/database"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -246,7 +246,6 @@ func FindUpcomingTrips(limit int) (*Trips, error) {
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return &trips, nil
 }
 
@@ -351,6 +350,7 @@ func (t *Trip) GetTripVenues() error {
 
 func (t *Trip) GetImage() error {
 	conn, _ := database.GetConnection()
+	defer conn.Close()
 
 	f := &File{}
 

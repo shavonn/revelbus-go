@@ -36,11 +36,6 @@ input[type=text], textarea {
     @include box-sizing();
 }
 
-hr {
-    margin: 35px 0;
-    border: 1px solid #efefef;
-}
-
 @import 'header';
 @import 'page';
 @import 'shared';

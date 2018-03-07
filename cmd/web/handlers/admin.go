@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"revelforce/cmd/web/utils"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/flash"
+	"revelbus/cmd/web/utils"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/flash"
 	"strconv"
 )
 
@@ -85,7 +85,7 @@ func PostSettings(w http.ResponseWriter, r *http.Request) {
 		ContactBlurb:      utils.NewNullStr(f.ContactBlurb),
 		AboutBlurb:        utils.NewNullStr(f.AboutBlurb),
 		AboutContent:      utils.NewNullStr(f.AboutContent),
-		HomeGalleryID:     utils.NewNullInt(strconv.Itoa(f.HomeGalleryID)),
+		HomeGalleryID:     utils.NewNullInt(f.HomeGalleryID),
 		HomeGalleryActive: f.HomeGalleryActive,
 	}
 

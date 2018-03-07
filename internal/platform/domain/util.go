@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"revelforce/pkg/database"
+	"revelbus/pkg/database"
 
 	"github.com/gosimple/slug"
 )

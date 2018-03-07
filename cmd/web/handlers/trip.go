@@ -3,11 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-	"revelforce/cmd/web/utils"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/flash"
+	"revelbus/cmd/web/utils"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/flash"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -131,13 +131,13 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if f.ImageID != 0 {
-		t.ImageID = utils.NewNullInt(strconv.Itoa(f.ImageID))
+		t.ImageID = utils.NewNullInt(f.ImageID)
 	} else {
 		t.ImageID = sql.NullInt64{}
 	}
 
 	if f.GalleryID != 0 {
-		t.GalleryID = utils.NewNullInt(strconv.Itoa(f.GalleryID))
+		t.GalleryID = utils.NewNullInt(f.GalleryID)
 	} else {
 		t.GalleryID = sql.NullInt64{}
 	}
@@ -149,7 +149,7 @@ func PostTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		t.ImageID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+		t.ImageID = utils.NewNullInt(image[0].ID)
 	} else if (f.ImageID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.ImageID,

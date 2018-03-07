@@ -3,7 +3,7 @@ package cal
 import (
 	"net/url"
 	"path/filepath"
-	"revelforce/internal/platform/domain/models"
+	"revelbus/internal/platform/domain/models"
 )
 
 func GetCalendarLinks(t *models.Trip) map[string]string {

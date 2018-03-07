@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"revelforce/cmd/web/utils"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
+	"revelbus/cmd/web/utils"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/flash"
+	"revelbus/internal/platform/forms"
 	"strings"
 
 	"github.com/justinas/nosurf"
@@ -84,6 +84,8 @@ func parseTemplates() (*template.Template, error) {
 		"getDateRange":  getDateRange,
 		"numToMonth":    numToMonth,
 		"blurb":         blurb,
+		"seoDate":       seoDate,
+		"notTrip":       notTrip,
 	}
 	templ := template.New("").Funcs(fm)
 	err := filepath.Walk(viper.GetString("files.tpl"), func(path string, info os.FileInfo, err error) error {

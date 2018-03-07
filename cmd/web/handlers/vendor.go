@@ -3,11 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-	"revelforce/cmd/web/utils"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/flash"
+	"revelbus/cmd/web/utils"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/flash"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -114,7 +114,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if f.BrandID != 0 {
-		v.BrandID = utils.NewNullInt(strconv.Itoa(f.BrandID))
+		v.BrandID = utils.NewNullInt(f.BrandID)
 	} else {
 		v.BrandID = sql.NullInt64{}
 	}
@@ -126,7 +126,7 @@ func PostVendor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(image) > 0 {
-		v.BrandID = utils.NewNullInt(strconv.Itoa(image[0].ID))
+		v.BrandID = utils.NewNullInt(image[0].ID)
 	} else if (f.BrandID != 0) && (len(r.Form["deleteimg"]) == 1) {
 		image := &models.File{
 			ID: f.BrandID,

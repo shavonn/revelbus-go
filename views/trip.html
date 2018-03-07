@@ -1,30 +1,32 @@
 {{define "trip"}}
 {{template "header" .}}
-{{with .Trip}}
-    <main class="page with-sidebar trip container">
+<section class="trip">
+    {{template "banner" .}}
+    {{with .Trip}}
+    <div class="two-col inner">
         <div class="content">
-                <h3 class="blurb">{{.Blurb.String}}</h3>
-                {{$.Content}}
+            <h3 class="blurb">{{.Blurb.String}}</h3>
+            {{$.Content}}
 
-                {{if .Partners}}
-                <hr />
-                <div class="partners">
-                    <h2>Partners</h2>
-                    {{range .Partners}}
-                        {{if .URL}}<a href="{{.URL}}" target="_new">{{end}}
-                            <img src="/assets/{{.Brand.Thumb.String}}" alt="{{.Name.String}}" />
-                        {{if .URL}}</a>{{end}}
-                    {{end}}
-                </div>
+            {{if .Partners}}
+            <div class="partners">
+                <h2>Partners</h2>
+                {{range .Partners}}
+                    {{if .URL}}<a href="{{.URL}}" target="_new">{{end}}
+                        <img src="/assets/{{.Brand.Thumb.String}}" alt="{{.Name.String}}" />
+                    {{if .URL}}</a>{{end}}
                 {{end}}
-                
-                {{if .GalleryID}}
-                <hr />
+            </div>
+            {{end}}
+            
+            {{if .Gallery}}
+            <div class="gallery">
                 <h2>Gallery</h2>
                 {{template "gallery-partial" .Gallery}}
-                {{end}}
+            </div>
+            {{end}}
         </div>
-        <div class="sidebar">
+        <aside class="sidebar">
             <div class="widget with-icon">
                 <h3 class="date-and-time">DATE AND TIME</h3>
                 {{humanDate .Start}}<br />
@@ -52,38 +54,39 @@
                 {{end}}
             </div>
             {{end}}
-        </div>
-    </main>
-    <div class="trip-listing horizontal container">
-        <h4>Upcoming Trips</h4>
-        <div class="trips">
-            {{range $.Trips}}
-            {{template "trip-pod" .}}
-            {{end}}
-        </div>
+        </aside>
     </div>
-    <div class="mailing-list">
-        <div class="container">
-            <img src="/assets/images/chars/golf_guy.svg" class="one" />
-            <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-            <div class="txt-grp">
-                <h3>Join the Party</h3>
-                <p>Get notified about upcoming trips in your area.</p>
-            </div>
-            <div class="field">
-                <div class="input">
-                    <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
-                    <div id="mce-responses" class="clear">
-                        <div class="response" id="mce-error-response" style="display:none"></div>
-                        <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ce6905f609353633857e2d198_9ab582054e" tabindex="-1" value=""></div>
-                    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+</section>
+<div class="trip-listing horizontal inner">
+    <h4>Upcoming Trips</h4>
+    <div class="trips">
+        {{range $.Trips}}
+        {{template "trip-pod" .}}
+        {{end}}
+    </div>
+</div>
+<div class="mailing-list">
+    <div class="inner">
+        <img src="/assets/images/chars/golf_guy.svg" class="one" />
+        <form action="https://revelbus.us9.list-manage.com/subscribe/post?u=ce6905f609353633857e2d198&amp;id=9ab582054e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="txt-grp">
+            <h3>Join the Party</h3>
+            <p>Get notified about upcoming trips in your area.</p>
+        </div>
+        <div class="field">
+            <div class="input">
+                <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+                <div id="mce-responses" class="clear">
+                    <div class="response" id="mce-error-response" style="display:none"></div>
+                    <div class="response" id="mce-success-response" style="display:none"></div>
                 </div>
+                <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ce6905f609353633857e2d198_9ab582054e" tabindex="-1" value=""></div>
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
             </div>
-            </form>
         </div>
+        </form>
     </div>
+</div>
 {{end}}
 {{template "footer" .}}
 {{end}}

@@ -1,13 +1,15 @@
-.header {
-    padding-top: 22px;
-    margin-bottom: 35px;
-
+header {
     h2 {
         @include font-rem(60);
         font-weight: 300;
         line-height: 64px;
         color: #fff;
     }
+}
+
+.main-header {
+    padding-top: 22px;
+    margin-bottom: 20px;
 }
 
 .main-nav {
@@ -40,11 +42,38 @@
 
             &.facebook {
                 margin-left: 60px;
+                background-image: url('../images/social/facebook.svg');
+
+                a {
+                    width: 10px;
+                    height: 19px;
+                }
             }
 
-            &.social a {
-                @include font-rem(18);
-                color: $turqoise;
+            &.twitter {
+                background-image: url('../images/social/twitter.svg');
+                
+                a {
+                    width: 22px;
+                    height: 17px;
+                }
+            }
+
+            &.instagram {
+                background-image: url('../images/social/instagram.svg');
+                
+                a {
+                    width: 19px;
+                    height: 19px;
+                }
+            }
+
+            &.social {
+                background-repeat: no-repeat;
+                
+                a {
+                    display: block;
+                }
             }
 
             a {
@@ -63,7 +92,7 @@
 }
 
 .home {
-    .header {
+    .main-header {
         padding-top: 25px;
         background-color: $sea-foam;
     } 
@@ -76,6 +105,22 @@
 
         .toggle, ul li a {
             color: #fff;
+        }
+
+        ul {
+            li {
+                &.facebook {
+                    background-image: url('../images/social/facebook_wht.svg');
+                }
+    
+                &.twitter {
+                    background-image: url('../images/social/twitter_wht.svg');
+                }
+    
+                &.instagram {
+                    background-image: url('../images/social/instagram_wht.svg');
+                }
+            }
         }
     }
 }
@@ -99,14 +144,14 @@
 }
 
 .banner {
-    margin-top: 20px;
+    margin: 20px 0 35px;
     padding-top: 75px;
     height: 282px;
     @include  box-sizing();
     position: relative;
     @include box-shadow(inset, 0px 4px 13px 0, 50, 50, 50, 0.2);
 
-    .container {
+    .inner {
         padding: 0;
         min-height: 100%;
     }
@@ -131,7 +176,7 @@
     &.golfers {
         background-color: #91D9F8;
 
-        .container {
+        .inner {
             position: inherit;
         }
 
@@ -165,7 +210,7 @@
         background-size: cover;
         border-top: 4px solid #44B4A8;
 
-        .container {
+        .inner {
             padding: 0;
         }
 

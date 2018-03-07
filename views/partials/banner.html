@@ -1,0 +1,34 @@
+{{define "banner"}}
+{{if eq .ActiveKey "trip"}}
+{{with .Trip}}
+<header class="banner trip" style="background-image: url('/assets/{{.Image.Name.String}}');">
+    <div class="inner">
+        <div class="details">
+            <h2>{{.Title.String}}</h2>
+            <div class="info">
+                <div class="date">
+                    <div class="month">{{getShortMonth .Start .End}}</div>
+                    <div class="day">{{getDateRange .Start .End}}</div>
+                </div>
+                <div class="price-ticket">
+                    <div class="price">{{.Price.String}}</div>
+                    {{if .TicketingURL.String}}
+                        <a href="{{.TicketingURL.String}}" class="btn">Buy Tickets</a>
+                    {{else}}
+                        <span class="btn">Tickets Coming Soon!</span>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{{end}}
+{{else if .ActiveKey}}
+<header class="banner {{.HeaderStyle}}">
+    <div class="inner">
+        <h2>{{.Title}}</h2>
+        <img src="/assets/images/headers/{{.HeaderStyle}}.svg" class="banner-character" />
+    </div>
+</header>
+{{end}}
+{{end}}

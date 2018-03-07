@@ -1,7 +1,7 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
-BINARY_NAME=revelforce
+BINARY_NAME=revelbus
 GOOS=linux
 GOARCH=amd64
     

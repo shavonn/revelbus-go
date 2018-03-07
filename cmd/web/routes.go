@@ -2,9 +2,9 @@ package web
 
 import (
 	"net/http"
-	"revelforce/cmd/web/handlers"
-	"revelforce/cmd/web/middleware"
-	"revelforce/cmd/web/view"
+	"revelbus/cmd/web/handlers"
+	"revelbus/cmd/web/middleware"
+	"revelbus/cmd/web/view"
 
 	"github.com/spf13/viper"
 
@@ -18,8 +18,8 @@ func Routes() http.Handler {
 	r.HandleFunc("/trips", handlers.Trips).Methods("GET")
 	r.HandleFunc("/trip/{slug}", handlers.Trip).Methods("GET")
 	r.HandleFunc("/faq", handlers.Faq).Methods("GET")
-	r.HandleFunc("/about", handlers.About).Methods("GET")
-	r.HandleFunc("/contact", handlers.Contact).Methods("GET")
+	r.HandleFunc("/about-us", handlers.About).Methods("GET")
+	r.HandleFunc("/contact-us", handlers.Contact).Methods("GET")
 	r.HandleFunc("/contact", handlers.ContactPost).Methods("POST")
 
 	r.HandleFunc("/ical/{slug}.ics", handlers.Ical).Methods("GET")
