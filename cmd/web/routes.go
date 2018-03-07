@@ -2,9 +2,9 @@ package web
 
 import (
 	"net/http"
-	"revelforce/cmd/web/handlers"
-	"revelforce/cmd/web/middleware"
-	"revelforce/cmd/web/view"
+	"revelbus/cmd/web/handlers"
+	"revelbus/cmd/web/middleware"
+	"revelbus/cmd/web/view"
 
 	"github.com/spf13/viper"
 

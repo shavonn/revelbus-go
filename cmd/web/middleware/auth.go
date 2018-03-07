@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"net/http"
-	"revelforce/cmd/web/utils"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/flash"
+	"revelbus/cmd/web/utils"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/flash"
 )
 
 func RequireLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

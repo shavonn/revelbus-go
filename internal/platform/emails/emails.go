@@ -1,8 +1,8 @@
 package emails
 
 import (
-	"revelforce/internal/platform/forms"
-	"revelforce/pkg/email"
+	"revelbus/internal/platform/forms"
+	"revelbus/pkg/email"
 )
 
 func NewPassword(e string, pw string) error {

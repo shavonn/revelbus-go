@@ -1,8 +1,8 @@
 {{define "gallery-partial"}}
-    <div class="gallery">
-        {{range .Images}}
-        <a href="/assets/{{.Name.String}}"><img src="/assets/{{.Thumb.String}}" alt="" title="" /></a>
-        {{end}}
-        <div class="clear"></div>
-    </div>
+    {{if .Images}}
+    {{range .Images}}
+    <a href="/assets/{{.Name.String}}"><img src="/assets/{{.Thumb.String}}" alt="" title="" /></a>
+    {{end}}
+    {{end}}
+    <div class="clear"></div>
 {{end}}

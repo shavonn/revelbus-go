@@ -2,7 +2,7 @@ package cal
 
 import (
 	"io"
-	"revelforce/internal/platform/domain/models"
+	"revelbus/internal/platform/domain/models"
 	"strconv"
 	"strings"
 	"time"

@@ -9,7 +9,6 @@
             {{$.Content}}
 
             {{if .Partners}}
-            <hr />
             <div class="partners">
                 <h2>Partners</h2>
                 {{range .Partners}}
@@ -20,10 +19,11 @@
             </div>
             {{end}}
             
-            {{if .GalleryID}}
-            <hr />
-            <h2>Gallery</h2>
-            {{template "gallery-partial" .Gallery}}
+            {{if .Gallery}}
+            <div class="gallery">
+                <h2>Gallery</h2>
+                {{template "gallery-partial" .Gallery}}
+            </div>
             {{end}}
         </div>
         <aside class="sidebar">

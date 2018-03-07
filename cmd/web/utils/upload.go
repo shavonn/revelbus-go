@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/nfnt/resize"

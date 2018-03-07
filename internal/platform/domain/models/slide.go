@@ -2,10 +2,10 @@ package models
 
 import (
 	"database/sql"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/forms"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/forms"
 
-	"revelforce/pkg/database"
+	"revelbus/pkg/database"
 )
 
 type Slide struct {

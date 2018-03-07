@@ -1,6 +1,6 @@
 {{define "trips"}}
 {{template "header" .}}
-<section class="trips">
+<section class="trips-all">
     {{template "banner" .}}
     <div class="trip-listing inner">
         {{range $month, $trips := .TripsGrouped }}

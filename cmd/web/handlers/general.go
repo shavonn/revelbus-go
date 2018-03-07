@@ -3,13 +3,13 @@ package handlers
 import (
 	"html/template"
 	"net/http"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/cal"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/emails"
-	"revelforce/internal/platform/flash"
-	"revelforce/internal/platform/forms"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/cal"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/emails"
+	"revelbus/internal/platform/flash"
+	"revelbus/internal/platform/forms"
 
 	"github.com/gorilla/mux"
 )

@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"revelforce/cmd/web/utils"
-	"revelforce/cmd/web/view"
-	"revelforce/internal/platform/domain"
-	"revelforce/internal/platform/domain/models"
-	"revelforce/internal/platform/flash"
+	"revelbus/cmd/web/utils"
+	"revelbus/cmd/web/view"
+	"revelbus/internal/platform/domain"
+	"revelbus/internal/platform/domain/models"
+	"revelbus/internal/platform/flash"
 	"strconv"
 
 	"github.com/gorilla/mux"

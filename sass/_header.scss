@@ -42,11 +42,38 @@ header {
 
             &.facebook {
                 margin-left: 60px;
+                background-image: url('../images/social/facebook.svg');
+
+                a {
+                    width: 10px;
+                    height: 19px;
+                }
             }
 
-            &.social a {
-                @include font-rem(18);
-                color: $turqoise;
+            &.twitter {
+                background-image: url('../images/social/twitter.svg');
+                
+                a {
+                    width: 22px;
+                    height: 17px;
+                }
+            }
+
+            &.instagram {
+                background-image: url('../images/social/instagram.svg');
+                
+                a {
+                    width: 19px;
+                    height: 19px;
+                }
+            }
+
+            &.social {
+                background-repeat: no-repeat;
+                
+                a {
+                    display: block;
+                }
             }
 
             a {
@@ -78,6 +105,22 @@ header {
 
         .toggle, ul li a {
             color: #fff;
+        }
+
+        ul {
+            li {
+                &.facebook {
+                    background-image: url('../images/social/facebook_wht.svg');
+                }
+    
+                &.twitter {
+                    background-image: url('../images/social/twitter_wht.svg');
+                }
+    
+                &.instagram {
+                    background-image: url('../images/social/instagram_wht.svg');
+                }
+            }
         }
     }
 }

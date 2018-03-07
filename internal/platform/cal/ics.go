@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 	"net/http"
-	"revelforce/internal/platform/domain/models"
+	"revelbus/internal/platform/domain/models"
 )
 
 func GenerateICS(w http.ResponseWriter, t *models.Trip) error {
